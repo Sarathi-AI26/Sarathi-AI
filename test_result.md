@@ -120,15 +120,21 @@ backend:
 frontend:
   - task: "Landing page and assessment funnel UI"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/app/page.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Built SARATHI landing page plus responsive multi-step assessment form with progress bar and React Hook Form validation."
+      - working: false
+        agent: "user"
+        comment: "User reported a blocking runtime error on /assessment: TypeError: __webpack_require__.n is not a function, pointing to components/assessment-flow.jsx while starting the mock assessment."
+      - working: true
+        agent: "main"
+        comment: "Fixed the client boundary issue by adding 'use client' to /app/components/sarathi-logo.jsx, which had been imported into client components like assessment-flow. Verified /assessment loads successfully afterward."
   - task: "Checkout and result dashboard UI"
     implemented: true
     working: "NA"

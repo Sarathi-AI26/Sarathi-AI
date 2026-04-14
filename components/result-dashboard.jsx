@@ -9,6 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { toast } from 'sonner'
 
+import SarathiLogo from '@/components/sarathi-logo'
+
 const ResultDashboard = ({ assessmentId }) => {
   const [loading, setLoading] = useState(true)
   const [locked, setLocked] = useState(false)
@@ -116,13 +118,14 @@ const ResultDashboard = ({ assessmentId }) => {
   return (
     <main className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
       <div className="container mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
-        <div className="print:hidden">
+        <div className="flex items-center justify-between gap-4 print:hidden">
           <Button asChild variant="ghost" className="mb-4 px-0 text-slate-500 hover:bg-transparent hover:text-[#0A2351]">
             <Link href="/checkout">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to checkout
             </Link>
           </Button>
+          <SarathiLogo href="/" imageClassName="h-16 w-auto sm:h-20" />
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_0.38fr]">

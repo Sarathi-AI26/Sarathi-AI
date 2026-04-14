@@ -25,6 +25,8 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { assessmentQuestions } from '@/lib/sarathi-data'
 import { toast } from 'sonner'
 
+import SarathiLogo from '@/components/sarathi-logo'
+
 const formSchema = z.object({
   name: z.string().min(2, 'Please enter your full name'),
   email: z.string().email('Please enter a valid email'),
@@ -146,13 +148,8 @@ const AssessmentFlow = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <Button asChild variant="ghost" className="mb-3 px-0 text-slate-500 hover:bg-transparent hover:text-[#0A2351]">
-              <Link href="/">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to home
-              </Link>
-            </Button>
-            <div className="inline-flex items-center rounded-full border border-[#0A2351]/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0A2351] shadow-sm">
+            <SarathiLogo href="/" imageClassName="h-20 w-auto" />
+            <div className="mt-4 inline-flex items-center rounded-full border border-[#0A2351]/10 bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0A2351] shadow-sm">
               SARATHI Assessment Flow
             </div>
             <h1 className="mt-4 text-3xl font-bold text-[#0A2351] sm:text-4xl">Discover your strongest career direction</h1>

@@ -9,6 +9,8 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { toast } from 'sonner'
 
+import SarathiLogo from '@/components/sarathi-logo'
+
 const includedItems = [
   'Top career recommendations with fit scores',
   'Strength summary and personalized insight',
@@ -85,12 +87,15 @@ const CheckoutClient = ({ assessmentId }) => {
   return (
     <main className="min-h-screen bg-slate-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <Button asChild variant="ghost" className="mb-4 px-0 text-slate-500 hover:bg-transparent hover:text-[#0A2351]">
-          <Link href="/assessment">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to assessment
-          </Link>
-        </Button>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <Button asChild variant="ghost" className="px-0 text-slate-500 hover:bg-transparent hover:text-[#0A2351]">
+            <Link href="/assessment">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to assessment
+            </Link>
+          </Button>
+          <SarathiLogo href="/" imageClassName="h-16 w-auto sm:h-20" />
+        </div>
 
         <div className="grid gap-6 xl:grid-cols-[1fr_0.55fr]">
           <Card className="border-slate-200 bg-white shadow-sm">
