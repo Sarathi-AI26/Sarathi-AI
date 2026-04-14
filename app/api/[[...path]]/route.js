@@ -66,21 +66,18 @@ const validateAnswers = (answers) => {
   })
 }
 
-const createAssessmentRecord = async (supabase, userId, answers, aiAnalysis) => {
+const createAssessmentRecord = async (supabase, userId, answers) => {
   let result = await supabase
     .from('assessments')
     .insert({
       user_id: userId,
       raw_answers: answers,
       payment_status: false,
-      ai_analysis_result: aiAnalysis,
     })
     .select('*')
     .single()
 
-  const fallbackNeeded =
-    result?.error?.message?.includes('raw_answers') ||
-    result?.error?.message?.includes('ai_analysis_result')
+  const fallbackNeeded = result?.error?.message?.includes('raw_answers')
 
   if (fallbackNeeded) {
     result = await supabase
@@ -89,7 +86,6 @@ const createAssessmentRecord = async (supabase, userId, answers, aiAnalysis) => 
         user_id: userId,
         answers_json: answers,
         payment_status: false,
-        ai_analysis: aiAnalysis,
       })
       .select('*')
       .single()
@@ -155,13 +151,10 @@ const handleRoute = async (request, { params }) => {
         return jsonResponse(withSchemaHint(userError, 'Unable to save student profile'), 500)
       }
 
-      const aiAnalysis = buildCareerAnalysis(answers, name)
-
       const { data: assessment, error: assessmentError } = await createAssessmentRecord(
         supabase,
         user.id,
-        answers,
-        aiAnalysis
+        answers
       )
 
       if (assessmentError) {

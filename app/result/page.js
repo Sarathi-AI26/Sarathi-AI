@@ -1,9 +1,9 @@
-import ResultDashboard from '@/components/result-dashboard'
+import ResultDashboardReal from '@/components/result-dashboard-real'
 
 const App = ({ searchParams }) => {
   const assessmentId = Array.isArray(searchParams?.id) ? searchParams?.id?.[0] : searchParams?.id || ''
 
-  return <ResultDashboard assessmentId={assessmentId} />
+  return <ResultDashboardReal assessmentId={assessmentId} />
 }
 
 export default App

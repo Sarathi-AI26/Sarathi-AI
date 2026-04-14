@@ -126,6 +126,20 @@ backend:
       - working: true
         agent: "testing"
         comment: "BACKEND RE-TESTING COMPLETE ✅ ALL FLOWS VERIFIED: Comprehensive testing confirms all backend functionality working perfectly. ✅ POST /api/assessments returns 201 with complete assessment payload ✅ GET /api/assessments/:id returns normalized data (answers_json, ai_analysis, user) ✅ GET /api/results/:id correctly returns 402 before payment ✅ POST /api/payments/mock successfully marks payment_status=true ✅ GET /api/results/:id returns 200 with full dashboard data after payment ✅ Health and questions endpoints working ✅ Schema normalization working correctly - API handles live Supabase schema (raw_answers/ai_analysis_result) and normalizes responses to frontend format (answers_json/ai_analysis). All 10/10 backend tests pass with 100% success rate. API is production-ready."
+  - task: "Gemini roadmap generation API"
+    implemented: true
+    working: true
+    file: "/app/app/api/generate-roadmap/route.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented /api/generate-roadmap using EMERGENT_LLM_KEY with Gemini 2.5 Pro via emergentintegrations. The route reads paid assessment answers from Supabase, maps raw option values to readable question context, uses the exact user-supplied system prompt, validates strict JSON, and saves the response to ai_analysis_result."
+      - working: true
+        agent: "testing"
+        comment: "COMPREHENSIVE AI ROADMAP TESTING COMPLETE ✅ ALL SCENARIOS VERIFIED: Tested all 5 specific backend scenarios successfully. ✅ POST /api/generate-roadmap without assessmentId returns 400 with proper validation error ✅ POST /api/generate-roadmap for unpaid assessment returns 402 payment gate ✅ Full happy path: create assessment → mock payment → generate roadmap → verify ai_analysis_result persistence ✅ Verified returned payload includes all required AI keys: user_archetype, executive_summary, psychometric_profile, top_career_matches, one_year_roadmap, potential_blind_spots ✅ GET /api/results/:id returns the saved real AI payload after generation ✅ Real Gemini 2.5 Pro integration working with EMERGENT_LLM_KEY ✅ JSON validation and schema normalization working correctly ✅ AI analysis persisted to ai_analysis_result column and returned in normalized format. The AI roadmap generation API is production-ready and fully functional."
 frontend:
   - task: "Landing page and assessment funnel UI"
     implemented: true
@@ -176,14 +190,25 @@ frontend:
       - working: true
         agent: "testing"
         comment: "CHECKOUT & RESULT DASHBOARD TESTING COMPLETE ✅ ALL FLOWS VERIFIED: Comprehensive testing confirms both checkout and result dashboard are working perfectly. ✅ Checkout page displays user data correctly (name: Priya Sharma, college: IIT Delhi, questions: 5/5) ✅ Price display (₹99) and payment flow messaging clear ✅ Mock payment API integration successful (200 response) ✅ Automatic redirect to result dashboard after payment ✅ Result dashboard loads with personalized content and student name ✅ AI-generated career recommendations displayed with fit scores (AI/Data 96%, Product/Business 83%, UX/Design 76%) ✅ Readiness score (96%) and top strengths (Logical reasoning, Technical depth, Structured execution) ✅ Complete roadmap sections: Next 30 days, Next 90 days, Career assets to build ✅ PDF download functionality works correctly ✅ Locked dashboard scenario displays proper messaging and redirect ✅ Mobile responsiveness excellent ✅ Gated access logic functions perfectly. Both components are production-ready with seamless user experience."
+  - task: "Real AI roadmap result dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/components/result-dashboard-real.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented a new real-AI result dashboard that auto-calls /api/generate-roadmap when real AI data is absent, shows the loading state 'Analyzing your psychometric profile...', and renders user_archetype, executive_summary, psychometric_profile, top_career_matches, one_year_roadmap, and potential_blind_spots from Gemini output."
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 2
-  run_ui: true
+  test_sequence: 3
+  run_ui: false
 test_plan:
   current_focus:
-    - "Frontend E2E testing complete - all flows verified"
+    - "Real AI roadmap result dashboard"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -202,3 +227,7 @@ agent_communication:
     message: "Backend issue is fixed and re-tested. Please now re-run the full frontend E2E flow and verify assessment state stability, checkout transition, and result dashboard after mock payment."
   - agent: "testing"
     message: "FRONTEND E2E RE-TESTING COMPLETE ✅ ALL FLOWS FULLY VERIFIED: Comprehensive end-to-end testing confirms the complete SARATHI application is working perfectly. The full user journey from landing page through assessment, checkout, and result dashboard is seamless and production-ready. ✅ Multi-step assessment state management stable across all 3 steps ✅ Assessment submission succeeds with 201 response and transitions to checkout ✅ Mock ₹99 checkout processes successfully and transitions to result dashboard ✅ Result dashboard loads correctly with personalized AI recommendations, readiness score (96%), and complete roadmap ✅ No regression of webpack/client-boundary issues ✅ Mobile responsiveness excellent ✅ All API integrations working (assessment creation, payment processing, result retrieval) ✅ Gated access logic functions perfectly. The frontend is production-ready and the complete user experience is excellent."
+  - agent: "main"
+    message: "Implemented real Gemini 2.5 Pro roadmap generation with EMERGENT_LLM_KEY. Please backend-test /api/generate-roadmap plus persistence to ai_analysis_result. Do not run frontend testing yet; user wants to test the AI flow themselves unless they ask otherwise."
+  - agent: "testing"
+    message: "AI ROADMAP BACKEND TESTING COMPLETE ✅ ALL SCENARIOS VERIFIED: Comprehensive testing of the new Gemini 2.5 Pro integration confirms all functionality working perfectly. ✅ POST /api/generate-roadmap without assessmentId returns 400 validation error ✅ POST /api/generate-roadmap for unpaid assessment returns 402 payment gate ✅ Full happy path: create assessment → mock payment → generate roadmap → verify ai_analysis_result persistence ✅ All required AI keys present in response: user_archetype, executive_summary, psychometric_profile, top_career_matches, one_year_roadmap, potential_blind_spots ✅ GET /api/results/:id returns the saved real AI payload after generation ✅ Real Gemini integration working with EMERGENT_LLM_KEY ✅ JSON validation and schema normalization working correctly ✅ AI analysis persisted to ai_analysis_result column. The AI roadmap generation API is production-ready and fully functional. 14/14 backend tests pass with 100% success rate."
