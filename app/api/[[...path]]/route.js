@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
 
 import { getSupabaseAdmin } from '../../../lib/supabase'
-import { assessmentQuestions, buildCareerAnalysis } from '../../../lib/sarathi-data'
+import { assessmentQuestions } from '../../../lib/psychometric-assessment'
+import { buildCareerAnalysis } from '../../../lib/sarathi-data'
 
 const jsonResponse = (payload, status = 200) => {
   const response = NextResponse.json(payload, { status })
@@ -53,16 +54,18 @@ const getRoute = (params) => {
 }
 
 const validateAnswers = (answers) => {
-  const validIds = new Set(assessmentQuestions.map((question) => question.id))
-  const validOptions = new Set(['a', 'b', 'c', 'd'])
-
   if (!answers || typeof answers !== 'object') {
     return false
   }
 
   return assessmentQuestions.every((question) => {
     const value = answers[question.id]
-    return validIds.has(question.id) && validOptions.has(value)
+
+    if (question.input_type === 'text') {
+      return typeof value === 'string' && value.trim().length >= 10
+    }
+
+    return question.options?.some((option) => option.value === value)
   })
 }
 
@@ -138,7 +141,7 @@ const handleRoute = async (request, { params }) => {
       }
 
       if (!validateAnswers(answers)) {
-        return jsonResponse({ error: 'All 5 assessment questions must be answered' }, 400)
+        return jsonResponse({ error: 'Please complete all assessment questions before submitting' }, 400)
       }
 
       const { data: user, error: userError } = await supabase

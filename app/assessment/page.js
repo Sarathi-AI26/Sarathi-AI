@@ -1,7 +1,7 @@
-import AssessmentFlow from '@/components/assessment-flow'
+import AssessmentFlowPsychometric from '@/components/assessment-flow-psychometric'
 
 const App = () => {
-  return <AssessmentFlow />
+  return <AssessmentFlowPsychometric />
 }
 
 export default App

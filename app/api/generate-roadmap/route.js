@@ -3,7 +3,7 @@ import { spawn } from 'child_process'
 import { NextResponse } from 'next/server'
 
 import { getSupabaseAdmin } from '../../../lib/supabase'
-import { assessmentQuestions } from '../../../lib/sarathi-data'
+import { assessmentQuestions } from '../../../lib/psychometric-assessment'
 
 const assessmentSelect = '*, users(id, email, name, college, created_at)'
 
@@ -44,15 +44,19 @@ const buildAssessmentContext = (row) => {
 
   return assessmentQuestions.map((question) => {
     const selectedValue = answers?.[question.id] || null
-    const selectedOption = question.options.find((option) => option.value === selectedValue)
+    const selectedOption = question.options?.find((option) => option.value === selectedValue)
 
     return {
       question_id: question.id,
+      question_number: question.question_number,
+      section: question.section_title,
       question: question.question,
-      question_description: question.description,
-      selected_option_value: selectedValue,
-      selected_option_label: selectedOption?.label || null,
-      all_options: question.options.map((option) => ({
+      question_description: question.section_description,
+      response_type: question.input_type,
+      selected_option_value: question.input_type === 'choice' ? selectedValue : null,
+      selected_option_label: question.input_type === 'choice' ? selectedOption?.label || null : null,
+      response_text: question.input_type === 'text' ? selectedValue : null,
+      all_options: (question.options || []).map((option) => ({
         value: option.value,
         label: option.label,
       })),
