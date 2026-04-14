@@ -117,12 +117,15 @@ backend:
       - working: true
         agent: "testing"
         comment: "COMPREHENSIVE BACKEND TESTING COMPLETED: All core API functionality working correctly. Schema-independent endpoints (health, questions, validation, routing) all pass. Schema-dependent endpoints (assessments, payments, results) correctly detect missing Supabase schema and provide appropriate error responses. API is production-ready - only needs /app/supabase_schema.sql to be run in Supabase SQL Editor for full database functionality. Minor: withSchemaHint function could be enhanced to catch more schema error patterns like 'column does not exist'."
+      - working: true
+        agent: "user"
+        comment: "User confirmed /app/supabase_schema.sql has already been run in Supabase SQL Editor, so database tables and RLS policies are active and ready for persistence testing."
 frontend:
   - task: "Landing page and assessment funnel UI"
     implemented: true
-    working: true
+    working: false
     file: "/app/app/page.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
@@ -135,9 +138,15 @@ frontend:
       - working: true
         agent: "main"
         comment: "Fixed the client boundary issue by adding 'use client' to /app/components/sarathi-logo.jsx, which had been imported into client components like assessment-flow. Verified /assessment loads successfully afterward."
+      - working: true
+        agent: "user"
+        comment: "User confirmed the assessment flow is loading perfectly after the client-boundary fix."
+      - working: false
+        agent: "testing"
+        comment: "CRITICAL ISSUE: Assessment submission fails with 500 error from /api/assessments endpoint. Frontend UI works perfectly - multi-step form, state management, validation, and navigation all function correctly. The webpack regression is fixed. However, the core assessment flow is blocked by backend API failure preventing checkout redirect. All UI components, mobile responsiveness, and form interactions work flawlessly."
   - task: "Checkout and result dashboard UI"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/components/result-dashboard.jsx"
     stuck_count: 0
     priority: "high"
@@ -146,15 +155,20 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Built MOCKED checkout experience and DUMMY AI result dashboard with gated access, readiness score, recommendations, and print-to-PDF action."
+      - working: true
+        agent: "testing"
+        comment: "UI components work perfectly. Gated access logic functions correctly - locked dashboard displays proper messaging and lock icon. Checkout page handles missing assessment ID gracefully. Mobile responsiveness excellent. Preview Dashboard UX link works. All UI elements render correctly, but full flow testing blocked by assessment API failure."
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 1
-  run_ui: false
+  test_sequence: 2
+  run_ui: true
 test_plan:
   current_focus:
-    - "Frontend testing (if needed)"
-  stuck_tasks: []
+    - "Assessment API 500 error fix"
+    - "Backend assessment submission endpoint"
+  stuck_tasks:
+    - "Assessment submission API failure"
   test_all: false
   test_priority: "high_first"
 agent_communication:
@@ -162,3 +176,7 @@ agent_communication:
     message: "Implemented SARATHI MVP. User did not provide DB password, so manual schema SQL was added at /app/supabase_schema.sql. Please backend-test API behavior with this constraint in mind and verify health/schema-hint behavior."
   - agent: "testing"
     message: "BACKEND TESTING COMPLETE ✅ All API endpoints working correctly. Core functionality (health, questions, validation, routing) fully operational. Schema-dependent endpoints properly handle missing database schema with appropriate error responses. API is production-ready and only needs Supabase schema application for full database features. Minor enhancement opportunity: improve withSchemaHint function to catch more schema error patterns."
+  - agent: "main"
+    message: "User has now confirmed the Supabase schema is applied and has explicitly requested frontend testing. Please test the full UI flow end-to-end: multi-step assessment state handling, mock ₹99 checkout, and gated result dashboard after payment."
+  - agent: "testing"
+    message: "FRONTEND TESTING COMPLETE ⚠️ CRITICAL ISSUE FOUND: Assessment submission fails with 500 error from /api/assessments endpoint, blocking the core user flow. However, ALL UI components work perfectly: ✅ Landing page loads correctly ✅ Assessment multi-step form with excellent state management ✅ Mobile responsiveness ✅ Gated access logic ✅ Checkout and result dashboard UI components ✅ No webpack regression errors. The frontend is production-ready but blocked by backend API failure."
