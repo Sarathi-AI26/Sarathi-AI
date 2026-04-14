@@ -60,24 +60,102 @@ const buildAssessmentContext = (row) => {
   })
 }
 
+const toStringValue = (value, fallback = '') => {
+  if (typeof value === 'string') {
+    return value.trim() || fallback
+  }
+
+  if (value === null || value === undefined) {
+    return fallback
+  }
+
+  return String(value)
+}
+
+const toStringArray = (value) => {
+  if (Array.isArray(value)) {
+    return value.map((item) => toStringValue(item)).filter(Boolean)
+  }
+
+  const singleValue = toStringValue(value)
+  return singleValue ? [singleValue] : []
+}
+
+const normalizeAiPayload = (analysis) => {
+  if (!analysis || typeof analysis !== 'object') {
+    return null
+  }
+
+  const profile = analysis?.psychometric_profile || {}
+  const roadmap = analysis?.one_year_roadmap || analysis?.roadmap || {}
+  const rawCareerMatches = Array.isArray(analysis?.top_career_matches)
+    ? analysis.top_career_matches
+    : analysis?.top_career_matches
+      ? [analysis.top_career_matches]
+      : []
+
+  const normalizedCareerMatches = rawCareerMatches
+    .map((item) => ({
+      career_title: toStringValue(item?.career_title || item?.title),
+      why_it_fits: toStringValue(item?.why_it_fits || item?.why),
+      starting_salary_inr: toStringValue(item?.starting_salary_inr || item?.salary_range),
+      growth_potential: toStringValue(item?.growth_potential),
+    }))
+    .filter((item) => item.career_title && item.why_it_fits)
+
+  const normalized = {
+    user_archetype: toStringValue(analysis?.user_archetype),
+    executive_summary: toStringValue(analysis?.executive_summary || analysis?.summary),
+    psychometric_profile: {
+      dominant_personality_traits: toStringArray(profile?.dominant_personality_traits),
+      core_motivators: toStringArray(profile?.core_motivators),
+      learning_style: toStringValue(profile?.learning_style),
+    },
+    top_career_matches: normalizedCareerMatches,
+    one_year_roadmap: {
+      q1_focus: toStringValue(roadmap?.q1_focus || roadmap?.q1),
+      q2_focus: toStringValue(roadmap?.q2_focus || roadmap?.q2),
+      q3_focus: toStringValue(roadmap?.q3_focus || roadmap?.q3),
+      q4_focus: toStringValue(roadmap?.q4_focus || roadmap?.q4),
+    },
+    potential_blind_spots: toStringArray(analysis?.potential_blind_spots),
+  }
+
+  return normalized
+}
+
 const validateAiPayload = (analysis) => {
   if (!analysis || typeof analysis !== 'object') {
     return false
   }
 
-  return (
-    typeof analysis.user_archetype === 'string' &&
-    typeof analysis.executive_summary === 'string' &&
-    typeof analysis.psychometric_profile?.learning_style === 'string' &&
-    Array.isArray(analysis.psychometric_profile?.dominant_personality_traits) &&
-    Array.isArray(analysis.psychometric_profile?.core_motivators) &&
-    Array.isArray(analysis.top_career_matches) &&
-    typeof analysis.one_year_roadmap?.q1_focus === 'string' &&
-    typeof analysis.one_year_roadmap?.q2_focus === 'string' &&
-    typeof analysis.one_year_roadmap?.q3_focus === 'string' &&
-    typeof analysis.one_year_roadmap?.q4_focus === 'string' &&
-    Array.isArray(analysis.potential_blind_spots)
+  return Boolean(
+    analysis.user_archetype &&
+      analysis.executive_summary &&
+      analysis.psychometric_profile?.learning_style &&
+      analysis.top_career_matches?.length &&
+      analysis.one_year_roadmap?.q1_focus &&
+      analysis.one_year_roadmap?.q2_focus &&
+      analysis.one_year_roadmap?.q3_focus &&
+      analysis.one_year_roadmap?.q4_focus &&
+      analysis.potential_blind_spots?.length
   )
+}
+
+const generateValidatedRoadmap = async (payload) => {
+  let lastResponse = null
+
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const rawResponse = await runGeneratorScript(payload)
+    const normalizedResponse = normalizeAiPayload(rawResponse)
+    lastResponse = normalizedResponse || rawResponse
+
+    if (validateAiPayload(normalizedResponse)) {
+      return normalizedResponse
+    }
+  }
+
+  throw new Error(`AI returned an unexpected JSON structure: ${JSON.stringify(lastResponse)}`)
 }
 
 const runGeneratorScript = (payload) => {
@@ -194,7 +272,7 @@ export async function POST(request) {
       return jsonResponse({ error: 'No assessment answers found for this record' }, 400)
     }
 
-    const aiAnalysis = await runGeneratorScript({
+    const aiAnalysis = await generateValidatedRoadmap({
       session_id: `sarathi-roadmap-${assessment.id}`,
       assessment_id: assessment.id,
       student_profile: {
@@ -204,10 +282,6 @@ export async function POST(request) {
       },
       assessment_context: buildAssessmentContext(assessment),
     })
-
-    if (!validateAiPayload(aiAnalysis)) {
-      return jsonResponse({ error: 'AI returned an unexpected JSON structure', details: aiAnalysis }, 502)
-    }
 
     const { data: updatedAssessment, error: updateError } = await updateAnalysisRecord(
       supabase,
