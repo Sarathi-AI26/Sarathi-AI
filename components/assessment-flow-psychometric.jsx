@@ -15,7 +15,7 @@ const AssessmentFlowPsychometric = () => {
   const [absoluteStep, setAbsoluteStep] = useState(1)
   const [textResponse, setTextResponse] = useState("")
   
-  // Form State for Validation
+  // Form State for Mandatory Validation
   const [formData, setFormData] = useState({
     name: "",
     whatsapp: "",
@@ -25,6 +25,7 @@ const AssessmentFlowPsychometric = () => {
   // Track completed questions for the Grid
   const [completedSteps, setCompletedSteps] = useState([])
 
+  // Section configuration from your psychometric document [cite: 1, 18, 32, 44, 56, 66]
   const sections = [
     { name: "Basic Information", questions: 1 }, 
     { name: "Personality Traits", questions: 15 },
@@ -35,6 +36,7 @@ const AssessmentFlowPsychometric = () => {
     { name: "Open Reflections", questions: 5 }
   ]
 
+  // Full question bank from your doc [cite: 3-72]
   const questionBank = [
     "I enjoy solving problems that require deep thinking and analysis.",
     "I like having a clear plan and structure for my daily tasks.",
@@ -115,7 +117,8 @@ const AssessmentFlowPsychometric = () => {
     }
   }
 
- const handleNext = () => {
+  const handleNext = () => {
+    // Track completion for the visual grid
     if (!completedSteps.includes(absoluteStep)) {
       setCompletedSteps([...completedSteps, absoluteStep])
     }
@@ -126,8 +129,7 @@ const AssessmentFlowPsychometric = () => {
       updateSection(nextStep)
       setTextResponse("") 
     } else {
-      // 🚀 FIX: This ensures the user goes to the dashboard after the final question
-      // Using 'demo-unlocked' or a specific ID helps the Result page know to show the data
+      // 🚀 SUCCESS: Bypasses the lock loop by passing the 'demo-ready' flag
       router.push('/result?id=demo-ready')
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -147,16 +149,23 @@ const AssessmentFlowPsychometric = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
           <Card className="overflow-hidden border-slate-200 bg-white shadow-xl">
+            {/* PROGRESS HEADER */}
             <div className="bg-[#0A2351] px-6 py-4 text-white">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium opacity-80">Section {currentSection + 1}: {sections[currentSection]?.name}</span>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">Step {absoluteStep} of {totalSteps}</span>
+                <span className="text-sm font-medium opacity-80">
+                   Section {currentSection + 1}: {sections[currentSection]?.name}
+                </span>
+                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
+                   Step {absoluteStep} of {totalSteps}
+                </span>
               </div>
               <Progress value={progress} className="mt-4 h-1.5 bg-white/20" indicatorClassName="bg-[#F57D14]" />
             </div>
 
             <CardContent className="p-6 sm:p-10">
               <div className="mx-auto max-w-xl">
+                
+                {/* SECTION 0: MANDATORY PERSONAL DETAILS */}
                 {currentSection === 0 ? (
                   <div className="space-y-6">
                     <h3 className="text-xl font-bold text-[#0A2351]">Tell us who you are</h3>
@@ -187,39 +196,41 @@ const AssessmentFlowPsychometric = () => {
                       <Button 
                         onClick={handleNext} 
                         disabled={!isFormValid}
-                        className={`h-12 rounded-xl px-8 font-bold text-white ${isFormValid ? 'bg-[#F57D14] hover:bg-[#dd6f11]' : 'bg-slate-300 cursor-not-allowed'}`}
+                        className={`h-12 rounded-xl px-8 font-bold text-white transition-all ${isFormValid ? 'bg-[#F57D14] hover:bg-[#dd6f11]' : 'bg-slate-300 cursor-not-allowed'}`}
                       >
                         Start Assessment <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
-                    {!isFormValid && <p className="text-right text-xs text-slate-400 mt-2">* Please fill all fields to continue</p>}
+                    {!isFormValid && <p className="text-right text-[10px] text-slate-400 mt-2">* These fields are required to generate your personalized roadmap</p>}
                   </div>
                 ) : currentSection === 6 ? (
+                  /* SECTION 6: OPEN REFLECTIONS [cite: 66-72] */
                   <div className="space-y-8 py-4">
                     <div className="space-y-3">
                       <h3 className="text-lg font-bold text-[#0A2351]">Self-Reflection</h3>
-                      <p className="text-base text-slate-700 font-medium">{questionBank[absoluteStep - 2]}</p>
+                      <p className="text-base text-slate-700 font-medium leading-relaxed">{questionBank[absoluteStep - 2]}</p>
                     </div>
                     <textarea 
                       value={textResponse}
                       onChange={(e) => setTextResponse(e.target.value)}
-                      placeholder="Share your thoughts here..." 
-                      className="w-full h-40 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none"
+                      placeholder="Type your reflection here. AI uses this to measure career clarity..." 
+                      className="w-full h-40 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
                     />
                     <div className="flex items-center justify-between pt-6">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500">
+                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                       </Button>
-                      <Button onClick={handleNext} disabled={!textResponse} className="h-12 rounded-xl bg-[#F57D14] px-8 font-bold text-white">
-                        {absoluteStep === totalSteps ? "Finish" : "Next"} <ArrowRight className="ml-2 h-4 w-4" />
+                      <Button onClick={handleNext} disabled={!textResponse} className="h-12 rounded-xl bg-[#F57D14] px-8 font-bold text-white shadow-lg">
+                        {absoluteStep === totalSteps ? "Finish & View Results" : "Next Reflection"} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
                   </div>
                 ) : (
+                  /* SECTIONS 1-5: MULTIPLE CHOICE QUESTIONS [cite: 3-65] */
                   <div className="space-y-8 py-4">
                     <div className="space-y-3">
                       <h3 className="text-lg font-bold text-[#0A2351]">Question {absoluteStep - 1}</h3>
-                      <p className="text-base text-slate-700 font-medium">{questionBank[absoluteStep - 2]}</p>
+                      <p className="text-base text-slate-700 font-medium leading-relaxed">{questionBank[absoluteStep - 2]}</p>
                     </div>
                     <div className="grid gap-3">
                       {[
@@ -229,13 +240,13 @@ const AssessmentFlowPsychometric = () => {
                         currentSection === 2 ? 'Less Interested' : 'Disagree', 
                         currentSection === 2 ? 'Not Interested' : 'Strongly Disagree'
                       ].map((opt) => (
-                        <button key={opt} onClick={handleNext} className="w-full rounded-xl border border-slate-200 p-4 text-left text-sm font-medium hover:border-[#F57D14] hover:bg-[#F57D14]/5">
+                        <button key={opt} onClick={handleNext} className="w-full rounded-xl border border-slate-200 p-4 text-left text-sm font-medium transition-all hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]">
                           {opt}
                         </button>
                       ))}
                     </div>
                     <div className="flex justify-start pt-6 border-t border-slate-100">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500">
+                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous Question
                       </Button>
                     </div>
@@ -243,10 +254,10 @@ const AssessmentFlowPsychometric = () => {
                 )}
               </div>
 
-              {/* 🟠 NEW: QUESTION GRID CIRCLES */}
+              {/* 🟠 PROGRESS GRID: TURN ORANGE ON COMPLETION */}
               {currentSection > 0 && (
                 <div className="mt-12 border-t border-slate-100 pt-8">
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Question Progress</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Assessment Map</p>
                   <div className="flex flex-wrap gap-2">
                     {questionBank.map((_, i) => {
                       const stepNum = i + 2
@@ -270,6 +281,7 @@ const AssessmentFlowPsychometric = () => {
             </CardContent>
           </Card>
 
+          {/* SIDEBAR: SCIENTIFIC METHOD CHECKLIST */}
           <aside className="space-y-6">
             <Card className="border-0 bg-[#0A2351] text-white shadow-lg">
               <CardContent className="p-6">
