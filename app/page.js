@@ -7,8 +7,8 @@ import SarathiLogo from '@/components/sarathi-logo'
 
 const steps = [
   {
-    title: 'Take a short psychometric test',
-    description: 'Answer 5 guided questions designed for Indian college students exploring their career direction.',
+    title: 'Take a comprehensive psychometric test',
+    description: 'Answer 60 guided questions designed to deeply analyze your personality, aptitude, and career drivers.',
     icon: BrainCircuit,
   },
   {
@@ -16,7 +16,7 @@ const steps = [
     description: 'Securely process your ₹99 assessment fee to instantly generate your premium AI career insights.',
     icon: BadgeIndianRupee,
   },
- {
+  {
     title: 'Get your roadmap dashboard',
     description: 'See your top career matches, strengths, readiness score, and your personalized 5-year action plan.',
     icon: LineChart,
@@ -25,13 +25,13 @@ const steps = [
 
 const highlights = [
   'Built for India-first college and campus career journeys',
-  'Simple assessment flow with paid result unlocking',
+  'Frictionless assessment flow with instant roadmap generation',
   'Actionable dashboard instead of generic motivational advice',
 ]
 
 const trustSignals = [
-  { label: 'Career paths mapped', value: '12+' },
-  { label: 'Minutes to finish', value: '4 min' },
+  { label: 'Career paths mapped', value: 'Dynamic' }, // Changed from 12+ since AI can map to hundreds
+  { label: 'Minutes to finish', value: '15 min' }, // Changed from 4 min
   { label: 'Early unlock price', value: '₹99' },
 ]
 
@@ -170,8 +170,8 @@ const App = () => {
                 },
                 {
                   icon: BrainCircuit,
-                  title: 'Simple assessment, strong insight',
-                  description: 'The short form is easy to complete on mobile while still producing a rich dashboard experience.',
+                  title: 'Comprehensive assessment, strong insight',
+                  description: 'The guided, one-question-at-a-time flow keeps students focused on mobile while producing a rich dashboard experience.',
                 },
                 {
                   icon: ShieldCheck,
@@ -198,7 +198,7 @@ const App = () => {
           <Card className="border-white/10 bg-white text-slate-900 shadow-2xl">
             <CardContent className="p-6 sm:p-8">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#F57D14]">Ready to explore?</p>
-              <h3 className="mt-3 text-2xl font-bold text-[#0A2351]">Start your SARATHI assessment in under 4 minutes</h3>
+             <h3 className="mt-3 text-2xl font-bold text-[#0A2351]">Start your SARATHI assessment in under 15 minutes</h3>
               <p className="mt-3 text-sm leading-6 text-slate-600">
                 SARATHI uses advanced AI to analyze your psychometric profile and generate a highly personalized, actionable 5-year career roadmap.
               </p>
