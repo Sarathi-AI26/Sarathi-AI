@@ -32,24 +32,44 @@ export default function AboutPage() {
         <h2 style={{ color: '#333' }}>Project Vision</h2>
         <p style={{ fontSize: '1.1rem', color: '#444' }}>
           SARATHI is an AI-driven ecosystem designed to bridge the gap between academic learning and professional success. 
-          By combining psychometric science with the power of <strong>Gemini 2.5 AI</strong>, we provide students with 
+          By combining psychometric science with the power of <strong> Advanced Gemini AI</strong>, we provide students with 
           a clear "True North" for their careers.
         </p>
       </section>
 
-      <section style={{ marginTop: '30px' }}>
-        <h2 style={{ color: '#333' }}>Why SARATHI?</h2>
-        <p>
-          In the Indian education landscape, students often face "decision paralysis" due to a lack of personalized guidance. 
-          SARATHI solves this by:
-        </p>
-        <ul style={{ paddingLeft: '20px' }}>
-          <li style={{ marginBottom: '10px' }}><strong>Personalized Roadmaps:</strong> Not just advice, but a week-by-week plan for 5 years.</li>
-          <li style={{ marginBottom: '10px' }}><strong>Skill Gap Analysis:</strong> Identifying exactly what you need to learn for your dream job.</li>
-          <li style={{ marginBottom: '10px' }}><strong>Data-Driven Decisions:</strong> Removing guesswork from career planning.</li>
-        </ul>
-      </section>
+      <section style={{ marginTop: '40px' }}>
+  <h2 style={{ color: '#0A2351', marginBottom: '10px' }}>Why SARATHI Platform?</h2>
+  <p style={{ color: '#64748b', lineHeight: '1.6' }}>
+    In the Indian education landscape, students often face "decision paralysis" due to a lack of personalized guidance.
+    The SARATHI Platform addresses these challenges through three core pillars:
+  </p>
 
+  {/* 🚀 This adds the extra gap you requested before the pillars start */}
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px', marginTop: '30px' }}>
+    
+    {/* Pillar 1 */}
+    <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <h4 style={{ color: '#0A2351', fontWeight: 'bold', marginBottom: '8px' }}>Personalized Roadmaps</h4>
+      <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.5' }}>
+        More than just advice; a week-by-week strategic action plan for the next 5 years.
+      </p>
     </div>
-  );
-}
+
+    {/* Pillar 2 */}
+    <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <h4 style={{ color: '#0A2351', fontWeight: 'bold', marginBottom: '8px' }}>Skill Gap Analysis</h4>
+      <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.5' }}>
+        Identifying exactly what you need to learn today to qualify for your dream career tomorrow.
+      </p>
+    </div>
+
+    {/* Pillar 3 */}
+    <div style={{ padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+      <h4 style={{ color: '#0A2351', fontWeight: 'bold', marginBottom: '8px' }}>Data-Driven Decisions</h4>
+      <p style={{ fontSize: '14px', color: '#475569', lineHeight: '1.5' }}>
+        Removing the guesswork from career planning using psychometric science and AI.
+      </p>
+    </div>
+
+  </div>
+</section>
