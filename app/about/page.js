@@ -1,15 +1,10 @@
 import React from 'react';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import SarathiLogo from '@/components/sarathi-logo';
 
 const AboutPage = () => {
   return (
     <main className="min-h-screen bg-slate-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-        <nav className="mb-8 flex items-center justify-between">
-
         <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-slate-200">
           <h1 className="text-4xl font-extrabold text-[#0A2351] mb-8">About SARATHI</h1>
 
@@ -34,7 +29,6 @@ const AboutPage = () => {
           <section style={{ marginTop: '40px' }}>
             <h3 className="text-xl font-bold text-[#0A2351] mb-4">Why SARATHI Platform?</h3>
             <p className="text-slate-600 mb-8">
-              In the Indian education landscape, students often face "decision paralysis" due to a lack of personalized guidance. 
               The SARATHI Platform addresses these challenges through three core pillars:
             </p>
 
