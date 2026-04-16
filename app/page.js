@@ -42,7 +42,6 @@ const App = () => {
         <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(10,35,81,0.12),_transparent_55%)]" />
         <div className="container relative mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <nav className="mb-16 flex items-center justify-between rounded-full border border-slate-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
-            <SarathiLogo href="/" imageClassName="h-16 w-auto sm:h-20" />
             <Button asChild className="bg-[#0A2351] text-white hover:bg-[#16356d]">
               <Link href="/assessment">Take the Test</Link>
             </Button>
