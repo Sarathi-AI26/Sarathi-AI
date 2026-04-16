@@ -16,9 +16,9 @@ const steps = [
     description: 'Securely process your ₹99 assessment fee to instantly generate your premium AI career insights.',
     icon: BadgeIndianRupee,
   },
-  {
+ {
     title: 'Get your roadmap dashboard',
-    description: 'See your top career matches, strengths, readiness score, and the next 30/90 day plan.',
+    description: 'See your top career matches, strengths, readiness score, and your personalized 5-year action plan.',
     icon: LineChart,
   },
 ]
@@ -207,7 +207,7 @@ const App = () => {
                 <ul className="mt-4 space-y-3 text-sm text-slate-700">
                   <li className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#F57D14]" /> Top career matches with fit score</li>
                   <li className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#F57D14]" /> Strength summary and readiness score</li>
-                  <li className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#F57D14]" /> Next 30/90 day roadmap with career assets to build</li>
+                  <li className="flex gap-3"><CheckCircle2 className="mt-0.5 h-4 w-4 text-[#F57D14]" /> Step-by-step 5-year action plan tailored to the Indian job market</li>
                 </ul>
               </div>
               <Button asChild size="lg" className="mt-6 w-full bg-[#F57D14] text-white hover:bg-[#dd6f11]">
