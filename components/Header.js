@@ -1,14 +1,21 @@
 import Link from 'next/link';
+// Import your dedicated logo component
+import SarathiLogo from '@/components/sarathi-logo'; 
 
 export default function Header() {
   return (
-    <header style={{ padding: '20px', borderBottom: '1px solid #eaeaea', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-      <div style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
-        <Link href="/">SARATHI</Link>
-      </div>
-      <nav>
-        <Link href="/" style={{ marginRight: '15px' }}>Home</Link>
-        <Link href="/about">About</Link>
+    <header className="flex items-center justify-between border-b border-slate-200 bg-white px-6 py-4 shadow-sm sm:px-8">
+      
+      {/* 🚀 This replaces the plain "SARATHI" text with your actual graphic */}
+      <SarathiLogo href="/" imageClassName="h-10 w-auto" />
+
+      <nav className="flex items-center gap-6">
+        <Link href="/" className="text-sm font-medium text-[#0A2351] hover:text-[#F57D14] transition-colors">
+          Home
+        </Link>
+        <Link href="/about" className="text-sm font-medium text-[#0A2351] hover:text-[#F57D14] transition-colors">
+          About
+        </Link>
       </nav>
     </header>
   );
