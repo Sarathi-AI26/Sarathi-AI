@@ -15,9 +15,9 @@ const AssessmentFlowPsychometric = () => {
   const [currentSection, setCurrentSection] = useState(0) 
   const [absoluteStep, setAbsoluteStep] = useState(1) 
   const [textResponse, setTextResponse] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false) // Loading state for API call
+  const [isSubmitting, setIsSubmitting] = useState(false)
   
-  // 🚀 CRUCIAL: Array to store all 60 answers
+  // Array to store all 60 answers
   const [allAnswers, setAllAnswers] = useState(Array(60).fill(null))
   
   // Form State
@@ -121,31 +121,32 @@ const AssessmentFlowPsychometric = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // 🚀 CRUCIAL: handleNext now accepts the answer and sends to API
   const handleNext = async (selectedOption) => {
-    // 1. Save the answer
     const updatedAnswers = [...allAnswers]
+    
+    // Save current answer
     if (currentSection === 5) {
-      updatedAnswers[absoluteStep - 1] = textResponse
+      updatedAnswers[absoluteStep - 1] = textResponse.trim()
     } else {
       updatedAnswers[absoluteStep - 1] = selectedOption
     }
     setAllAnswers(updatedAnswers)
 
-    // 2. Mark step completed
     if (!completedSteps.includes(absoluteStep)) {
       setCompletedSteps([...completedSteps, absoluteStep])
     }
     
-    // 3. Move forward or Submit
     if (absoluteStep < totalSteps) {
       const nextStep = absoluteStep + 1
+      
+      // ✅ GHOST BUSTER: Pre-sync state for the next question
+      const nextSavedAnswer = updatedAnswers[nextStep - 1]
+      setTextResponse(nextSavedAnswer || "")
+
       setAbsoluteStep(nextStep)
       updateSection(nextStep)
-      setTextResponse("") 
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      // 🚀 FINAL SUBMIT TO SUPABASE API (PHASE 1)
       setIsSubmitting(true)
       try {
         const response = await fetch('/api/submit-assessment', {
@@ -162,7 +163,6 @@ const AssessmentFlowPsychometric = () => {
         const data = await response.json();
         
         if (data.assessmentId) {
-          // Send them to the result page (Phase 2/3)
           router.push(`/result?id=${data.assessmentId}`);
         } else {
            console.error("No assessment ID returned", data)
@@ -178,17 +178,17 @@ const AssessmentFlowPsychometric = () => {
   const handlePrevious = () => {
     if (absoluteStep > 1) {
       const prevStep = absoluteStep - 1
+      
+      // ✅ GHOST BUSTER: Pre-sync state for the previous question
+      const prevSavedAnswer = allAnswers[prevStep - 1]
+      setTextResponse(prevSavedAnswer || "")
+
       setAbsoluteStep(prevStep)
       updateSection(prevStep)
-      
-      // Pre-fill text area if going back to a text question
-      if (currentSection === 5 || prevStep > 55) {
-         setTextResponse(allAnswers[prevStep - 1] || "")
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       setIsFormCompleted(false)
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -256,7 +256,6 @@ const AssessmentFlowPsychometric = () => {
                         Start Assessment <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
-                    {!isFormValid && <p className="text-right text-[10px] text-slate-400 mt-2">* These fields are required to generate your personalized roadmap</p>}
                   </div>
                 ) : currentSection === 5 ? (
                   /* ---------------- OPEN REFLECTIONS (Section 6) ---------------- */
@@ -276,21 +275,21 @@ const AssessmentFlowPsychometric = () => {
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                       </Button>
                       
-                      {/* 🚀 SUBMIT BUTTON */}
                       <Button 
                         onClick={() => handleNext(null)} 
-                        disabled={!textResponse || isSubmitting} 
+                        disabled={!textResponse.trim() || isSubmitting} 
                         className="h-12 rounded-xl bg-[#F57D14] px-8 font-bold text-white shadow-lg hover:bg-[#dd6f11]"
                       >
                         {isSubmitting ? (
                           <>Processing Data <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
                         ) : absoluteStep === totalSteps ? (
-                          <>"Finish & View Results" <ArrowRight className="ml-2 h-4 w-4" /></>
+                          // 🚀 Fixed the quotes issue here
+                          <>Finish & View Results <ArrowRight className="ml-2 h-4 w-4" /></>
                         ) : (
-                          <>"Next Reflection" <ArrowRight className="ml-2 h-4 w-4" /></>
+                          // 🚀 Fixed the quotes issue here
+                          <>Next Reflection <ArrowRight className="ml-2 h-4 w-4" /></>
                         )}
                       </Button>
-
                     </div>
                   </div>
                 ) : (
@@ -332,7 +331,7 @@ const AssessmentFlowPsychometric = () => {
                 )}
               </div>
 
-              {/* 🟠 PROGRESS GRID: Turns Orange */}
+              {/* 🟠 PROGRESS MAP */}
               {isFormCompleted && (
                 <div className="mt-12 border-t border-slate-100 pt-8">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Assessment Map</p>
@@ -359,7 +358,7 @@ const AssessmentFlowPsychometric = () => {
             </CardContent>
           </Card>
 
-          {/* SIDEBAR: SCIENTIFIC METHOD CHECKLIST */}
+          {/* SIDEBAR */}
           <aside className="space-y-6 hidden lg:block">
             <Card className="border-0 bg-[#0A2351] text-white shadow-lg">
               <CardContent className="p-6">
