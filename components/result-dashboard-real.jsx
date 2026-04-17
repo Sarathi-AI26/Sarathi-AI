@@ -63,6 +63,7 @@ const ResultDashboardReal = ({ assessmentId }) => {
           setAssessment(currentAssessment)
           setLoading(false)
         } else {
+          // ... inside loadResult
           setAnalyzing(true)
           const roadmapResponse = await fetch('/api/generate-roadmap', {
             method: 'POST',
@@ -70,9 +71,22 @@ const ResultDashboardReal = ({ assessmentId }) => {
             body: JSON.stringify({ assessmentId }),
           })
 
-          const roadmapData = await roadmapResponse.json()
-          if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
+          // 🚀 REPLACE THIS OLD CODE:
+          // const roadmapData = await roadmapResponse.json()
+          // if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
           
+          // 🚀 WITH THIS NEW SAFE PARSER:
+          const textData = await roadmapResponse.text() // Get raw response first
+          let roadmapData = {}
+          try {
+            roadmapData = JSON.parse(textData) // Try to parse it
+          } catch (e) {
+            console.error("Vercel returned non-JSON:", textData)
+            throw new Error("The AI took too long to respond (Vercel Timeout). Please click 'Retake' to resume.")
+          }
+          if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
+          // ------------------------------------
+
           setAssessment(roadmapData?.assessment)
           setAnalyzing(false)
           setLoading(false)
