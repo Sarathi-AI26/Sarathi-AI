@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../lib/supabase'
-import { assessmentQuestions } from '../../../lib/psychometric-assessment'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60 // 🚀 ADD THIS: Tells Vercel to allow up to 60 seconds'
+export const maxDuration = 60 // 🚀 Vercel timeout extended to 60 seconds
 
 const SYSTEM_PROMPT = `You are an expert Career Counselor for the SARATHI App. 
 Your goal is to provide a 5-year strategic transformation roadmap for an Indian college student.
@@ -37,7 +37,58 @@ Output a structured JSON response with exactly this format:
   "potential_blind_spots": ["Constructive feedback"]
 }`
 
-// ... (Rest of the helper functions: jsonResponse, hasRealAiAnalysis, normalizeAssessment, etc. remain the same as previous)
+// --- HELPER FUNCTIONS ---
+
+const jsonResponse = (data, status = 200) => NextResponse.json(data, { status })
+
+const buildAssessmentContext = (assessment) => {
+  if (!assessment || !assessment.raw_answers) return "No answers provided."
+  return assessment.raw_answers.map((ans, i) => `Question ${i + 1}: ${ans}`).join('\n')
+}
+
+const normalizeAssessment = (assessment) => {
+  if (!assessment) return null
+  return {
+    ...assessment,
+    // Ensures frontend always finds the data regardless of column naming
+    ai_analysis: assessment.ai_analysis_result || assessment.ai_analysis 
+  }
+}
+
+// 🚀 THE ENGINE UPGRADE: Using the high-speed Flash model
+async function generateValidatedRoadmap(promptData) {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("Missing GEMINI_API_KEY environment variable")
+  }
+
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
+  
+  // Using Flash for real-time mobile performance
+  const model = genAI.getGenerativeModel({ 
+    model: 'gemini-1.5-flash',
+    systemInstruction: SYSTEM_PROMPT,
+    generationConfig: {
+      responseMimeType: "application/json", // Forces perfect JSON output
+      temperature: 0.7
+    }
+  })
+
+  const userPrompt = `
+    Student Profile:
+    Name: ${promptData.student_profile.name}
+    College: ${promptData.student_profile.college}
+
+    Assessment Answers:
+    ${promptData.assessment_context}
+  `
+
+  const result = await model.generateContent(userPrompt)
+  const responseText = result.response.text()
+  
+  return JSON.parse(responseText)
+}
+
+// --- MAIN API ROUTE ---
 
 export async function POST(request) {
   try {
@@ -47,22 +98,42 @@ export async function POST(request) {
     if (!assessmentId) return jsonResponse({ error: 'assessmentId is required' }, 400)
 
     const supabase = getSupabaseAdmin()
-    const { data: assessment } = await supabase.from('assessments').select('*, users(*)').eq('id', assessmentId).single()
+    const { data: assessment, error: fetchError } = await supabase
+      .from('assessments')
+      .select('*, users(*)')
+      .eq('id', assessmentId)
+      .single()
 
+    if (fetchError || !assessment) {
+      return jsonResponse({ error: 'Assessment not found' }, 404)
+    }
+
+    // Generate the AI Roadmap using the high-speed engine
     const aiAnalysis = await generateValidatedRoadmap({
-      student_profile: { name: assessment?.users?.name || 'Student', college: assessment?.users?.college || '' },
+      student_profile: { 
+        name: assessment?.users?.name || 'Student', 
+        college: assessment?.users?.college || '' 
+      },
       assessment_context: buildAssessmentContext(assessment),
     })
 
-    const { data: updatedAssessment } = await supabase
+    // Save the result back to Supabase
+    const { data: updatedAssessment, error: updateError } = await supabase
       .from('assessments')
       .update({ ai_analysis_result: aiAnalysis })
       .eq('id', assessmentId)
       .select('*, users(*)')
       .single()
 
+    if (updateError) {
+      console.error("Supabase Update Error:", updateError)
+      return jsonResponse({ error: 'Failed to save analysis to database' }, 500)
+    }
+
     return jsonResponse({ ok: true, assessment: normalizeAssessment(updatedAssessment) })
+
   } catch (error) {
-    return jsonResponse({ error: error?.message || 'Unknown error' }, 500)
+    console.error("Roadmap Generation Failed:", error)
+    return jsonResponse({ error: error?.message || 'AI Generation Failed' }, 500)
   }
 }
