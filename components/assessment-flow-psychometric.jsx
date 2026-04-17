@@ -1,8 +1,8 @@
 "use client"
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck, Star } from 'lucide-react'
+import { ArrowLeft, ArrowRight, CheckCircle2, ClipboardCheck, Star, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
@@ -10,15 +10,17 @@ import { Progress } from '@/components/ui/progress'
 const AssessmentFlowPsychometric = () => {
   const router = useRouter()
   
-  // 🚀 NEW: Separate state to track if the pre-assessment form is done
-  const [isFormCompleted, setIsFormCompleted] = useState(false)
-  
   // State Management
+  const [isFormCompleted, setIsFormCompleted] = useState(false)
   const [currentSection, setCurrentSection] = useState(0) 
-  const [absoluteStep, setAbsoluteStep] = useState(1) // Now strictly counts 1 to 60
+  const [absoluteStep, setAbsoluteStep] = useState(1) 
   const [textResponse, setTextResponse] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false) // Loading state for API call
   
-  // Form State for Mandatory Validation
+  // 🚀 CRUCIAL: Array to store all 60 answers
+  const [allAnswers, setAllAnswers] = useState(Array(60).fill(null))
+  
+  // Form State
   const [formData, setFormData] = useState({
     name: "",
     whatsapp: "",
@@ -27,7 +29,6 @@ const AssessmentFlowPsychometric = () => {
 
   const [completedSteps, setCompletedSteps] = useState([])
 
-  // 🚀 FIXED: Removed "Basic Information" so Personality Traits is Section 1
   const sections = [
     { name: "Personality Traits", questions: 15 },
     { name: "Career Interests", questions: 12 },
@@ -100,7 +101,7 @@ const AssessmentFlowPsychometric = () => {
     "Would you prefer building your career in India, abroad, or both? Why?"
   ]
 
-  const totalSteps = questionBank.length // Now exactly 60
+  const totalSteps = questionBank.length 
   const progress = (absoluteStep / totalSteps) * 100
   const isFormValid = formData.name.trim() !== "" && formData.whatsapp.length >= 10 && formData.college.trim() !== ""
 
@@ -115,26 +116,63 @@ const AssessmentFlowPsychometric = () => {
     }
   }
 
-  // 🚀 NEW: Function just to handle moving from Form -> Question 1
   const handleStartTest = () => {
     setIsFormCompleted(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleNext = () => {
+  // 🚀 CRUCIAL: handleNext now accepts the answer and sends to API
+  const handleNext = async (selectedOption) => {
+    // 1. Save the answer
+    const updatedAnswers = [...allAnswers]
+    if (currentSection === 5) {
+      updatedAnswers[absoluteStep - 1] = textResponse
+    } else {
+      updatedAnswers[absoluteStep - 1] = selectedOption
+    }
+    setAllAnswers(updatedAnswers)
+
+    // 2. Mark step completed
     if (!completedSteps.includes(absoluteStep)) {
       setCompletedSteps([...completedSteps, absoluteStep])
     }
     
+    // 3. Move forward or Submit
     if (absoluteStep < totalSteps) {
       const nextStep = absoluteStep + 1
       setAbsoluteStep(nextStep)
       updateSection(nextStep)
       setTextResponse("") 
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      router.push('/result?id=demo-ready')
+      // 🚀 FINAL SUBMIT TO SUPABASE API (PHASE 1)
+      setIsSubmitting(true)
+      try {
+        const response = await fetch('/api/submit-assessment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.name,
+            whatsapp: formData.whatsapp,
+            college: formData.college,
+            answers: updatedAnswers 
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (data.assessmentId) {
+          // Send them to the result page (Phase 2/3)
+          router.push(`/result?id=${data.assessmentId}`);
+        } else {
+           console.error("No assessment ID returned", data)
+           setIsSubmitting(false)
+        }
+      } catch (error) {
+        console.error("Submission failed", error);
+        setIsSubmitting(false)
+      }
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handlePrevious = () => {
@@ -142,8 +180,12 @@ const AssessmentFlowPsychometric = () => {
       const prevStep = absoluteStep - 1
       setAbsoluteStep(prevStep)
       updateSection(prevStep)
+      
+      // Pre-fill text area if going back to a text question
+      if (currentSection === 5 || prevStep > 55) {
+         setTextResponse(allAnswers[prevStep - 1] || "")
+      }
     } else {
-      // 🚀 Allow user to go back to the basic info form from question 1
       setIsFormCompleted(false)
     }
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -230,12 +272,25 @@ const AssessmentFlowPsychometric = () => {
                       className="w-full h-40 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
                     />
                     <div className="flex items-center justify-between pt-6">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
+                      <Button variant="ghost" onClick={handlePrevious} disabled={isSubmitting} className="text-slate-500 hover:text-[#0A2351]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                       </Button>
-                      <Button onClick={handleNext} disabled={!textResponse} className="h-12 rounded-xl bg-[#F57D14] px-8 font-bold text-white shadow-lg">
-                        {absoluteStep === totalSteps ? "Finish & View Results" : "Next Reflection"} <ArrowRight className="ml-2 h-4 w-4" />
+                      
+                      {/* 🚀 SUBMIT BUTTON */}
+                      <Button 
+                        onClick={() => handleNext(null)} 
+                        disabled={!textResponse || isSubmitting} 
+                        className="h-12 rounded-xl bg-[#F57D14] px-8 font-bold text-white shadow-lg hover:bg-[#dd6f11]"
+                      >
+                        {isSubmitting ? (
+                          <>Processing Data <Loader2 className="ml-2 h-4 w-4 animate-spin" /></>
+                        ) : absoluteStep === totalSteps ? (
+                          <>"Finish & View Results" <ArrowRight className="ml-2 h-4 w-4" /></>
+                        ) : (
+                          <>"Next Reflection" <ArrowRight className="ml-2 h-4 w-4" /></>
+                        )}
                       </Button>
+
                     </div>
                   </div>
                 ) : (
@@ -252,14 +307,24 @@ const AssessmentFlowPsychometric = () => {
                         'Neutral', 
                         currentSection === 1 ? 'Less Interested' : 'Disagree', 
                         currentSection === 1 ? 'Not Interested' : 'Strongly Disagree'
-                      ].map((opt) => (
-                        <button key={opt} onClick={handleNext} className="w-full rounded-xl border border-slate-200 p-4 text-left text-sm font-medium transition-all hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]">
-                          {opt}
-                        </button>
-                      ))}
+                      ].map((opt) => {
+                        const isSelected = allAnswers[absoluteStep - 1] === opt;
+                        return (
+                          <button 
+                            key={opt} 
+                            onClick={() => handleNext(opt)} 
+                            disabled={isSubmitting}
+                            className={`w-full rounded-xl border p-4 text-left text-sm font-medium transition-all 
+                              ${isSelected ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]' : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'}
+                            `}
+                          >
+                            {opt}
+                          </button>
+                        )
+                      })}
                     </div>
                     <div className="flex justify-start pt-6 border-t border-slate-100">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
+                      <Button variant="ghost" onClick={handlePrevious} disabled={isSubmitting} className="text-slate-500 hover:text-[#0A2351]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> {absoluteStep === 1 ? 'Back to Details' : 'Previous Question'}
                       </Button>
                     </div>
@@ -295,7 +360,7 @@ const AssessmentFlowPsychometric = () => {
           </Card>
 
           {/* SIDEBAR: SCIENTIFIC METHOD CHECKLIST */}
-          <aside className="space-y-6">
+          <aside className="space-y-6 hidden lg:block">
             <Card className="border-0 bg-[#0A2351] text-white shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
@@ -309,7 +374,6 @@ const AssessmentFlowPsychometric = () => {
                 </div>
                 <div className="mt-6 space-y-4">
                   {sections.map((s, i) => {
-                    // Check logic for sidebar highlight
                     const isPassed = isFormCompleted && currentSection > i;
                     const isActive = isFormCompleted && currentSection === i;
                     const isUpcoming = !isFormCompleted || currentSection < i;
