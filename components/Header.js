@@ -32,10 +32,11 @@ export default function Header() {
           </Link>
         </div>
 
-        {/* 💻 Desktop Navigation */}
+       {/* 💻 Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
           <Link href="/" className="hover:text-[#F57D14] transition-colors">Home</Link>
-          <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
+          {/* 🚀 FIXED: Now points to your dedicated /about page */}
+          <Link href="/about" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">Methodology</Link>
           <Link href="/#institutions" className="hover:text-[#F57D14] transition-colors">For Institutions</Link>
           <Link href="/#contact" className="hover:text-[#F57D14] transition-colors">Contact</Link>
@@ -58,12 +59,10 @@ export default function Header() {
         </button>
       </div>
 
-      {/* 📱 Mobile Dropdown Menu */}
-      {isOpen && (
-        <div className="border-t border-slate-100 bg-white p-6 shadow-xl md:hidden absolute w-full left-0">
-          <div className="flex flex-col space-y-4 text-center text-sm font-bold text-slate-600">
+      {/* 📱 Mobile Dropdown Menu Links */}
             <Link href="/" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Home</Link>
-            <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">About SARATHI</Link>
+            {/* 🚀 FIXED: Now points to your dedicated /about page */}
+            <Link href="/about" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">About SARATHI</Link>
             <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Methodology</Link>
             <Link href="/#institutions" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">For Institutions</Link>
             <Link href="/#contact" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Contact</Link>
