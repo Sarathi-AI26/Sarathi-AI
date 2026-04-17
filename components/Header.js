@@ -12,30 +12,32 @@ export default function Header() {
     <header className="border-b border-slate-100 bg-white sticky top-0 z-50">
       <div className="container mx-auto flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
         
-        {/* Logo */}
+        {/* 🚀 FIXED: The Image Logo */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="text-xl font-extrabold text-[#0A2351]">
-            SARATHI
+          <Link href="/">
+            {/* Change "/sarathi-logo.png" to your actual logo filename if it is different */}
+            <img src="/sarathi-logo.png" alt="SARATHI Logo" className="h-12 w-auto" />
           </Link>
         </div>
 
-        {/* 💻 Desktop Navigation (Hidden on Mobile) */}
+        {/* 💻 Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
           <Link href="/" className="hover:text-[#F57D14] transition-colors">Home</Link>
-          <Link href="/#about" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
+          {/* 🚀 FIXED: Using Anchor Links for smooth scrolling */}
+          <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">Methodology</Link>
           <Link href="/#institutions" className="hover:text-[#F57D14] transition-colors">For Institutions</Link>
           <Link href="/#contact" className="hover:text-[#F57D14] transition-colors">Contact</Link>
         </div>
 
-        {/* 💻 Desktop Button (Hidden on Mobile) */}
+        {/* 💻 Desktop Button */}
         <div className="hidden md:block">
-          <Button asChild className="rounded-full bg-[#0A2351] px-6 font-bold text-white hover:bg-[#0A2351]/90">
+          <Button asChild className="rounded-full bg-[#0A2351] px-6 font-bold text-white hover:bg-[#0A2351]/90 shadow-md shadow-[#0A2351]/10">
             <Link href="/assessment">Take the Test</Link>
           </Button>
         </div>
 
-        {/* 📱 Mobile Hamburger Button (Visible ONLY on Mobile) */}
+        {/* 📱 Mobile Hamburger Button */}
         <button 
           className="p-2 text-[#0A2351] md:hidden" 
           onClick={() => setIsOpen(!isOpen)}
@@ -45,12 +47,12 @@ export default function Header() {
         </button>
       </div>
 
-      {/* 📱 Mobile Dropdown Menu (Opens when Hamburger is clicked) */}
+      {/* 📱 Mobile Dropdown Menu */}
       {isOpen && (
         <div className="border-t border-slate-100 bg-white p-6 shadow-xl md:hidden absolute w-full left-0">
           <div className="flex flex-col space-y-4 text-center text-sm font-bold text-slate-600">
             <Link href="/" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Home</Link>
-            <Link href="/#about" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">About SARATHI</Link>
+            <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">About SARATHI</Link>
             <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Methodology</Link>
             <Link href="/#institutions" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">For Institutions</Link>
             <Link href="/#contact" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Contact</Link>
