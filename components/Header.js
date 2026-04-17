@@ -11,29 +11,30 @@ export default function Header() {
 
   return (
     <header className="border-b border-slate-100 bg-white sticky top-0 z-50">
-      <div className="container mx-auto flex h-24 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex h-20 sm:h-24 items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* 🚀 STRIP-STYLE LOGO WITH TAGLINE */}
         <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-4 sm:gap-5">
-            {/* The Logo */}
-            <div className="h-16 sm:h-20 w-auto flex items-center">
+          <Link href="/" className="flex items-center gap-3 sm:gap-5">
+            
+            {/* 🚀 THE LOGO FIX: Added [&>svg] classes to force the internal SVG to scale up */}
+            <div className="h-10 sm:h-16 flex items-center [&>svg]:h-full [&>svg]:w-auto">
                <SarathiLogo />
             </div>
             
-            {/* Vertical Divider Line (Hidden on tiny screens) */}
-            <div className="hidden sm:block h-10 w-[2px] bg-slate-200"></div>
+            {/* Vertical Divider Line (Now visible on all screens) */}
+            <div className="h-8 sm:h-10 w-[2px] bg-slate-200"></div>
             
-            {/* Empowering Tagline (Hidden on tiny screens) */}
-            <div className="hidden sm:flex flex-col justify-center pt-1">
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-400 leading-tight">Empowering</span>
-              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-slate-400 leading-tight">Student Clarity</span>
+            {/* Empowering Tagline (Visible on mobile, text scales down to fit) */}
+            <div className="flex flex-col justify-center">
+              <span className="text-[8px] sm:text-[10px] lg:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400 leading-tight">Empowering</span>
+              <span className="text-[8px] sm:text-[10px] lg:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400 leading-tight">Student Clarity</span>
             </div>
           </Link>
         </div>
 
         {/* 💻 Desktop Navigation */}
-        <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
+        <div className="hidden md:flex items-center gap-6 lg:gap-8 text-sm font-bold text-slate-600">
           <Link href="/" className="hover:text-[#F57D14] transition-colors">Home</Link>
           <Link href="/about" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">Methodology</Link>
@@ -50,7 +51,7 @@ export default function Header() {
 
         {/* 📱 Mobile Hamburger Button */}
         <button 
-          className="p-2 text-[#0A2351] md:hidden" 
+          className="p-2 text-[#0A2351] md:hidden ml-auto" 
           onClick={() => setIsOpen(!isOpen)}
           aria-label="Toggle Menu"
         >
