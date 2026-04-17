@@ -16,7 +16,7 @@ export default function Header() {
         {/* 🚀 STRIP-STYLE LOGO WITH TAGLINE */}
         <div className="flex items-center">
           <Link href="/" className="flex items-center gap-4 sm:gap-5">
-            {/* The Logo - Increased to h-16/h-20 for bigger size */}
+            {/* The Logo */}
             <div className="h-16 sm:h-20 w-auto flex items-center">
                <SarathiLogo />
             </div>
@@ -32,10 +32,9 @@ export default function Header() {
           </Link>
         </div>
 
-       {/* 💻 Desktop Navigation */}
+        {/* 💻 Desktop Navigation */}
         <div className="hidden md:flex items-center gap-8 text-sm font-bold text-slate-600">
           <Link href="/" className="hover:text-[#F57D14] transition-colors">Home</Link>
-          {/* 🚀 FIXED: Now points to your dedicated /about page */}
           <Link href="/about" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">Methodology</Link>
           <Link href="/#institutions" className="hover:text-[#F57D14] transition-colors">For Institutions</Link>
@@ -59,9 +58,11 @@ export default function Header() {
         </button>
       </div>
 
-      {/* 📱 Mobile Dropdown Menu Links */}
+      {/* 📱 Mobile Dropdown Menu */}
+      {isOpen && (
+        <div className="absolute left-0 w-full border-t border-slate-100 bg-white p-6 shadow-xl md:hidden">
+          <div className="flex flex-col space-y-4 text-center text-sm font-bold text-slate-600">
             <Link href="/" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Home</Link>
-            {/* 🚀 FIXED: Now points to your dedicated /about page */}
             <Link href="/about" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">About SARATHI</Link>
             <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">Methodology</Link>
             <Link href="/#institutions" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14]">For Institutions</Link>
