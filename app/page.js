@@ -12,8 +12,9 @@ import {
   Sparkles,
   CheckCircle2
 } from 'lucide-react';
+// 🚀 FIXED: Capital "H" to match your file name Header.js
+import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
-import Header from '@/components/header';
 
 export default function Home() {
   return (
@@ -22,7 +23,7 @@ export default function Home() {
       <Header />
 
       <main>
-        {/* 🚀 HERO SECTION (Matches your "True North" design) */}
+        {/* 🚀 HERO SECTION */}
         <section className="relative overflow-hidden bg-white pt-20 pb-24 sm:pt-32 sm:pb-40">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
@@ -44,7 +45,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* HERO VISUAL (Placeholder mimicking your UI card) */}
+              {/* HERO VISUAL */}
               <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
                 <div className="rounded-3xl bg-[#0A2351] p-8 shadow-2xl">
                   <div className="mb-6 rounded-2xl bg-white/10 p-6 backdrop-blur-sm border border-white/10">
