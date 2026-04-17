@@ -29,12 +29,12 @@ export async function POST(request) {
       userId = user.id
     }
 
-    // 2. Save Assessment
+   // 2. Save Assessment
     const { data: assessment, error: assessmentError } = await supabase
       .from('assessments')
       .insert([{
         user_id: userId,
-        answers_json: answers, // Using the standard column name from your database
+        raw_answers: answers, // 🚀 Changed this column name!
         payment_status: true
       }])
       .select('id')
