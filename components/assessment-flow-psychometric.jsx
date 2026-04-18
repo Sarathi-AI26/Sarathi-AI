@@ -144,6 +144,7 @@ const AssessmentFlowPsychometric = () => {
     }
     
     if (absoluteStep < totalSteps) {
+      setTimeout(() => {
       const nextStep = absoluteStep + 1
       
       // ✅ GHOST BUSTER: Pre-sync state for the next question
@@ -153,6 +154,7 @@ const AssessmentFlowPsychometric = () => {
       setAbsoluteStep(nextStep)
       updateSection(nextStep)
       window.scrollTo({ top: 0, behavior: 'smooth' })
+    }, 300);
     } else {
       setIsSubmitting(true)
       try {
