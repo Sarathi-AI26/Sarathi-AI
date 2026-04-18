@@ -23,7 +23,7 @@ export default function AboutPage() {
       <main>
         
         {/* 🌟 HERO SECTION */}
-        <section className="relative overflow-hidden bg-[#0A2351] pt-24 pb-32 sm:pt-32 sm:pb-40">
+        <section className="relative overflow-hidden bg-[#0A2351] pt-16 pb-20 sm:pt-24 sm:pb-24">
           <div className="absolute inset-0">
              {/* Subtle background glow */}
              <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#F57D14]/20 blur-[100px]" />
@@ -44,7 +44,7 @@ export default function AboutPage() {
         </section>
 
         {/* 📖 THE PROBLEM & SOLUTION (Split Layout) */}
-        <section className="py-24 sm:py-32">
+        <section className="py-12 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
               
@@ -57,7 +57,7 @@ export default function AboutPage() {
                     Every year, millions of Indian students graduate with degrees, but without direction. Traditional career counseling relies on outdated personality tests, subjective human opinions, and generic advice that doesn't account for the rapidly changing job market.
                   </p>
                   <p className="mt-4 text-lg leading-relaxed text-slate-600">
-                    We knew there had to be a better, more scientific way. <strong className="text-[#0A2351]">SARATHI</strong> was born from a simple idea: what if we could map a student's intrinsic traits directly to high-growth career trajectories with pinpoint accuracy?
+                    We knew there had to be a better, more scientific way. <strong className="text-[#0A2351]">SARATHI</strong> (Student Assessment Roadmap Application for Transformation & Holistic Improvement) was born from a simple idea: what if we could map a student's intrinsic traits directly to high-growth career trajectories with pinpoint accuracy?
                   </p>
                 </div>
                 
@@ -117,9 +117,9 @@ export default function AboutPage() {
         </section>
 
         {/* 🧬 CORE VALUES GRID */}
-        <section className="bg-slate-50 py-24 sm:py-32">
+        <section className="bg-slate-50 py-12 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-16 text-center">
+            <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Our Core DNA</h2>
               <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
                 The principles that drive every algorithm we write and every student we help.
@@ -146,9 +146,9 @@ export default function AboutPage() {
         </section>
 
         {/* 🚀 CTA SECTION */}
-        <section className="py-24 sm:py-32 relative overflow-hidden">
+        <section className="py-12 sm:py-16 relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="mx-auto max-w-4xl rounded-[3rem] bg-[#0A2351] p-10 text-center shadow-2xl sm:p-20 relative overflow-hidden">
+            <div className="mx-auto max-w-4xl rounded-[3rem] bg-[#0A2351] p-10 text-center shadow-2xl sm:p-16 relative overflow-hidden">
               <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
               
               <h2 className="text-3xl font-extrabold text-white sm:text-5xl">
