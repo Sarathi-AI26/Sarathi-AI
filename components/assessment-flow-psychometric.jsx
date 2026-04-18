@@ -324,8 +324,8 @@ const AssessmentFlowPsychometric = () => {
                         const isSelected = allAnswers[absoluteStep - 1] === opt;
                         return (
                           <button 
-                            key={opt} 
-                            onClick={() => handleNext(opt)} 
+  key={`${absoluteStep}-${opt}`} 
+  onClick={() => handleNext(opt)} 
                             disabled={isSubmitting}
                             className={`w-full rounded-xl border p-4 text-left text-sm font-medium transition-all 
                               ${isSelected ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]' : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'}
