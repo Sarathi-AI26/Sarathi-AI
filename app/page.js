@@ -78,8 +78,7 @@ export default function Home() {
     </div>
   </div>
 </div>
-          </div>
-        </section>
+         
 
         {/* 🧬 METHODOLOGY SECTION */}
         <section id="methodology" className="bg-slate-50 py-12 sm:py-16 border-t border-slate-100">
