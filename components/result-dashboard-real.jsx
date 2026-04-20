@@ -176,9 +176,9 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
                 <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
-              </h1>
+              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+  {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+</h1>
               <p className="mt-6 text-lg leading-relaxed text-white/70">
                 This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
               </p>
