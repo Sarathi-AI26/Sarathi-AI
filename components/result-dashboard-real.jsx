@@ -155,7 +155,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     <main className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
       <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         
-        {/* 🚀 PDF FIX: break-inside-avoid prevents the hero banner from splitting */}
         <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12 break-inside-avoid">
           <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
             <div className="max-w-3xl">
@@ -176,7 +175,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         <div className="grid gap-8 lg:grid-cols-3">
           
           <div className="lg:col-span-2 space-y-8">
-            {/* 🚀 PDF FIX: break-inside-avoid keeps summary card intact */}
             <Card className="border-0 shadow-sm overflow-hidden break-inside-avoid">
               <CardHeader className="bg-slate-50 border-b border-slate-100">
                 <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
@@ -191,7 +189,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
             <div className="grid gap-6 md:grid-cols-3">
               {(analysis.top_career_matches || []).map((match, i) => (
-                {/* 🚀 PDF FIX: break-inside-avoid stops Prime Matches from slicing in half */}
                 <Card key={i} className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14] break-inside-avoid">
                   <CardContent className="p-6">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
@@ -208,7 +205,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           </div>
 
           <div className="space-y-8">
-            {/* 🚀 PDF FIX: break-inside-avoid */}
             <Card className="border-0 bg-[#0A2351]/5 shadow-none break-inside-avoid">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
@@ -231,7 +227,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
               </CardContent>
             </Card>
 
-            {/* 🚀 PDF FIX: break-inside-avoid */}
             <Card className="border-0 shadow-sm bg-orange-50/50 break-inside-avoid mb-8">
                <CardHeader>
                  <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
@@ -250,7 +245,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           </div>
         </div>
 
-       {/* 🚀 PDF FIX: break-inside-avoid keeps the roadmap header intact */}
        <section className="mt-12 break-inside-avoid">
          <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
          <div className="grid gap-6 lg:grid-cols-3">
@@ -277,7 +271,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             {/* 🚀 PDF FIX: break-inside-avoid keeps the individual years from splitting */}
              <Card key={i} className="relative overflow-hidden border-0 shadow-lg bg-white break-inside-avoid">
                <div className={`h-2 w-full ${step.color}`} />
                <CardHeader>
