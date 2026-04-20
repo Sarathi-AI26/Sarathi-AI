@@ -233,7 +233,8 @@ const AssessmentFlowPsychometric = () => {
     <main className="min-h-screen bg-slate-50 py-8">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
-          <Card className="overflow-hidden border-slate-200 bg-white shadow-xl">
+          {/* 🚀 Changed to rounded-3xl for the main card container */}
+          <Card className="overflow-hidden rounded-3xl border-slate-200 bg-white shadow-xl">
             
             <div className="bg-[#0A2351] px-6 py-4 text-white">
               {!isFormCompleted ? (
@@ -265,13 +266,15 @@ const AssessmentFlowPsychometric = () => {
                   <div className="space-y-6">
                     <h3 className="text-xl font-bold text-[#0A2351]">Tell us who you are</h3>
                     <div className="space-y-4">
-                      <input type="text" placeholder="Full Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
-                      <input type="email" placeholder="Email Address *" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
-                      <input type="tel" placeholder="WhatsApp Number *" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
-                      <input type="text" placeholder="College Name *" value={formData.college} onChange={(e) => setFormData({...formData, college: e.target.value})} className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
+                      {/* 🚀 Changed all inputs to rounded-2xl */}
+                      <input type="text" placeholder="Full Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
+                      <input type="email" placeholder="Email Address *" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
+                      <input type="tel" placeholder="WhatsApp Number *" value={formData.whatsapp} onChange={(e) => setFormData({...formData, whatsapp: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
+                      <input type="text" placeholder="College Name *" value={formData.college} onChange={(e) => setFormData({...formData, college: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
                     </div>
                     <div className="flex justify-end pt-4">
-                      <Button onClick={handleStartTest} disabled={!isFormValid} className={`h-12 rounded-xl px-8 font-bold text-white transition-all ${isFormValid ? 'bg-[#F57D14] hover:bg-[#dd6f11]' : 'bg-slate-300 cursor-not-allowed'}`}>
+                      {/* 🚀 Changed to rounded-2xl */}
+                      <Button onClick={handleStartTest} disabled={!isFormValid} className={`h-12 rounded-2xl px-8 font-bold text-white transition-all ${isFormValid ? 'bg-[#F57D14] hover:bg-[#dd6f11]' : 'bg-slate-300 cursor-not-allowed'}`}>
                         Start Assessment <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
@@ -283,12 +286,14 @@ const AssessmentFlowPsychometric = () => {
                       <h3 className="text-lg font-bold text-[#0A2351]">Self-Reflection</h3>
                       <p className="text-base text-slate-700 font-medium leading-relaxed">{questionBank[absoluteStep - 1]}</p>
                     </div>
-                    <textarea value={textResponse} onChange={(e) => setTextResponse(e.target.value)} placeholder="Type your reflection here. AI uses this to measure career clarity..." className="w-full h-40 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]" />
+                    {/* 🚀 Changed text area to rounded-2xl */}
+                    <textarea value={textResponse} onChange={(e) => setTextResponse(e.target.value)} placeholder="Type your reflection here. AI uses this to measure career clarity..." className="w-full h-40 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]" />
                     <div className="flex items-center justify-between pt-6">
                       <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                       </Button>
-                      <Button onClick={() => handleNext(null)} disabled={!textResponse.trim()} className="h-12 rounded-xl bg-[#F57D14] px-4 sm:px-8 font-bold text-white shadow-lg hover:bg-[#dd6f11]">
+                      {/* 🚀 Changed to rounded-2xl */}
+                      <Button onClick={() => handleNext(null)} disabled={!textResponse.trim()} className="h-12 rounded-2xl bg-[#F57D14] px-4 sm:px-8 font-bold text-white shadow-lg hover:bg-[#dd6f11]">
                         {absoluteStep === totalSteps ? "Finish & View Results" : "Next Reflection"} <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     </div>
@@ -310,7 +315,8 @@ const AssessmentFlowPsychometric = () => {
                       ].map((opt) => {
                         const isSelected = allAnswers[absoluteStep - 1] === opt;
                         return (
-                          <button key={`${absoluteStep}-${opt}`} onClick={() => handleNext(opt)} className={`w-full rounded-xl border p-4 text-left text-sm font-medium transition-all ${isSelected ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]' : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'}`}>
+                          /* 🚀 Changed option buttons to rounded-2xl */
+                          <button key={`${absoluteStep}-${opt}`} onClick={() => handleNext(opt)} className={`w-full rounded-2xl border p-4 text-left text-sm font-medium transition-all ${isSelected ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]' : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'}`}>
                             {opt}
                           </button>
                         )
@@ -346,10 +352,12 @@ const AssessmentFlowPsychometric = () => {
           </Card>
 
           <aside className="space-y-6 hidden lg:block">
-            <Card className="border-0 bg-[#0A2351] text-white shadow-lg">
+            {/* 🚀 Changed sidebar card to rounded-3xl */}
+            <Card className="border-0 rounded-3xl bg-[#0A2351] text-white shadow-lg">
               <CardContent className="p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/10">
+                  {/* 🚀 Changed icon background to rounded-2xl */}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10">
                     <ClipboardCheck className="h-5 w-5 text-[#F57D14]" />
                   </div>
                   <div>
