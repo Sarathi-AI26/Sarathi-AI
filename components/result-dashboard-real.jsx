@@ -28,7 +28,8 @@ const hasRealAiAnalysis = (analysis) => {
   )
 }
 
-const ResultDashboardReal = ({ assessmentId, onReady }) => {
+// 🚀 Accept the isPdfMode prop
+const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [locked, setLocked] = useState(false)
@@ -133,8 +134,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           </Button>
         </Card>
       </div>
-    )
-  }
+    }
 
   if (locked) {
     return (
@@ -172,9 +172,10 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        {/* 🚀 PDF FIX: Toggle grid off if generating PDF */}
+        <div className={`grid gap-8 ${isPdfMode ? 'grid-cols-1' : 'lg:grid-cols-3'}`}>
           
-          <div className="lg:col-span-2 space-y-8">
+          <div className={`${isPdfMode ? 'col-span-1' : 'lg:col-span-2'} space-y-8`}>
             <Card className="border-0 shadow-sm overflow-hidden break-inside-avoid">
               <CardHeader className="bg-slate-50 border-b border-slate-100">
                 <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
@@ -187,13 +188,14 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
               </CardContent>
             </Card>
 
-            <div className="grid gap-6 md:grid-cols-3">
+            {/* 🚀 PDF FIX: Stack the prime match cards vertically in the PDF */}
+            <div className={`grid gap-6 ${isPdfMode ? 'grid-cols-1' : 'md:grid-cols-3'}`}>
               {(analysis.top_career_matches || []).map((match, i) => (
                 <Card key={i} className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14] break-inside-avoid">
                   <CardContent className="p-6">
                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
                     <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
-                    <p className="text-sm text-slate-500 mb-4 line-clamp-3">{match.why_it_fits}</p>
+                    <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
                     <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
                       <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
                       {match.starting_salary_inr}
@@ -247,7 +249,8 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
        <section className="mt-12 break-inside-avoid">
          <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
-         <div className="grid gap-6 lg:grid-cols-3">
+         {/* 🚀 PDF FIX: Stack the 5-year roadmap vertically in the PDF */}
+         <div className={`grid gap-6 ${isPdfMode ? 'grid-cols-1' : 'lg:grid-cols-3'}`}>
            {[
              { 
                label: 'Year 1', 
