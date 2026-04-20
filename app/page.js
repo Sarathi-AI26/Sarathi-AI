@@ -34,6 +34,7 @@ export default function Home() {
                   Stop guessing. Use the science of psychometrics and the power of Gemini AI to map your intrinsic traits to a personalized 5-year roadmap for career success.
                 </p>
                 <div className="mt-10 flex items-center gap-x-6">
+                  {/* Kept pill-shape (rounded-full) for the main CTA, as it draws the eye and looks intentional */}
                   <Button asChild className="h-14 rounded-full bg-[#0A2351] px-8 text-base font-bold text-white hover:bg-[#0A2351]/90 shadow-xl shadow-[#0A2351]/20 transition-all hover:scale-105">
                     <Link href="/assessment">Take the Test <ArrowRight className="ml-2 h-5 w-5" /></Link>
                   </Button>
@@ -42,7 +43,8 @@ export default function Home() {
 
               {/* HERO VISUAL */}
               <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
-                <div className="rounded-3xl bg-[#0A2351] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
+                {/* 🚀 Changed to rounded-[32px] for large panel hierarchy */}
+                <div className="rounded-[32px] bg-[#0A2351] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
                   
                   {/* Top Section: Insights */}
                   <div className="mb-6 rounded-2xl bg-white/10 p-5 backdrop-blur-sm border border-white/10">
@@ -124,7 +126,8 @@ export default function Home() {
         </section>
 
         {/* 🏢 FOR INSTITUTIONS SECTION */}
-        <section id="institutions" className="bg-white py-12 sm:py-16">
+        {/* 🚀 Added the missing scroll-mt-24 fix here */}
+        <section id="institutions" className="scroll-mt-24 bg-white py-12 sm:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="order-2 lg:order-1">
@@ -148,7 +151,8 @@ export default function Home() {
                 </ul>
               </div>
               
-              <div className="order-1 lg:order-2 relative aspect-square overflow-hidden rounded-3xl bg-[#0A2351] shadow-2xl lg:aspect-auto lg:h-[500px]">
+              {/* 🚀 Changed to rounded-[32px] for large panel hierarchy */}
+              <div className="order-1 lg:order-2 relative aspect-square overflow-hidden rounded-[32px] bg-[#0A2351] shadow-2xl lg:aspect-auto lg:h-[500px]">
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center border border-white/10 m-4 rounded-2xl bg-white/5 backdrop-blur-sm">
                   <Users className="mb-6 h-16 w-16 text-[#F57D14]" />
                   <h3 className="text-2xl font-bold text-white">Placement Intelligence Dashboard</h3>
@@ -206,32 +210,36 @@ export default function Home() {
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Representative Name</label>
+                      {/* 🚀 Changed to rounded-2xl for inputs */}
                       <input 
                         type="text" 
                         placeholder="e.g. Dr. Sharma" 
-                        className="w-full rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                        className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Designation</label>
+                      {/* 🚀 Changed to rounded-2xl for inputs */}
                       <input 
                         type="text" 
                         placeholder="e.g. TPO / Principal" 
-                        className="w-full rounded-xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                        className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Institution Name</label>
+                    {/* 🚀 Changed to rounded-2xl for inputs */}
                     <input 
                       type="text" 
                       placeholder="Enter full college name" 
-                      className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
                     />
                   </div>
 
-                  <Button type="button" className="mt-4 h-12 w-full rounded-xl bg-[#F57D14] text-base font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/20 transition-all hover:scale-[1.02]">
+                  {/* 🚀 Changed to rounded-2xl for the submit button */}
+                  <Button type="button" className="mt-4 h-12 w-full rounded-2xl bg-[#F57D14] text-base font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/20 transition-all hover:scale-[1.02]">
                     Book Campus Demo
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
