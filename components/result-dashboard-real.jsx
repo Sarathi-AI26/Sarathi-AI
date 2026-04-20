@@ -155,106 +155,101 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
     <main className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
       <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         
-        {/* === PAGE 1: HERO === */}
-        <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12">
-          <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
-            <div className="max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
-                <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
+        {/* HERO BANNER - Kept as one solid block so the banner doesn't split */}
+        <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: '2rem' }}>
+          <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12">
+            <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
+              <div className="max-w-3xl">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
+                  <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
+                </div>
+                <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+                </h1>
+                <p className="mt-6 text-lg leading-relaxed text-white/70">
+                  This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
+                </p>
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
-              </h1>
-              <p className="mt-6 text-lg leading-relaxed text-white/70">
-                This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
-              </p>
             </div>
-          </div>
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-        </section>
+            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+          </section>
+        </div>
 
-        {/* 🚀 THE FIX: Physical Canvas Cut #1 */}
-        {isPdfMode && <div className="html2pdf__page-break"></div>}
-
-        <div className={isPdfMode ? 'block' : 'grid gap-8 lg:grid-cols-3'}>
+        {/* Removed grids entirely for PDF mode to ensure natural document flow */}
+        <div className={isPdfMode ? 'block space-y-8' : 'grid gap-8 lg:grid-cols-3'}>
           
           <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
             
-            {/* === PAGE 2: EXECUTIVE SUMMARY === */}
             <Card className="border-0 shadow-sm overflow-hidden">
-              <CardHeader className="bg-slate-50 border-b border-slate-100">
+              <CardHeader className="bg-slate-50 border-b border-slate-100 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
                 <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
                 <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-6 text-slate-700 leading-relaxed text-lg">
+                {/* 🚀 THE FIX: Applied pageBreakInside directly to individual paragraphs so they flow naturally over pages */}
                 {executiveSummaryParagraphs.map((para, i) => (
-                  <p key={i}>{para}</p>
+                  <p key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>{para}</p>
                 ))}
               </CardContent>
             </Card>
 
-            {/* 🚀 THE FIX: Physical Canvas Cut #2 */}
-            {isPdfMode && <div className="html2pdf__page-break"></div>}
-
-            {/* === PAGE 3: PRIME MATCHES === */}
             <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
-              {/* Context header added specifically for the PDF page */}
-              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-2 pt-2">Recommended Career Paths</h2>}
+              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Recommended Career Paths</h2>}
               
               {(analysis.top_career_matches || []).map((match, i) => (
-                <Card key={i} className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
-                  <CardContent className="p-6">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
-                    <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
-                    <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
-                    <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
-                      <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
-                      {match.starting_salary_inr}
-                    </div>
-                  </CardContent>
-                </Card>
+                <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: isPdfMode ? '1.5rem' : '0' }}>
+                  <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
+                    <CardContent className="p-6">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
+                      <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
+                      <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
+                      <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
+                        <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
+                        {match.starting_salary_inr}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               ))}
             </div>
           </div>
 
-          {/* 🚀 THE FIX: Physical Canvas Cut #3 */}
-          {isPdfMode && <div className="html2pdf__page-break"></div>}
-
-          {/* === PAGE 4: PSYCHOMETRIC DNA & WARNINGS === */}
           <div className="space-y-8">
-            {/* Context header added specifically for the PDF page */}
-            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-2 pt-2">Psychometric Profile & Growth</h2>}
+            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid', marginTop: '2rem' }}>Psychometric Profile & Growth</h2>}
             
-            <Card className="border-0 bg-[#0A2351]/5 shadow-none">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
-                  <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Dominant Personality Traits</label>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {profile.dominant_personality_traits?.map(trait => (
-                      <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
-                    ))}
+            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+              <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
+                    <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Dominant Personality Traits</label>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {profile.dominant_personality_traits?.map(trait => (
+                        <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Preferred Learning Style</label>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
-                </div>
-              </CardContent>
-            </Card>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Preferred Learning Style</label>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
             <Card className="border-0 shadow-sm bg-orange-50/50 mb-8">
-               <CardHeader>
+               <CardHeader className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
                  <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
                </CardHeader>
                <CardContent>
                  <ul className="space-y-3">
+                   {/* 🚀 THE FIX: Applied pageBreakInside directly to individual list items so they flow over pages */}
                    {analysis.potential_blind_spots?.map((spot, i) => (
-                     <li key={i} className="flex gap-3 text-sm text-orange-900/70">
+                     <li key={i} className="flex gap-3 text-sm text-orange-900/70 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                        {spot}
                      </li>
@@ -265,12 +260,8 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
-       {/* 🚀 THE FIX: Physical Canvas Cut #4 */}
-       {isPdfMode && <div className="html2pdf__page-break"></div>}
-       
-       {/* === PAGE 5: 5-YEAR ROADMAP === */}
        <section className="mt-12">
-         <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
+         <h2 className="text-3xl font-bold text-[#0A2351] mb-8 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Your 5-Year Career Transformation</h2>
          <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
@@ -295,25 +286,27 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             <Card key={i} className="relative overflow-hidden border-0 shadow-lg bg-white">
-               <div className={`h-2 w-full ${step.color}`} />
-               <CardHeader>
-                 <div className="flex items-center gap-3">
-                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
-                     <step.icon className="h-5 w-5" />
+             <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: isPdfMode ? '1.5rem' : '0' }}>
+               <Card className="relative overflow-hidden border-0 shadow-lg bg-white">
+                 <div className={`h-2 w-full ${step.color}`} />
+                 <CardHeader>
+                   <div className="flex items-center gap-3">
+                     <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
+                       <step.icon className="h-5 w-5" />
+                     </div>
+                     <div>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
+                       <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
+                     </div>
                    </div>
-                   <div>
-                     <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
-                     <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
-                   </div>
-                 </div>
-               </CardHeader>
-               <CardContent>
-                 <p className="text-sm leading-relaxed text-slate-600">
-                   {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
-                 </p>
-               </CardContent>
-             </Card>
+                 </CardHeader>
+                 <CardContent>
+                   <p className="text-sm leading-relaxed text-slate-600">
+                     {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
+                   </p>
+                 </CardContent>
+               </Card>
+             </div>
            ))}
          </div>
        </section>
