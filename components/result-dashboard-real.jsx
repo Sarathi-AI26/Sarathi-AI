@@ -74,7 +74,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             roadmapData = JSON.parse(textData) 
           } catch (e) {
             console.error("Vercel returned non-JSON:", textData)
-            throw new Error("The AI took too long to respond (Vercel Timeout). Please click 'Retake' to resume.")
+            throw new Error("The AI took too long to respond. Please click 'Retake' to resume.")
           }
           if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
           
@@ -117,7 +117,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
         <h1 className="text-2xl font-bold text-[#0A2351]">Synthesizing Your 5-Year Vision...</h1>
         <p className="mt-2 text-slate-500 max-w-md">Our AI is analyzing 60+ data points to build your custom career transformation roadmap.</p>
         <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
-          <Loader2 className="h-4 w-4 animate-spin" /> Gemini 2.5 Flash Processing
+          <Loader2 className="h-4 w-4 animate-spin" /> Processing Roadmap...
         </div>
       </div>
     )
@@ -154,20 +154,17 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   return (
     <main className={`${isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}`}>
       
+      {/* 🚀 FIX: Removed display:inline-block so text doesn't jump to new pages randomly */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{__html: `
           .avoid-page-break {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            display: inline-block !important;
-            width: 100% !important;
-            vertical-align: top !important;
           }
         `}} />
       )}
 
-      {/* 🚀 FIX: Removed all overlapping space-y classes for PDF mode so gaps are perfectly even */}
-      <div className={`container mx-auto ${isPdfMode ? 'px-0 max-w-none' : 'space-y-8 px-4 sm:px-6 lg:px-8'}`}>
+      <div className={`container mx-auto ${isPdfMode ? 'px-0 max-w-none pb-4' : 'space-y-8 px-4 sm:px-6 lg:px-8'}`}>
         
         <div className={`avoid-page-break ${isPdfMode ? 'mb-5' : 'mb-8'}`}>
           <section className={`bg-[#0A2351] text-white shadow-2xl shadow-[#0A2351]/20 ${isPdfMode ? 'rounded-xl p-6' : 'rounded-[2rem] p-8 sm:p-12 relative overflow-hidden'}`}>
