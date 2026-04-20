@@ -22,14 +22,14 @@ const App = ({ searchParams }) => {
         const element = document.getElementById('sarathi-report');
         
         const opt = {
-          // 🚀 FIX 1: Tighter margins (0.4 inches) so less space is wasted
-          margin:       [0.4, 0.4, 0.4, 0.4], 
+          margin:       0.4, 
           filename:     'SARATHI_Career_Roadmap.pdf',
           image:        { type: 'jpeg', quality: 1 },
-          html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200, letterRendering: true }, 
+          // Using 1024px width prevents the text from stretching too wide in PDF mode
+          html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, letterRendering: true }, 
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-          // 🚀 FIX 2: Removed 'avoid-all' so paragraphs can naturally flow to page 2 without massive gaps!
-          pagebreak:    { mode: ['css', 'legacy'] } 
+          // 🚀 FIX: Only protect atomic elements (paragraphs/list items) to prevent giant gaps
+          pagebreak:    { mode: ['css', 'legacy'], avoid: ['.avoid-page-break', '.break-inside-avoid'] } 
         };
 
         await html2pdf().set(opt).from(element).save();
