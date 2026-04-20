@@ -155,6 +155,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
     <main className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
       <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         
+        {/* === PAGE 1: HERO & SUMMARY === */}
         <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12 break-inside-avoid">
           <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
             <div className="max-w-3xl">
@@ -172,7 +173,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
         </section>
 
-        {/* 🚀 PDF FIX: Completely remove grid classes when in PDF mode. Use simple block stacking. */}
         <div className={isPdfMode ? 'block space-y-8' : 'grid gap-8 lg:grid-cols-3'}>
           
           <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
@@ -188,7 +188,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
               </CardContent>
             </Card>
 
-            {/* 🚀 PDF FIX: Remove grid here too */}
+            {/* 🚀 FORCE PAGE BREAK BEFORE PRIME MATCHES */}
+            {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
+
+            {/* === PAGE 2: PRIME MATCHES === */}
             <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
               {(analysis.top_career_matches || []).map((match, i) => (
                 <Card key={i} className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14] break-inside-avoid">
@@ -206,6 +209,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             </div>
           </div>
 
+          {/* 🚀 FORCE PAGE BREAK BEFORE PSYCHOMETRIC DNA */}
+          {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
+
+          {/* === PAGE 3: PSYCHOMETRIC DNA & WARNINGS === */}
           <div className="space-y-8">
             <Card className="border-0 bg-[#0A2351]/5 shadow-none break-inside-avoid">
               <CardHeader>
@@ -247,12 +254,12 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
-       {/* 🚀 PDF FIX: Force a physical page break right before the Roadmap to make it look like "Chapter 2" */}
-       {isPdfMode && <div className="break-before-page" />}
+       {/* 🚀 FORCE PAGE BREAK BEFORE ROADMAP */}
+       {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
        
+       {/* === PAGE 4: 5-YEAR ROADMAP === */}
        <section className="mt-12 break-inside-avoid">
          <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
-         {/* 🚀 PDF FIX: Remove grid here too */}
          <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
