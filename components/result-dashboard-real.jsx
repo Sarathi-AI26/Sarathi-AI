@@ -179,7 +179,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           
           <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
             
-            {/* 🚀 THE FIX: Wrapped in a pure block div */}
             <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
               <Card className="border-0 shadow-sm overflow-hidden">
                 <CardHeader className="bg-slate-50 border-b border-slate-100">
@@ -194,14 +193,11 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
               </Card>
             </div>
 
-            {/* 🚀 FORCE PAGE BREAK BEFORE PRIME MATCHES */}
             {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
 
             {/* === PAGE 2: PRIME MATCHES === */}
             <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
               {(analysis.top_career_matches || []).map((match, i) => (
-                
-                {/* 🚀 THE FIX: Wrapped in a pure block div */}
                 <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
                   <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
                     <CardContent className="p-6">
@@ -219,13 +215,11 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             </div>
           </div>
 
-          {/* 🚀 FORCE PAGE BREAK BEFORE PSYCHOMETRIC DNA */}
           {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
 
           {/* === PAGE 3: PSYCHOMETRIC DNA & WARNINGS === */}
           <div className="space-y-8">
             
-            {/* 🚀 THE FIX: Wrapped in a pure block div */}
             <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
               <Card className="border-0 bg-[#0A2351]/5 shadow-none">
                 <CardHeader>
@@ -250,7 +244,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
               </Card>
             </div>
 
-            {/* 🚀 THE FIX: Wrapped in a pure block div */}
             <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
               <Card className="border-0 shadow-sm bg-orange-50/50 mb-8">
                  <CardHeader>
@@ -271,7 +264,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
-       {/* 🚀 FORCE PAGE BREAK BEFORE ROADMAP */}
        {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
        
        {/* === PAGE 4: 5-YEAR ROADMAP === */}
@@ -301,8 +293,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             
-             {/* 🚀 THE FIX: Wrapped in a pure block div */}
              <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
                <Card className="relative overflow-hidden border-0 shadow-lg bg-white">
                  <div className={`h-2 w-full ${step.color}`} />
@@ -324,7 +314,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                  </CardContent>
                </Card>
              </div>
-
            ))}
          </div>
        </section>
