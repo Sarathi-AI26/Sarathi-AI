@@ -9,35 +9,34 @@ const App = ({ searchParams }) => {
   const assessmentId = Array.isArray(searchParams?.id) ? searchParams?.id?.[0] : searchParams?.id || ''
   const [isDownloading, setIsDownloading] = useState(false)
   const [isReportReady, setIsReportReady] = useState(false)
-  
-  // State to trigger the vertical PDF layout
   const [isPdfMode, setIsPdfMode] = useState(false)
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true)
-    setIsPdfMode(true) // Trigger the layout shift
+    setIsPdfMode(true) // Trigger the tighter block layout
 
-    // Wait 800ms for the UI to stack vertically before snapping the PDF
+    // Wait 800ms for the UI to stack and compress
     setTimeout(async () => {
       try {
         const html2pdf = (await import('html2pdf.js')).default;
         const element = document.getElementById('sarathi-report');
         
         const opt = {
-          margin:       0.5, 
+          // 🚀 FIX 1: Tighter margins (0.4 inches) so less space is wasted
+          margin:       [0.4, 0.4, 0.4, 0.4], 
           filename:     'SARATHI_Career_Roadmap.pdf',
           image:        { type: 'jpeg', quality: 1 },
-          html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 }, 
+          html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200, letterRendering: true }, 
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-          // 🚀 THE ULTIMATE FIX: Tells the engine to strictly respect our CSS rules
-          pagebreak:    { mode: ['css', 'legacy'], avoid: '.avoid-page-break' } 
+          // 🚀 FIX 2: Removed 'avoid-all' so paragraphs can naturally flow to page 2 without massive gaps!
+          pagebreak:    { mode: ['css', 'legacy'] } 
         };
 
         await html2pdf().set(opt).from(element).save();
       } catch (error) {
         console.error("PDF Generation Failed:", error);
       } finally {
-        setIsPdfMode(false) // Instantly revert back to the beautiful 3-column web view
+        setIsPdfMode(false) 
         setIsDownloading(false)
       }
     }, 800);
@@ -64,7 +63,6 @@ const App = ({ searchParams }) => {
         )}
 
         <div id="sarathi-report" className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-          {/* Pass the isPdfMode state down to the dashboard */}
           <ResultDashboardReal 
             assessmentId={assessmentId} 
             onReady={() => setIsReportReady(true)} 
