@@ -156,7 +156,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
       <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         
         {/* HERO BANNER - Kept as one solid block so the banner doesn't split */}
-        <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: '2rem' }}>
+        <div className="avoid-page-break break-inside-avoid block mb-8" style={{ pageBreakInside: 'avoid' }}>
           <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12">
             <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
               <div className="max-w-3xl">
@@ -175,29 +175,27 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </section>
         </div>
 
-        {/* Removed grids entirely for PDF mode to ensure natural document flow */}
         <div className={isPdfMode ? 'block space-y-8' : 'grid gap-8 lg:grid-cols-3'}>
           
           <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
             
             <Card className="border-0 shadow-sm overflow-hidden">
-              <CardHeader className="bg-slate-50 border-b border-slate-100 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
+              <CardHeader className="bg-slate-50 border-b border-slate-100 avoid-page-break break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
                 <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
                 <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
               </CardHeader>
               <CardContent className="p-8 space-y-6 text-slate-700 leading-relaxed text-lg">
-                {/* 🚀 THE FIX: Applied pageBreakInside directly to individual paragraphs so they flow naturally over pages */}
                 {executiveSummaryParagraphs.map((para, i) => (
-                  <p key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>{para}</p>
+                  <p key={i} className="avoid-page-break break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>{para}</p>
                 ))}
               </CardContent>
             </Card>
 
             <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
-              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Recommended Career Paths</h2>}
+              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Recommended Career Paths</h2>}
               
               {(analysis.top_career_matches || []).map((match, i) => (
-                <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: isPdfMode ? '1.5rem' : '0' }}>
+                <div key={i} className={`avoid-page-break break-inside-avoid block ${isPdfMode ? 'mb-6' : ''}`} style={{ pageBreakInside: 'avoid' }}>
                   <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
                     <CardContent className="p-6">
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
@@ -215,9 +213,9 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
 
           <div className="space-y-8">
-            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid', marginTop: '2rem' }}>Psychometric Profile & Growth</h2>}
+            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break break-inside-avoid" style={{ pageBreakInside: 'avoid', marginTop: '2rem' }}>Psychometric Profile & Growth</h2>}
             
-            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+            <div className="avoid-page-break break-inside-avoid block" style={{ pageBreakInside: 'avoid' }}>
               <Card className="border-0 bg-[#0A2351]/5 shadow-none">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
@@ -242,14 +240,13 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             </div>
 
             <Card className="border-0 shadow-sm bg-orange-50/50 mb-8">
-               <CardHeader className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
+               <CardHeader className="avoid-page-break break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
                  <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
                </CardHeader>
                <CardContent>
                  <ul className="space-y-3">
-                   {/* 🚀 THE FIX: Applied pageBreakInside directly to individual list items so they flow over pages */}
                    {analysis.potential_blind_spots?.map((spot, i) => (
-                     <li key={i} className="flex gap-3 text-sm text-orange-900/70 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
+                     <li key={i} className="flex gap-3 text-sm text-orange-900/70 avoid-page-break break-inside-avoid block" style={{ pageBreakInside: 'avoid' }}>
                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
                        {spot}
                      </li>
@@ -261,7 +258,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
         </div>
 
        <section className="mt-12">
-         <h2 className="text-3xl font-bold text-[#0A2351] mb-8 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Your 5-Year Career Transformation</h2>
+         <h2 className="text-3xl font-bold text-[#0A2351] mb-8 avoid-page-break break-inside-avoid block" style={{ pageBreakInside: 'avoid' }}>Your 5-Year Career Transformation</h2>
          <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
@@ -286,7 +283,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block', marginBottom: isPdfMode ? '1.5rem' : '0' }}>
+             <div key={i} className={`avoid-page-break break-inside-avoid block ${isPdfMode ? 'mb-6' : ''}`} style={{ pageBreakInside: 'avoid' }}>
                <Card className="relative overflow-hidden border-0 shadow-lg bg-white">
                  <div className={`h-2 w-full ${step.color}`} />
                  <CardHeader>
