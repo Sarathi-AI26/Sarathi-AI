@@ -156,37 +156,43 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
       <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
         
         {/* === PAGE 1: HERO & SUMMARY === */}
-        <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12 break-inside-avoid">
-          <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
-            <div className="max-w-3xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
-                <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
+        <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+          <section className="relative overflow-hidden rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12">
+            <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
+              <div className="max-w-3xl">
+                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
+                  <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
+                </div>
+                <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+                  {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+                </h1>
+                <p className="mt-6 text-lg leading-relaxed text-white/70">
+                  This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
+                </p>
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-                {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
-              </h1>
-              <p className="mt-6 text-lg leading-relaxed text-white/70">
-                This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
-              </p>
             </div>
-          </div>
-          <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
-        </section>
+            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+          </section>
+        </div>
 
         <div className={isPdfMode ? 'block space-y-8' : 'grid gap-8 lg:grid-cols-3'}>
           
           <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
-            <Card className="border-0 shadow-sm overflow-hidden break-inside-avoid">
-              <CardHeader className="bg-slate-50 border-b border-slate-100">
-                <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
-                <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-8 space-y-6 text-slate-700 leading-relaxed text-lg">
-                {executiveSummaryParagraphs.map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
-              </CardContent>
-            </Card>
+            
+            {/* 🚀 THE FIX: Wrapped in a pure block div */}
+            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+              <Card className="border-0 shadow-sm overflow-hidden">
+                <CardHeader className="bg-slate-50 border-b border-slate-100">
+                  <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
+                  <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
+                </CardHeader>
+                <CardContent className="p-8 space-y-6 text-slate-700 leading-relaxed text-lg">
+                  {executiveSummaryParagraphs.map((para, i) => (
+                    <p key={i}>{para}</p>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
 
             {/* 🚀 FORCE PAGE BREAK BEFORE PRIME MATCHES */}
             {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
@@ -194,17 +200,21 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             {/* === PAGE 2: PRIME MATCHES === */}
             <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
               {(analysis.top_career_matches || []).map((match, i) => (
-                <Card key={i} className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14] break-inside-avoid">
-                  <CardContent className="p-6">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
-                    <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
-                    <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
-                    <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
-                      <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
-                      {match.starting_salary_inr}
-                    </div>
-                  </CardContent>
-                </Card>
+                
+                {/* 🚀 THE FIX: Wrapped in a pure block div */}
+                <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+                  <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
+                    <CardContent className="p-6">
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
+                      <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
+                      <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
+                      <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
+                        <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
+                        {match.starting_salary_inr}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               ))}
             </div>
           </div>
@@ -214,43 +224,50 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 
           {/* === PAGE 3: PSYCHOMETRIC DNA & WARNINGS === */}
           <div className="space-y-8">
-            <Card className="border-0 bg-[#0A2351]/5 shadow-none break-inside-avoid">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
-                  <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Dominant Personality Traits</label>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {profile.dominant_personality_traits?.map(trait => (
-                      <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
-                    ))}
+            
+            {/* 🚀 THE FIX: Wrapped in a pure block div */}
+            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+              <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
+                    <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Dominant Personality Traits</label>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {profile.dominant_personality_traits?.map(trait => (
+                        <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-                <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Preferred Learning Style</label>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
-                </div>
-              </CardContent>
-            </Card>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Preferred Learning Style</label>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card className="border-0 shadow-sm bg-orange-50/50 break-inside-avoid mb-8">
-               <CardHeader>
-                 <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
-               </CardHeader>
-               <CardContent>
-                 <ul className="space-y-3">
-                   {analysis.potential_blind_spots?.map((spot, i) => (
-                     <li key={i} className="flex gap-3 text-sm text-orange-900/70">
-                       <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
-                       {spot}
-                     </li>
-                   ))}
-                 </ul>
-               </CardContent>
-            </Card>
+            {/* 🚀 THE FIX: Wrapped in a pure block div */}
+            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+              <Card className="border-0 shadow-sm bg-orange-50/50 mb-8">
+                 <CardHeader>
+                   <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
+                 </CardHeader>
+                 <CardContent>
+                   <ul className="space-y-3">
+                     {analysis.potential_blind_spots?.map((spot, i) => (
+                       <li key={i} className="flex gap-3 text-sm text-orange-900/70">
+                         <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
+                         {spot}
+                       </li>
+                     ))}
+                   </ul>
+                 </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
 
@@ -258,7 +275,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
        {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always' }}></div>}
        
        {/* === PAGE 4: 5-YEAR ROADMAP === */}
-       <section className="mt-12 break-inside-avoid">
+       <section className="mt-12">
          <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
          <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 lg:grid-cols-3'}>
            {[
@@ -284,25 +301,30 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             <Card key={i} className="relative overflow-hidden border-0 shadow-lg bg-white break-inside-avoid">
-               <div className={`h-2 w-full ${step.color}`} />
-               <CardHeader>
-                 <div className="flex items-center gap-3">
-                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
-                     <step.icon className="h-5 w-5" />
+             
+             {/* 🚀 THE FIX: Wrapped in a pure block div */}
+             <div key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid', display: 'block' }}>
+               <Card className="relative overflow-hidden border-0 shadow-lg bg-white">
+                 <div className={`h-2 w-full ${step.color}`} />
+                 <CardHeader>
+                   <div className="flex items-center gap-3">
+                     <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
+                       <step.icon className="h-5 w-5" />
+                     </div>
+                     <div>
+                       <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
+                       <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
+                     </div>
                    </div>
-                   <div>
-                     <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
-                     <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
-                   </div>
-                 </div>
-               </CardHeader>
-               <CardContent>
-                 <p className="text-sm leading-relaxed text-slate-600">
-                   {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
-                 </p>
-               </CardContent>
-             </Card>
+                 </CardHeader>
+                 <CardContent>
+                   <p className="text-sm leading-relaxed text-slate-600">
+                     {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
+                   </p>
+                 </CardContent>
+               </Card>
+             </div>
+
            ))}
          </div>
        </section>
