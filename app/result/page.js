@@ -15,20 +15,20 @@ const App = ({ searchParams }) => {
     setIsDownloading(true)
     setIsPdfMode(true)
 
-    // Wait 800ms for the UI to apply the atomic CSS styles
+    // Wait 800ms for the UI to stack and compress
     setTimeout(async () => {
       try {
         const html2pdf = (await import('html2pdf.js')).default;
         const element = document.getElementById('sarathi-report');
         
         const opt = {
-          margin:       0.4, 
+          margin:       [0.4, 0.4, 0.4, 0.4], 
           filename:     'SARATHI_Career_Roadmap.pdf',
           image:        { type: 'jpeg', quality: 1 },
           html2canvas:  { scale: 2, useCORS: true, windowWidth: 1024, letterRendering: true }, 
           jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-          // 🚀 FIX: Let the custom CSS injected in the component handle the logic
-          pagebreak:    { mode: 'css', avoid: '.avoid-page-break' } 
+          // 🚀 FIX: Array format ['css', 'legacy'] is required to stop text slicing
+          pagebreak:    { mode: ['css', 'legacy'], avoid: '.avoid-page-break' } 
         };
 
         await html2pdf().set(opt).from(element).save();
