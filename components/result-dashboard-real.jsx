@@ -28,7 +28,8 @@ const hasRealAiAnalysis = (analysis) => {
   )
 }
 
-const ResultDashboardReal = ({ assessmentId }) => {
+// 🚀 NEW: Accept the onReady prop from the parent wrapper
+const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [locked, setLocked] = useState(false)
@@ -63,7 +64,6 @@ const ResultDashboardReal = ({ assessmentId }) => {
           setAssessment(currentAssessment)
           setLoading(false)
         } else {
-          // ... inside loadResult
           setAnalyzing(true)
           const roadmapResponse = await fetch('/api/generate-roadmap', {
             method: 'POST',
@@ -71,22 +71,16 @@ const ResultDashboardReal = ({ assessmentId }) => {
             body: JSON.stringify({ assessmentId }),
           })
 
-          // 🚀 REPLACE THIS OLD CODE:
-          // const roadmapData = await roadmapResponse.json()
-          // if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
-          
-          // 🚀 WITH THIS NEW SAFE PARSER:
-          const textData = await roadmapResponse.text() // Get raw response first
+          const textData = await roadmapResponse.text() 
           let roadmapData = {}
           try {
-            roadmapData = JSON.parse(textData) // Try to parse it
+            roadmapData = JSON.parse(textData) 
           } catch (e) {
             console.error("Vercel returned non-JSON:", textData)
             throw new Error("The AI took too long to respond (Vercel Timeout). Please click 'Retake' to resume.")
           }
           if (!roadmapResponse.ok) throw new Error(roadmapData?.error || 'AI generation failed')
-          // ------------------------------------
-
+          
           setAssessment(roadmapData?.assessment)
           setAnalyzing(false)
           setLoading(false)
@@ -100,6 +94,13 @@ const ResultDashboardReal = ({ assessmentId }) => {
 
     loadResult()
   }, [assessmentId])
+
+  // 🚀 NEW: Tell the parent page to show the PDF button ONLY when everything is fully loaded and ready
+  useEffect(() => {
+    if (!loading && !analyzing && !error && !locked && assessment) {
+      if (onReady) onReady();
+    }
+  }, [loading, analyzing, error, locked, assessment, onReady]);
 
   // Data Selectors
   const studentName = useMemo(() => assessment?.user?.name || 'Student', [assessment])
@@ -127,7 +128,8 @@ const ResultDashboardReal = ({ assessmentId }) => {
         <h1 className="text-2xl font-bold text-[#0A2351]">Synthesizing Your 5-Year Vision...</h1>
         <p className="mt-2 text-slate-500 max-w-md">Our AI is analyzing 60+ data points to build your custom career transformation roadmap.</p>
         <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
-          <Loader2 className="h-4 w-4 animate-spin" /> Gemini 2.5 Pro Processing
+          {/* 🚀 FIXED: Now correctly says Gemini 2.5 Flash */}
+          <Loader2 className="h-4 w-4 animate-spin" /> Gemini 2.5 Flash Processing
         </div>
       </div>
     )
@@ -181,7 +183,6 @@ const ResultDashboardReal = ({ assessmentId }) => {
                 This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
               </p>
             </div>
-           
           </div>
           {/* Subtle Background Pattern */}
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
@@ -264,56 +265,54 @@ const ResultDashboardReal = ({ assessmentId }) => {
         </div>
 
        {/* 🔥 5-YEAR TRANSFORMATION SECTION - REFINED MAPPING */}
-<section className="mt-12">
-  <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
-  <div className="grid gap-6 lg:grid-cols-3">
-    {[
-      { 
-        label: 'Year 1', 
-        title: 'Foundation & Skill Launch', 
-        // 🚀 SMART MAPPING: Checks for year_1, Year 1, or Year_1
-        data: roadmap?.year_1 || roadmap?.['Year 1'] || roadmap?.Year_1, 
-        icon: Target, 
-        color: 'bg-blue-600' 
-      },
-      { 
-        label: 'Year 3', 
-        title: 'Market Acceleration', 
-        data: roadmap?.year_3 || roadmap?.['Year 3'] || roadmap?.Year_3, 
-        icon: Sparkles, 
-        color: 'bg-[#F57D14]' 
-      },
-      { 
-        label: 'Year 5', 
-        title: 'Leadership & Mastery', 
-        data: roadmap?.year_5 || roadmap?.['Year 5'] || roadmap?.Year_5, 
-        icon: Network, 
-        color: 'bg-[#0A2351]' 
-      }
-    ].map((step, i) => (
-      <Card key={i} className="relative overflow-hidden border-0 shadow-lg bg-white">
-        <div className={`h-2 w-full ${step.color}`} />
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
-              <step.icon className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
-              <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* 🚀 If data exists, show it. If not, show a clean message */}
-          <p className="text-sm leading-relaxed text-slate-600">
-            {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
-          </p>
-        </CardContent>
-      </Card>
-    ))}
-  </div>
-</section>
+       <section className="mt-12">
+         <h2 className="text-3xl font-bold text-[#0A2351] mb-8">Your 5-Year Career Transformation</h2>
+         <div className="grid gap-6 lg:grid-cols-3">
+           {[
+             { 
+               label: 'Year 1', 
+               title: 'Foundation & Skill Launch', 
+               data: roadmap?.year_1 || roadmap?.['Year 1'] || roadmap?.Year_1, 
+               icon: Target, 
+               color: 'bg-blue-600' 
+             },
+             { 
+               label: 'Year 3', 
+               title: 'Market Acceleration', 
+               data: roadmap?.year_3 || roadmap?.['Year 3'] || roadmap?.Year_3, 
+               icon: Sparkles, 
+               color: 'bg-[#F57D14]' 
+             },
+             { 
+               label: 'Year 5', 
+               title: 'Leadership & Mastery', 
+               data: roadmap?.year_5 || roadmap?.['Year 5'] || roadmap?.Year_5, 
+               icon: Network, 
+               color: 'bg-[#0A2351]' 
+             }
+           ].map((step, i) => (
+             <Card key={i} className="relative overflow-hidden border-0 shadow-lg bg-white">
+               <div className={`h-2 w-full ${step.color}`} />
+               <CardHeader>
+                 <div className="flex items-center gap-3">
+                   <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
+                     <step.icon className="h-5 w-5" />
+                   </div>
+                   <div>
+                     <p className="text-xs font-bold text-slate-400 uppercase tracking-tight">{step.label}</p>
+                     <CardTitle className="text-lg text-[#0A2351]">{step.title}</CardTitle>
+                   </div>
+                 </div>
+               </CardHeader>
+               <CardContent>
+                 <p className="text-sm leading-relaxed text-slate-600">
+                   {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
+                 </p>
+               </CardContent>
+             </Card>
+           ))}
+         </div>
+       </section>
 
       </div>
     </main>
