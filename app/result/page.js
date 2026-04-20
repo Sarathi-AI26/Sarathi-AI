@@ -9,30 +9,37 @@ const App = ({ searchParams }) => {
   const assessmentId = Array.isArray(searchParams?.id) ? searchParams?.id?.[0] : searchParams?.id || ''
   const [isDownloading, setIsDownloading] = useState(false)
   const [isReportReady, setIsReportReady] = useState(false)
+  
+  // 🚀 NEW: State to trigger the vertical PDF layout
+  const [isPdfMode, setIsPdfMode] = useState(false)
 
   const handleDownloadPDF = async () => {
     setIsDownloading(true)
-    try {
-      const html2pdf = (await import('html2pdf.js')).default;
-      const element = document.getElementById('sarathi-report');
-      
-      const opt = {
-        margin:       [0.5, 0.5, 0.5, 0.5], 
-        filename:     'SARATHI_Career_Roadmap.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        // 🚀 FIX 1: Lock window width to 1200px so grids never overlap, regardless of user screen size
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 }, 
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
-        // 🚀 FIX 2: Explicitly tell the html2pdf engine to never slice elements with this exact class
-        pagebreak:    { mode: ['css', 'legacy'], avoid: '.break-inside-avoid' } 
-      };
+    setIsPdfMode(true) // Trigger the layout shift
 
-      await html2pdf().set(opt).from(element).save();
-    } catch (error) {
-      console.error("PDF Generation Failed:", error);
-    } finally {
-      setIsDownloading(false)
-    }
+    // 🚀 Wait 800ms for the UI to stack vertically before snapping the PDF
+    setTimeout(async () => {
+      try {
+        const html2pdf = (await import('html2pdf.js')).default;
+        const element = document.getElementById('sarathi-report');
+        
+        const opt = {
+          margin:       0.5, 
+          filename:     'SARATHI_Career_Roadmap.pdf',
+          image:        { type: 'jpeg', quality: 1 },
+          html2canvas:  { scale: 2, useCORS: true }, 
+          jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' },
+          pagebreak:    { mode: ['css', 'legacy'] } 
+        };
+
+        await html2pdf().set(opt).from(element).save();
+      } catch (error) {
+        console.error("PDF Generation Failed:", error);
+      } finally {
+        setIsPdfMode(false) // Instantly revert back to the beautiful 3-column web view
+        setIsDownloading(false)
+      }
+    }, 800);
   };
 
   return (
@@ -56,9 +63,11 @@ const App = ({ searchParams }) => {
         )}
 
         <div id="sarathi-report" className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+          {/* 🚀 Pass the isPdfMode state down to the dashboard */}
           <ResultDashboardReal 
             assessmentId={assessmentId} 
             onReady={() => setIsReportReady(true)} 
+            isPdfMode={isPdfMode}
           />
         </div>
       </div>
