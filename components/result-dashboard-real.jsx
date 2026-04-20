@@ -154,7 +154,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   return (
     <main className={`${isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}`}>
       
-      {/* 🚀 FIX: The ultimate CSS override specifically for PDF rendering */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{__html: `
           .avoid-page-break {
@@ -167,9 +166,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
         `}} />
       )}
 
-      <div className={`container mx-auto ${isPdfMode ? 'space-y-4 px-0 max-w-none pb-4' : 'space-y-8 px-4 sm:px-6 lg:px-8'}`}>
+      {/* 🚀 FIX: Removed all overlapping space-y classes for PDF mode so gaps are perfectly even */}
+      <div className={`container mx-auto ${isPdfMode ? 'px-0 max-w-none' : 'space-y-8 px-4 sm:px-6 lg:px-8'}`}>
         
-        <div className={`avoid-page-break ${isPdfMode ? 'mb-4 pb-2' : 'mb-8'}`}>
+        <div className={`avoid-page-break ${isPdfMode ? 'mb-5' : 'mb-8'}`}>
           <section className={`bg-[#0A2351] text-white shadow-2xl shadow-[#0A2351]/20 ${isPdfMode ? 'rounded-xl p-6' : 'rounded-[2rem] p-8 sm:p-12 relative overflow-hidden'}`}>
             <div className="relative z-10 flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-end">
               <div className="max-w-3xl">
@@ -188,28 +188,36 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </section>
         </div>
 
-        <div className={isPdfMode ? 'block space-y-4' : 'grid gap-8 lg:grid-cols-3'}>
+        <div className={isPdfMode ? 'block' : 'grid gap-8 lg:grid-cols-3'}>
           
-          <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-4`}>
+          <div className={isPdfMode ? 'block' : 'lg:col-span-2 space-y-4'}>
             
-            <Card className={`border-0 shadow-sm ${isPdfMode ? '' : 'overflow-hidden'}`}>
-              <CardHeader className={`bg-slate-50 border-b border-slate-100 avoid-page-break ${isPdfMode ? 'p-4 pb-2' : ''}`}>
-                <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
-                <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
-              </CardHeader>
-              <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-5 space-y-4 text-base' : 'p-8 space-y-6 text-lg'}`}>
-                {executiveSummaryParagraphs.map((para, i) => (
-                  <p key={i} className="avoid-page-break pb-2">{para}</p>
-                ))}
-              </CardContent>
+            <Card className={`border-0 shadow-sm ${isPdfMode ? 'mb-5 border border-slate-200 bg-white' : 'overflow-hidden'}`}>
+              <div className="avoid-page-break">
+                <CardHeader className={`bg-slate-50 border-b border-slate-100 ${isPdfMode ? 'p-4' : ''}`}>
+                  <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
+                  <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
+                </CardHeader>
+                <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-5 pb-0 text-base' : 'p-8 pb-0 text-lg'}`}>
+                  <p className="pb-4">{executiveSummaryParagraphs[0]}</p>
+                </CardContent>
+              </div>
+
+              {executiveSummaryParagraphs.length > 1 && (
+                <CardContent className={`text-slate-700 leading-relaxed pt-0 ${isPdfMode ? 'p-5 pt-0 text-base' : 'p-8 pt-0 space-y-6 text-lg'}`}>
+                  {executiveSummaryParagraphs.slice(1).map((para, i) => (
+                    <p key={i} className="avoid-page-break pb-4">{para}</p>
+                  ))}
+                </CardContent>
+              )}
             </Card>
 
-            <div className={isPdfMode ? 'block space-y-4 pt-2' : 'grid gap-6 md:grid-cols-3 pt-4'}>
-              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break pb-2">Recommended Career Paths</h2>}
-              
+            <div className={isPdfMode ? 'block pt-2 mb-5' : 'grid gap-6 md:grid-cols-3 pt-4'}>
               {(analysis.top_career_matches || []).map((match, i) => (
-                <div key={i} className={`avoid-page-break ${isPdfMode ? 'mb-4 pb-2' : ''}`}>
-                  <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
+                <div key={i} className={`avoid-page-break ${isPdfMode ? 'mb-4' : ''}`}>
+                  {isPdfMode && i === 0 && <h2 className="text-2xl font-bold text-[#0A2351] mb-3">Recommended Career Paths</h2>}
+                  
+                  <Card className={`group ${isPdfMode ? 'border border-slate-200 bg-white border-l-4 border-l-[#F57D14]' : 'border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]'}`}>
                     <CardContent className={isPdfMode ? 'p-4' : 'p-6'}>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
                       <h3 className="text-xl font-bold text-[#0A2351] mb-2">{match.career_title}</h3>
@@ -225,11 +233,11 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             </div>
           </div>
 
-          <div className={isPdfMode ? 'space-y-4 pt-4' : 'space-y-8'}>
-            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break pb-2">Psychometric Profile & Growth</h2>}
+          <div className={isPdfMode ? 'block' : 'space-y-8'}>
             
-            <div className="avoid-page-break pb-2">
-              <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+            <div className="avoid-page-break">
+              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-3">Psychometric Profile & Growth</h2>}
+              <Card className={`border-0 bg-[#0A2351]/5 ${isPdfMode ? 'mb-4' : 'shadow-none'}`}>
                 <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
                   <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
                     <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
@@ -252,7 +260,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
               </Card>
             </div>
 
-            <Card className="border-0 shadow-sm bg-orange-50/50 mb-4 avoid-page-break">
+            <Card className={`border-0 bg-orange-50/50 avoid-page-break ${isPdfMode ? 'mb-5 border border-orange-100' : 'shadow-sm mb-4'}`}>
                <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
                  <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
                </CardHeader>
@@ -272,9 +280,8 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
-       <section className={isPdfMode ? 'mt-8 mb-0 pb-0' : 'mt-12'}>
-         <h2 className="text-3xl font-bold text-[#0A2351] mb-6 avoid-page-break pb-2">Your 5-Year Career Transformation</h2>
-         <div className={isPdfMode ? 'block space-y-4' : 'grid gap-6 lg:grid-cols-3'}>
+       <section className={isPdfMode ? 'mt-2 mb-0 pb-0' : 'mt-12'}>
+         <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
                label: 'Year 1', 
@@ -298,8 +305,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             <div key={i} className={`avoid-page-break ${isPdfMode ? 'mb-4 pb-2' : ''}`}>
-               <Card className={`border-0 shadow-lg bg-white ${isPdfMode ? '' : 'relative overflow-hidden'}`}>
+             <div key={i} className={`avoid-page-break ${isPdfMode ? 'mb-4' : ''}`}>
+               {isPdfMode && i === 0 && <h2 className="text-2xl font-bold text-[#0A2351] mb-4">Your 5-Year Career Transformation</h2>}
+               
+               <Card className={isPdfMode ? 'border border-slate-200 bg-white' : 'border-0 shadow-lg bg-white relative overflow-hidden'}>
                  <div className={`h-2 w-full ${step.color}`} />
                  <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
                    <div className="flex items-center gap-3">
