@@ -152,60 +152,55 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 py-8 print:bg-white print:py-0">
-      <div className="container mx-auto space-y-8 px-4 sm:px-6 lg:px-8">
+    <main className={`min-h-screen bg-slate-50 ${isPdfMode ? 'py-0' : 'py-8'}`}>
+      <div className={`container mx-auto ${isPdfMode ? 'space-y-4 px-0 max-w-none' : 'space-y-8 px-4 sm:px-6 lg:px-8'}`}>
         
         {/* HERO BANNER */}
-        <div className="avoid-page-break block mb-8">
-          {/* 🚀 FIX: Stripped 'relative overflow-hidden' during PDF mode */}
-          <section className={`rounded-[2rem] bg-[#0A2351] p-8 text-white shadow-2xl shadow-[#0A2351]/20 sm:p-12 ${isPdfMode ? '' : 'relative overflow-hidden'}`}>
-            <div className="relative z-10 flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-end">
+        <div className={`break-inside-avoid ${isPdfMode ? 'mb-4' : 'mb-8'}`} style={{ pageBreakInside: 'avoid' }}>
+          <section className={`bg-[#0A2351] text-white shadow-2xl shadow-[#0A2351]/20 ${isPdfMode ? 'rounded-xl p-6' : 'rounded-[2rem] p-8 sm:p-12 relative overflow-hidden'}`}>
+            <div className="relative z-10 flex flex-col items-start justify-between gap-4 lg:flex-row lg:items-end">
               <div className="max-w-3xl">
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
                   <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
                 </div>
                 <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
                   {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
                 </h1>
-                <p className="mt-6 text-lg leading-relaxed text-white/70">
+                <p className={`text-white/70 leading-relaxed ${isPdfMode ? 'mt-4 text-base' : 'mt-6 text-lg'}`}>
                   This transformation strategy was custom-built using your unique psychometric signature, mapping your future within the Indian job market.
                 </p>
               </div>
             </div>
-            {/* 🚀 FIX: Hide decorative absolute background elements during PDF render */}
             {!isPdfMode && <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-white/5 blur-3xl" />}
           </section>
         </div>
 
-        <div className={isPdfMode ? 'block space-y-8' : 'grid gap-8 lg:grid-cols-3'}>
+        <div className={isPdfMode ? 'block space-y-4' : 'grid gap-8 lg:grid-cols-3'}>
           
-          <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-8`}>
+          <div className={`${isPdfMode ? 'block' : 'lg:col-span-2'} space-y-4`}>
             
-            <div className="avoid-page-break block">
-              {/* 🚀 FIX: Stripped 'overflow-hidden' from Card */}
-              <Card className={`border-0 shadow-sm ${isPdfMode ? '' : 'overflow-hidden'}`}>
-                <CardHeader className="bg-slate-50 border-b border-slate-100">
-                  <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
-                  <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
-                </CardHeader>
-                <CardContent className="p-8 space-y-6 text-slate-700 leading-relaxed text-lg">
-                  {executiveSummaryParagraphs.map((para, i) => (
-                    <p key={i}>{para}</p>
-                  ))}
-                </CardContent>
-              </Card>
-            </div>
+            <Card className={`border-0 shadow-sm ${isPdfMode ? '' : 'overflow-hidden'}`}>
+              <CardHeader className={`bg-slate-50 border-b border-slate-100 break-inside-avoid ${isPdfMode ? 'p-4' : ''}`} style={{ pageBreakInside: 'avoid' }}>
+                <CardTitle className="text-2xl text-[#0A2351]">Strategic Executive Summary</CardTitle>
+                <CardDescription>How SARATHI interprets your unique behavioral fingerprint.</CardDescription>
+              </CardHeader>
+              <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-5 space-y-4 text-base' : 'p-8 space-y-6 text-lg'}`}>
+                {executiveSummaryParagraphs.map((para, i) => (
+                  <p key={i} className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>{para}</p>
+                ))}
+              </CardContent>
+            </Card>
 
-            <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 md:grid-cols-3'}>
-              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break mt-4">Recommended Career Paths</h2>}
+            <div className={isPdfMode ? 'block space-y-4 pt-2' : 'grid gap-6 md:grid-cols-3 pt-4'}>
+              {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Recommended Career Paths</h2>}
               
               {(analysis.top_career_matches || []).map((match, i) => (
-                <div key={i} className={`avoid-page-break block ${isPdfMode ? 'mb-6' : ''}`}>
+                <div key={i} className={`break-inside-avoid ${isPdfMode ? 'mb-4' : ''}`} style={{ pageBreakInside: 'avoid' }}>
                   <Card className="group border-0 shadow-sm hover:shadow-md transition-all border-l-4 border-l-[#F57D14]">
-                    <CardContent className="p-6">
+                    <CardContent className={isPdfMode ? 'p-4' : 'p-6'}>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
-                      <h3 className="text-xl font-bold text-[#0A2351] mb-3">{match.career_title}</h3>
-                      <p className="text-sm text-slate-500 mb-4">{match.why_it_fits}</p>
+                      <h3 className="text-xl font-bold text-[#0A2351] mb-2">{match.career_title}</h3>
+                      <p className="text-sm text-slate-500 mb-3">{match.why_it_fits}</p>
                       <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
                         <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
                         {match.starting_salary_inr}
@@ -217,20 +212,20 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
             </div>
           </div>
 
-          <div className="space-y-8">
-            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] avoid-page-break mt-8">Psychometric Profile & Growth</h2>}
+          <div className={isPdfMode ? 'space-y-4 pt-4' : 'space-y-8'}>
+            {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Psychometric Profile & Growth</h2>}
             
-            <div className="avoid-page-break block">
+            <div className="break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
               <Card className="border-0 bg-[#0A2351]/5 shadow-none">
-                <CardHeader>
+                <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
                   <CardTitle className="flex items-center gap-2 text-xl text-[#0A2351]">
                     <Compass className="h-5 w-5 text-[#F57D14]" /> Psychometric DNA
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className={isPdfMode ? 'p-4 pt-2 space-y-4' : 'space-y-6'}>
                   <div>
                     <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Dominant Personality Traits</label>
-                    <div className="mt-3 flex flex-wrap gap-2">
+                    <div className="mt-2 flex flex-wrap gap-2">
                       {profile.dominant_personality_traits?.map(trait => (
                         <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
                       ))}
@@ -238,35 +233,33 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                   </div>
                   <div>
                     <label className="text-[10px] font-bold uppercase text-slate-400 tracking-tighter">Preferred Learning Style</label>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600 font-medium italic">{profile.learning_style}</p>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            <div className="avoid-page-break block">
-              <Card className="border-0 shadow-sm bg-orange-50/50 mb-8">
-                 <CardHeader>
-                   <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
-                 </CardHeader>
-                 <CardContent>
-                   <ul className="space-y-3">
-                     {analysis.potential_blind_spots?.map((spot, i) => (
-                       <li key={i} className="flex gap-3 text-sm text-orange-900/70">
-                         <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
-                         {spot}
-                       </li>
-                     ))}
-                   </ul>
-                 </CardContent>
-              </Card>
-            </div>
+            <Card className="border-0 shadow-sm bg-orange-50/50 mb-4">
+               <CardHeader className={`break-inside-avoid ${isPdfMode ? 'p-4 pb-2' : ''}`} style={{ pageBreakInside: 'avoid' }}>
+                 <CardTitle className="text-sm uppercase tracking-widest text-orange-800">Growth Warnings</CardTitle>
+               </CardHeader>
+               <CardContent className={isPdfMode ? 'p-4 pt-0' : ''}>
+                 <ul className="space-y-2">
+                   {analysis.potential_blind_spots?.map((spot, i) => (
+                     <li key={i} className="flex gap-3 text-sm text-orange-900/70 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>
+                       <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
+                       {spot}
+                     </li>
+                   ))}
+                 </ul>
+               </CardContent>
+            </Card>
           </div>
         </div>
 
-       <section className="mt-12">
-         <h2 className="text-3xl font-bold text-[#0A2351] mb-8 avoid-page-break block">Your 5-Year Career Transformation</h2>
-         <div className={isPdfMode ? 'block space-y-6' : 'grid gap-6 lg:grid-cols-3'}>
+       <section className={isPdfMode ? 'mt-8' : 'mt-12'}>
+         <h2 className="text-3xl font-bold text-[#0A2351] mb-6 break-inside-avoid" style={{ pageBreakInside: 'avoid' }}>Your 5-Year Career Transformation</h2>
+         <div className={isPdfMode ? 'block space-y-4' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
                label: 'Year 1', 
@@ -290,11 +283,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                color: 'bg-[#0A2351]' 
              }
            ].map((step, i) => (
-             <div key={i} className={`avoid-page-break block ${isPdfMode ? 'mb-6' : ''}`}>
-               {/* 🚀 FIX: Stripped 'relative overflow-hidden' from Card during PDF mode */}
+             <div key={i} className={`break-inside-avoid ${isPdfMode ? 'mb-4' : ''}`} style={{ pageBreakInside: 'avoid' }}>
                <Card className={`border-0 shadow-lg bg-white ${isPdfMode ? '' : 'relative overflow-hidden'}`}>
                  <div className={`h-2 w-full ${step.color}`} />
-                 <CardHeader>
+                 <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
                    <div className="flex items-center gap-3">
                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
                        <step.icon className="h-5 w-5" />
@@ -305,7 +297,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                      </div>
                    </div>
                  </CardHeader>
-                 <CardContent>
+                 <CardContent className={isPdfMode ? 'p-4 pt-2' : ''}>
                    <p className="text-sm leading-relaxed text-slate-600">
                      {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
                    </p>
