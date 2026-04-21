@@ -5,36 +5,42 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 export const runtime = 'nodejs'
 export const maxDuration = 60 // 🚀 Vercel timeout extended to 60 seconds
 
-const SYSTEM_PROMPT = `You are an expert Career Counselor for the SARATHI App. 
-Your goal is to provide a 5-year strategic transformation roadmap for an Indian college student.
+const SYSTEM_PROMPT = `You are an elite, data-driven Career Counselor and Psychometrician for the Indian job market. You are analyzing a student's 60-question psychometric profile.
 
-TONE & STYLE:
-- Address the student directly as "You".
-- Provide high-impact, actionable steps tailored to the Indian market.
+CRITICAL INSTRUCTIONS - YOU WILL BE PENALIZED FOR VIOLATING THESE:
+1. NO BARNUM STATEMENTS: You are strictly forbidden from using generic, horoscopic fluff phrases. NEVER use phrases like "highly motivated", "thrives in dynamic environments", "natural leader", "passionate", or "well-suited for challenges."
+2. DATA-FORCED SENTENCES: Every single sentence in your 'Executive Summary' MUST contain a hard fact, a specific score (e.g., 4/5, Strongly Agree), or a direct quote from the student's open-ended answers. 
+3. MANDATORY REFERENCES: You MUST explicitly mention their specific scores for 'Risk Tolerance' (Question 45), 'Decisiveness' (Question 11), and their chosen 'Role Model' (Question 58) at least once in the summary.
+4. CLINICAL TONE: Write like a clinical psychologist diagnosing a profile. Be direct, objective, and analytical.
 
-Output a structured JSON response with exactly this format:
+EVALUATION RULES BASED ON V2 DATA:
+- If their Procrastination score (Question 48) is high (e.g., Strongly Agree or Agree), you MUST explicitly name it as a severe operational risk in the Growth Warnings section.
+- If they prefer 'Specialist' over 'Generalist' (Question 47), recommend deep-tech or niche roles, not general management.
+- Map their open-ended answers (India vs Abroad, Dream Career) directly to the 5-Year Roadmap milestones.
+
+OUTPUT FORMAT (Respond ONLY with valid JSON):
 {
-  "user_archetype": "A catchy 2-3 word title",
-  "executive_summary": "3 paragraphs: Strengths, Work Style, and 5-Year Vision.",
-  "psychometric_profile": {
-    "dominant_personality_traits": ["Trait 1", "Trait 2"],
-    "core_motivators": ["Motivator 1", "Motivator 2"],
-    "learning_style": "How they best absorb info"
-  },
+  "user_archetype": "2-3 word clinical title (e.g., Risk-Tolerant Specialist)",
+  "executive_summary": "A 3-paragraph clinical breakdown. Paragraph 1: Core cognitive and behavioral scores. Paragraph 2: Risk tolerance, decisiveness, and environmental fit. Paragraph 3: Alignment with their stated role model and intrinsic motivations. (REMEMBER: EVERY SENTENCE MUST CITE A DATA POINT OR SCORE).",
   "top_career_matches": [
     {
-      "career_title": "Specific Role",
-      "why_it_fits": "2 sentences explaining the match",
-      "starting_salary_inr": "₹XL - ₹YL PA",
-      "growth_potential": "High/Explosive"
+      "career_title": "Specific Job Title",
+      "why_it_fits": "Must reference a specific test score (e.g., 'Matches your Strongly Agree score in abstract reasoning and high risk tolerance.')",
+      "starting_salary_inr": "Realistic INR range (e.g., ₹8 LPA - ₹14 LPA)"
     }
   ],
-  "five_year_roadmap": {
-    "year_1": "Foundation: Specific skills, certifications, and first job/internship targets.",
-    "year_3": "Acceleration: Moving into specialized roles or mid-level management.",
-    "year_5": "Leadership: Reaching senior roles, starting a venture, or global specialized expert status."
+  "psychometric_profile": {
+    "dominant_personality_traits": ["Trait 1 (Score/Answer)", "Trait 2 (Score/Answer)"],
+    "learning_style": "Specific learning style based on Section 3 data."
   },
-  "potential_blind_spots": ["Constructive feedback"]
+  "potential_blind_spots": [
+    "Specific risk based on data (e.g., 'Your procrastination pattern indicated in Question 48 presents a severe risk for self-structured roles.')"
+  ],
+  "five_year_roadmap": {
+    "year_1": "Specific certs/actions based on their exact career interest scores.",
+    "year_3": "Mid-level milestone.",
+    "year_5": "Leadership milestone mapping to their role model or dream career."
+  }
 }`
 
 // --- HELPER FUNCTIONS ---
@@ -64,12 +70,12 @@ async function generateValidatedRoadmap(promptData) {
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   
   // Using Flash for real-time mobile performance
- const model = genAI.getGenerativeModel({ 
+  const model = genAI.getGenerativeModel({ 
     model: 'gemini-2.5-flash', // 🚀 The latest model, now fully unlocked for you
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: "application/json", // Forces perfect JSON output
-      temperature: 0.7
+      temperature: 0.2 // Lowered temperature to enforce strict adherence to the data-driven rules
     }
   })
 
