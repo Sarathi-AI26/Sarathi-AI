@@ -14,7 +14,10 @@ import {
   Sparkles,
   Target,
   ArrowLeft,
-  Loader2
+  Loader2,
+  BookOpen, // New icon for Year 2
+  TrendingUp, // New icon for Year 4
+  Timer // Icon for Immediate Action Plan
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -102,6 +105,8 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   const analysis = assessment?.ai_analysis || {}
   const profile = analysis?.psychometric_profile || {}
   const roadmap = analysis?.five_year_roadmap || {}
+  // 🚀 Added extraction for the new immediate action plan
+  const immediateAction = analysis?.immediate_action_plan || {}
   
   const executiveSummaryParagraphs = String(analysis?.executive_summary || '')
     .split(/\n\s*\n/)
@@ -279,6 +284,25 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
+       {/* 🚀 NEW: Immediate Action Plan Banner */}
+       {immediateAction?.next_30_days && (
+         <section className={isPdfMode ? 'mt-4 mb-5' : 'mt-8'}>
+           <Card className="border-0 shadow-lg bg-gradient-to-r from-[#0A2351] to-[#1a3a75] text-white">
+             <CardContent className={isPdfMode ? 'p-5' : 'p-8'}>
+               <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+                 <div className="space-y-2">
+                   <div className="flex items-center gap-2 text-[#F57D14] font-bold text-sm tracking-widest uppercase avoid-page-break">
+                     <Timer className="h-5 w-5" /> Immediate Action Plan
+                   </div>
+                   <h3 className="text-xl md:text-2xl font-bold avoid-page-break">{immediateAction.next_30_days}</h3>
+                   <p className="text-white/80 text-sm avoid-page-break"><span className="font-semibold text-white">Success Metric:</span> {immediateAction.success_metric}</p>
+                 </div>
+               </div>
+             </CardContent>
+           </Card>
+         </section>
+       )}
+
        <section className={isPdfMode ? 'mt-2 mb-0 pb-0' : 'mt-12'}>
          {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-4 avoid-page-break">Your 5-Year Career Transformation</h2>}
          
@@ -291,12 +315,28 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                icon: Target, 
                color: 'bg-blue-600' 
              },
+             // 🚀 NEW: Added Year 2
+             { 
+               label: 'Year 2', 
+               title: 'Skill Application & Execution', 
+               data: roadmap?.year_2 || roadmap?.['Year 2'] || roadmap?.Year_2, 
+               icon: BookOpen, 
+               color: 'bg-indigo-500' 
+             },
              { 
                label: 'Year 3', 
                title: 'Market Acceleration', 
                data: roadmap?.year_3 || roadmap?.['Year 3'] || roadmap?.Year_3, 
                icon: Sparkles, 
                color: 'bg-[#F57D14]' 
+             },
+             // 🚀 NEW: Added Year 4
+             { 
+               label: 'Year 4', 
+               title: 'Strategic Positioning', 
+               data: roadmap?.year_4 || roadmap?.['Year 4'] || roadmap?.Year_4, 
+               icon: TrendingUp, 
+               color: 'bg-amber-500' 
              },
              { 
                label: 'Year 5', 
@@ -305,7 +345,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                icon: Network, 
                color: 'bg-[#0A2351]' 
              }
-           ].map((step, i) => (
+           ].filter(step => step.data).map((step, i) => ( // 🚀 .filter ensures older reports don't show empty cards!
              <div key={i} className={isPdfMode ? 'mb-4' : ''}>
                <Card className={isPdfMode ? 'border border-slate-200 bg-white' : 'border-0 shadow-lg bg-white relative overflow-hidden'}>
                  <div className={`h-2 w-full ${step.color}`} />
@@ -322,7 +362,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                  </CardHeader>
                  <CardContent className={isPdfMode ? 'p-4 pt-2' : ''}>
                    <p className="text-sm leading-relaxed text-slate-600 avoid-page-break">
-                     {step.data ? step.data : "Your personalized milestone is being calculated for this period."}
+                     {step.data}
                    </p>
                  </CardContent>
                </Card>
