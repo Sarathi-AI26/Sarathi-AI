@@ -20,8 +20,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white">
       <main>
-        {/* 🚀 HERO SECTION (Added id="home" and scroll-mt-36) */}
-        <section id="home" className="scroll-mt-36 relative overflow-hidden bg-white py-20 lg:py-24">
+        {/* 🚀 HERO SECTION */}
+        <section id="home" className="relative overflow-hidden bg-white py-20 lg:py-24">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
               <div className="max-w-2xl">
@@ -99,10 +99,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 🚀 TESTIMONIALS (Added id="about" and scroll-mt-36) */}
-        <section id="about" className="scroll-mt-36 py-20 bg-white px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+        {/* 🚀 TESTIMONIALS (Tightened padding to bring content up) */}
+        <section id="about" className="scroll-mt-24 py-12 lg:py-16 bg-white px-4 sm:px-6 lg:px-8 border-b border-slate-100">
           <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
+            <div className="text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Trusted by students across India</h2>
               <p className="mt-4 text-slate-500">Real outcomes from our 15-minute psychometric analysis.</p>
             </div>
@@ -127,10 +127,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 🧬 METHODOLOGY SECTION */}
-        <section id="methodology" className="scroll-mt-36 bg-slate-50 py-20 lg:py-24 border-t border-slate-100">
+        {/* 🧬 METHODOLOGY SECTION (Tightened padding to bring content up) */}
+        <section id="methodology" className="scroll-mt-24 bg-slate-50 py-12 lg:py-16 border-t border-slate-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-10 text-center">
+            <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">The Science Behind the Roadmap</h2>
               <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
                 SARATHI eliminates the "hit-or-miss" approach of traditional counseling. We leverage proprietary psychometric data processed via the Gemini 2.5 Flash engine to provide a blueprint that evolves with the Indian job market.
@@ -171,8 +171,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 🏢 FOR INSTITUTIONS SECTION */}
-        <section id="institutions" className="scroll-mt-36 bg-white py-20 lg:py-24">
+        {/* 🏢 FOR INSTITUTIONS SECTION (Tightened padding to bring content up) */}
+        <section id="institutions" className="scroll-mt-24 bg-white py-12 lg:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="order-2 lg:order-1">
@@ -208,8 +208,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 🤝 CONTACT SECTION */}
-       <section id="contact" className="scroll-mt-36 bg-[#0A2351] py-20 lg:py-24">
+        {/* 🤝 CONTACT SECTION (Tightened padding to bring content up) */}
+       <section id="contact" className="scroll-mt-24 bg-[#0A2351] py-12 lg:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-center">
               <div className="space-y-10">
