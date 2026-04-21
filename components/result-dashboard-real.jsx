@@ -336,11 +336,12 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
          </section>
        )}
 
-       {/* 🚀 THE ULTIMATE PAGE BREAK FIX: Using html2pdf's native class */}
-       {isPdfMode && <div className="html2pdf__page-break"></div>}
+       {/* 🚀 THE FIX: Physical height (1px) combined with strict page breaks */}
+       {isPdfMode && <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always', display: 'block', height: '1px', width: '100%', backgroundColor: 'transparent' }}></div>}
        
-       <section className={isPdfMode ? 'mt-4 mb-0 pb-0' : 'mt-12'}>
-         {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-4 avoid-page-break">Your 5-Year Career Transformation</h2>}
+       {/* 🚀 THE FIX: Using 'pt-4' (padding) instead of 'mt-4' (margin) so the engine doesn't miscalculate the Y-coordinate */}
+       <section className={isPdfMode ? 'pt-4 mb-0 pb-0' : 'mt-12'}>
+         {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-4">Your 5-Year Career Transformation</h2>}
          
          <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-3'}>
            {[
