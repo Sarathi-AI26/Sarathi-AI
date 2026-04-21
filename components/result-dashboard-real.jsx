@@ -28,7 +28,7 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tool
 const hasRealAiAnalysis = (analysis) => {
   return Boolean(
     analysis?.user_archetype &&
-    typeof analysis?.executive_summary === 'string' &&
+    analysis?.executive_summary && 
     Array.isArray(analysis?.top_career_matches)
   )
 }
@@ -109,10 +109,11 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   const roadmap = analysis?.five_year_roadmap || {}
   const immediateAction = analysis?.immediate_action_plan || {}
   
-  const executiveSummaryParagraphs = String(analysis?.executive_summary || '')
-    .split(/\n\s*\n/)
-    .map(p => p.trim())
-    .filter(Boolean)
+  // 🚀 FIX: Bulletproof Executive Summary Parsing (Handles both String and Object formats from Gemini)
+  const rawSummary = analysis?.executive_summary || '';
+  const executiveSummaryParagraphs = typeof rawSummary === 'string'
+    ? rawSummary.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
+    : Object.values(rawSummary).filter(Boolean); // Extracts text if Gemini sends an object!
 
   const rawScores = analysis?.radar_chart_scores || {}
   const chartData = [
@@ -236,7 +237,8 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                     <CardContent className={isPdfMode ? 'p-4' : 'p-6'}>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Prime Match</p>
                       <h3 className="text-xl font-bold text-[#0A2351] mb-2">{match.career_title}</h3>
-                      <p className="text-sm text-slate-500 mb-3">{match.why_it_fits}</p>
+                      {/* 🚀 FIX: Fallback applied if Gemini uses 'match_reason' instead of 'why_it_fits' */}
+                      <p className="text-sm text-slate-500 mb-3">{match.match_reason || match.why_it_fits}</p>
                       <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm">
                         <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
                         {match.starting_salary_inr}
@@ -304,14 +306,18 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                </CardHeader>
                <CardContent className={isPdfMode ? 'p-4 pt-0' : ''}>
                  <ul className="space-y-3">
-                   {analysis.potential_blind_spots?.map((spot, i) => (
-                     <li key={i} className="pb-2">
-                       <div className="flex gap-3 text-sm text-orange-900/70">
-                         <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
-                         <span className="leading-relaxed">{spot}</span>
-                       </div>
-                     </li>
-                   ))}
+                   {analysis.potential_blind_spots?.map((spot, i) => {
+                     // 🚀 THE MAGIC SHIELD: If Gemini sends an object, extract the text!
+                     const spotText = typeof spot === 'string' ? spot : Object.values(spot).join(' - ');
+                     return (
+                       <li key={i} className="pb-2">
+                         <div className="flex gap-3 text-sm text-orange-900/70">
+                           <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-400" />
+                           <span className="leading-relaxed">{spotText}</span>
+                         </div>
+                       </li>
+                     )
+                   })}
                  </ul>
                </CardContent>
             </Card>
@@ -383,7 +389,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                <Card className={isPdfMode ? 'border border-slate-200 bg-white' : 'border-0 shadow-lg bg-white relative overflow-hidden'}>
                  <div className={`h-2 w-full ${step.color}`} />
                  <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
-                   {/* 🚀 Restored the armor to the header content */}
                    <div className="flex items-center gap-3 avoid-page-break">
                      <div className={`flex h-10 w-10 items-center justify-center rounded-xl text-white ${step.color}`}>
                        <step.icon className="h-5 w-5" />
@@ -395,7 +400,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                    </div>
                  </CardHeader>
                  <CardContent className={isPdfMode ? 'p-4 pt-2' : ''}>
-                   {/* 🚀 Restored the armor strictly to the text paragraph */}
                    <p className="text-sm leading-relaxed text-slate-600 avoid-page-break">
                      {step.data}
                    </p>
