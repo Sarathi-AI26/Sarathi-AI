@@ -23,7 +23,6 @@ import {
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-// 🚀 Recharts Imports
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Tooltip } from 'recharts'
 
 const hasRealAiAnalysis = (analysis) => {
@@ -115,7 +114,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
     .map(p => p.trim())
     .filter(Boolean)
 
-  // 🚀 Map AI scores to the Radar Chart Format safely
   const rawScores = analysis?.radar_chart_scores || {}
   const chartData = [
     { subject: 'Personality', score: Number(rawScores["Personality"]) || 0, fullMark: 100 },
@@ -176,9 +174,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           .avoid-page-break {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            display: inline-block !important;
-            width: 100% !important;
-            vertical-align: top !important;
           }
         `}} />
       )}
@@ -252,7 +247,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 
           <div className={isPdfMode ? 'block' : 'space-y-8'}>
             
-            {/* 🚀 NEW: The Interactive Radar Chart */}
             <div className="avoid-page-break">
               {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-3">Psychometric Dimensions</h2>}
               <Card className={`border-0 bg-[#0A2351]/5 ${isPdfMode ? 'mb-4' : 'shadow-none'}`}>
@@ -268,7 +262,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                         <PolarGrid stroke="#cbd5e1" />
                         <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }} />
                         <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                        {/* isAnimationActive={false} guarantees it renders perfectly in the PDF immediately */}
                         <Radar name="Score" dataKey="score" stroke="#F57D14" fill="#F57D14" fillOpacity={0.4} isAnimationActive={false} />
                       </RadarChart>
                     </ResponsiveContainer>
@@ -340,7 +333,10 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
          </section>
        )}
 
-       <section className={isPdfMode ? 'mt-2 mb-0 pb-0' : 'mt-12'}>
+       {/* 🚀 ULTIMATE FIX: FORCED PAGE BREAK. The 5-Year Roadmap will now ALWAYS start on a brand new page! */}
+       {isPdfMode && <div className="html2pdf__page-break"></div>}
+       
+       <section className={isPdfMode ? 'mt-4 mb-0 pb-0' : 'mt-12'}>
          <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
