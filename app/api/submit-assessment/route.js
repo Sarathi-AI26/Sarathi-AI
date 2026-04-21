@@ -4,7 +4,8 @@ import { getSupabaseAdmin } from '../../../lib/supabase'
 export async function POST(request) {
   try {
     const body = await request.json()
-    const { name, email, whatsapp, college, answers } = body
+    // 🚀 FIX: Removed whatsapp from the incoming request payload
+    const { name, email, college, answers } = body
     const supabase = getSupabaseAdmin()
 
     // 1. Check if user already exists by Email
@@ -15,12 +16,11 @@ export async function POST(request) {
       // User exists! Grab their ID.
       userId = existingUser.id;
       
-      // Update their old profile with the fresh name and details from the frontend
+      // 🚀 FIX: Removed whatsapp from the update call
       const { error: updateError } = await supabase
         .from('users')
         .update({ 
           name: name, 
-          whatsapp: whatsapp, 
           college: college 
         })
         .eq('id', userId);
@@ -31,12 +31,12 @@ export async function POST(request) {
 
     } else {
       // Completely new user! Create a brand new profile.
+      // 🚀 FIX: Removed whatsapp from the insert call
       const { data: user, error: userError } = await supabase
         .from('users')
         .insert([{ 
           name: name, 
           email: email, 
-          whatsapp: whatsapp,
           college: college 
         }])
         .select('id')
