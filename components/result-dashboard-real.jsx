@@ -174,6 +174,9 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           .avoid-page-break {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
+            display: inline-block !important;
+            width: 100% !important;
+            vertical-align: top !important;
           }
         `}} />
       )}
@@ -333,10 +336,13 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
          </section>
        )}
 
-       {/* 🚀 ULTIMATE FIX: FORCED PAGE BREAK. The 5-Year Roadmap will now ALWAYS start on a brand new page! */}
-       {isPdfMode && <div className="html2pdf__page-break"></div>}
+       {/* 🚀 THE ULTIMATE PAGE BREAK FIX */}
+       {isPdfMode && <div style={{ pageBreakBefore: 'always', clear: 'both' }}></div>}
        
        <section className={isPdfMode ? 'mt-4 mb-0 pb-0' : 'mt-12'}>
+         {/* 🚀 Title moved OUTSIDE the map loop! */}
+         {isPdfMode && <h2 className="text-2xl font-bold text-[#0A2351] mb-4 avoid-page-break">Your 5-Year Career Transformation</h2>}
+         
          <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-3'}>
            {[
              { 
@@ -376,7 +382,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
              }
            ].filter(step => step.data).map((step, i) => ( 
              <div key={i} className={`avoid-page-break ${isPdfMode ? 'mb-4' : ''}`}>
-               {isPdfMode && i === 0 && <h2 className="text-2xl font-bold text-[#0A2351] mb-4">Your 5-Year Career Transformation</h2>}
                <Card className={isPdfMode ? 'border border-slate-200 bg-white' : 'border-0 shadow-lg bg-white relative overflow-hidden'}>
                  <div className={`h-2 w-full ${step.color}`} />
                  <CardHeader className={isPdfMode ? 'p-4 pb-2' : ''}>
