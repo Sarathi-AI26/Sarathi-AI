@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../lib/supabase'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60 // 🚀 Vercel timeout extended to 60 seconds
+export const maxDuration = 60
 
 const SYSTEM_PROMPT = `You are an elite, data-driven Career Counselor and Psychometrician for the Indian job market. You are analyzing a student's 60-question psychometric profile.
 
@@ -22,6 +22,13 @@ OUTPUT FORMAT (Respond ONLY with valid JSON):
 {
   "user_archetype": "2-3 word clinical title (e.g., Risk-Tolerant Specialist)",
   "executive_summary": "A 3-paragraph clinical breakdown. Paragraph 1: Core cognitive and behavioral scores. Paragraph 2: Risk tolerance, decisiveness, and environmental fit. Paragraph 3: Alignment with their stated role model and intrinsic motivations. (REMEMBER: EVERY SENTENCE MUST CITE A DATA POINT OR SCORE).",
+  "radar_chart_scores": {
+    "Personality": "Integer 0-100 based on traits",
+    "Aptitude": "Integer 0-100 based on aptitude indicators",
+    "Motivation": "Integer 0-100 based on career drivers",
+    "Career Interests": "Integer 0-100 based on stated interests",
+    "Behavioural Tendencies": "Integer 0-100 based on work style"
+  },
   "top_career_matches": [
     {
       "career_title": "Specific Job Title",
@@ -37,7 +44,7 @@ OUTPUT FORMAT (Respond ONLY with valid JSON):
     "Specific risk based on data (e.g., 'Your procrastination pattern indicated in Question 48 presents a severe risk for self-structured roles.')"
   ],
   "immediate_action_plan": {
-    "next_30_days": "One specific, highly actionable step to take this month (e.g., 'Enroll in the Google Data Analytics Coursera track').",
+    "next_30_days": "One specific, highly actionable step to take this month.",
     "success_metric": "How to measure completion."
   },
   "five_year_roadmap": {
@@ -62,12 +69,10 @@ const normalizeAssessment = (assessment) => {
   if (!assessment) return null
   return {
     ...assessment,
-    // Ensures frontend always finds the data regardless of column naming
     ai_analysis: assessment.ai_analysis_result || assessment.ai_analysis 
   }
 }
 
-// 🚀 THE ENGINE UPGRADE: Using the high-speed Flash model
 async function generateValidatedRoadmap(promptData) {
   if (!process.env.GEMINI_API_KEY) {
     throw new Error("Missing GEMINI_API_KEY environment variable")
@@ -75,13 +80,12 @@ async function generateValidatedRoadmap(promptData) {
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   
-  // Using Flash for real-time mobile performance
   const model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.5-flash', // 🚀 The latest model, now fully unlocked for you
+    model: 'gemini-2.5-flash', 
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
-      responseMimeType: "application/json", // Forces perfect JSON output
-      temperature: 0.2 // Lowered temperature to enforce strict adherence to the data-driven rules
+      responseMimeType: "application/json", 
+      temperature: 0.2 
     }
   })
 
@@ -99,8 +103,6 @@ async function generateValidatedRoadmap(promptData) {
   
   return JSON.parse(responseText)
 }
-
-// --- MAIN API ROUTE ---
 
 export async function POST(request) {
   try {
@@ -120,7 +122,6 @@ export async function POST(request) {
       return jsonResponse({ error: 'Assessment not found' }, 404)
     }
 
-    // Generate the AI Roadmap using the high-speed engine
     const aiAnalysis = await generateValidatedRoadmap({
       student_profile: { 
         name: assessment?.users?.name || 'Student', 
@@ -129,7 +130,6 @@ export async function POST(request) {
       assessment_context: buildAssessmentContext(assessment),
     })
 
-    // Save the result back to Supabase
     const { data: updatedAssessment, error: updateError } = await supabase
       .from('assessments')
       .update({ ai_analysis_result: aiAnalysis })
