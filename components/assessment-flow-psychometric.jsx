@@ -78,21 +78,24 @@ const AssessmentFlowPsychometric = () => {
   ]
 
   const questionBank = [
+    // Section 1: Personality Traits
     "I enjoy solving problems that require deep thinking and analysis.",
     "I like having a clear plan and structure for my daily tasks.",
-    "I feel comfortable talking to new people and making connections.",
+    "When I disagree with someone in a group, I usually voice my opinion even if it creates tension.",
     "I often think of creative ideas or new ways of doing things.",
     "I remain calm even during stressful situations.",
     "I naturally take the lead when working in a group.",
     "I think carefully before making important decisions.",
-    "I prefer working alone rather than in large teams.",
-    "I avoid taking risks unless I’m confident about the outcome.",
+    "When facing an unfamiliar problem, I prefer to figure it out myself before asking for help.",
+    "I avoid taking risks unless I'm confident about the outcome.",
     "I adapt quickly when situations change suddenly.",
-    "I try to understand how others feel before reacting.",
+    "I make important decisions quickly and course-correct later, rather than waiting until I'm fully certain.",
     "I can stay focused on tasks for long periods without distraction.",
-    "I enjoy learning new topics or exploring unfamiliar fields.",
+    "I find it easy to switch between very different tasks or subjects in the same day.",
     "I like keeping my workspace and schedule organized.",
-    "I can communicate my thoughts clearly while speaking or writing.",
+    "I often notice when someone is uncomfortable in a conversation, even if they don't say anything.",
+
+    // Section 2: Career Interests
     "Rate your interest: Analyzing data, numbers, or patterns.",
     "Rate your interest: Designing visuals such as graphics, videos, or UI screens.",
     "Rate your interest: Understanding how machines, software, or technology systems work.",
@@ -101,20 +104,24 @@ const AssessmentFlowPsychometric = () => {
     "Rate your interest: Writing articles, blogs, scripts, or social media content.",
     "Rate your interest: Conducting research in science, humanities, commerce, or social studies.",
     "Rate your interest: Exploring business ideas, startups, or entrepreneurial ventures.",
-    "Rate your interest: Preparing for competitive exams like UPSC, SSC, Banking, CAT, or GATE.",
-    "Rate your interest: Working with NGOs, social impact projects, or community development.",
-    "Rate your interest: Building apps, websites, or digital tools.",
+    "Rate your interest: Working in healthcare, medicine, nursing, or medical technology.",
+    "Rate your interest: Working in finance, banking, investment, or insurance sectors.",
+    "Rate your interest: Working in law, policy-making, public administration, or governance.",
     "Rate your interest: Pursuing higher studies abroad for exposure and global career opportunities.",
-    "I can easily identify errors in mathematical or numerical calculations.",
+
+    // Section 3: Aptitude Indicators
+    "My teachers or peers often ask me to explain concepts they find difficult.",
     "I understand diagrams, charts, and visual data quickly.",
-    "I can explain difficult concepts in a simple way.",
+    "In school or college, I consistently scored higher in Maths or Science than in other subjects.",
     "I learn new software or technology faster than most people.",
-    "I remember information better when I write or visualize it.",
+    "When I read instructions for a new device or app, I rarely need to read them twice.",
     "I can think of multiple solutions when faced with a problem.",
     "I can stay focused even when tasks are repetitive or long.",
-    "I can evaluate pros and cons logically before making decisions.",
+    "I notice patterns or inconsistencies in data or information that others tend to miss.",
     "I easily understand abstract concepts like theories, algorithms, or frameworks.",
     "I am comfortable analyzing large amounts of information to reach conclusions.",
+
+    // Section 4: Motivation & Drivers
     "Rate importance: Earning a high salary early in my career.",
     "Rate importance: Having long-term job stability and security.",
     "Rate importance: Having opportunities to innovate or build new ideas.",
@@ -122,24 +129,27 @@ const AssessmentFlowPsychometric = () => {
     "Rate importance: Having a good work-life balance and manageable workload.",
     "Rate importance: Contributing to society and making a positive impact.",
     "Rate importance: Working in roles that allow international travel or relocation.",
-    "Rate importance: Working in a competitive and fast-paced environment.",
-    "Rate importance: Being able to work independently without much supervision.",
-    "Rate importance: Building a strong personal identity or brand through my achievements.",
-    "I usually complete tasks well before the deadline.",
+    "Rate importance: Being able to take calculated risks and try new things, even if some fail.",
+    "Rate importance: Having my family's approval and support for my career choices.",
+    "Rate importance: Mastering a specific skill or subject deeply, rather than knowing a little of many things.",
+
+    // Section 5: Behavioural Tendencies
+    "When I have a long deadline, I tend to start seriously only in the final few days.",
     "I feel stressed when too many tasks pile up at once.",
     "I enjoy collaborating with others and working in teams.",
-    "I take initiative even when instructions are not given.",
+    "If I disagree with how a team decision was made, I find it hard to commit fully to it.",
     "I actively use feedback to improve myself.",
     "I feel confident presenting or speaking in front of groups.",
-    "I follow rules and guidelines carefully.",
-    "I stay committed to long-term goals even when progress is slow.",
+    "I tend to keep trying a difficult problem even after multiple failures, rather than moving on.",
+    "I often research a topic extensively on my own, beyond what was required in class.",
+
+    // Section 6: Open Reflections
     "What is your dream career, and why does it inspire you?",
     "Describe a challenge you faced and how you overcame it.",
-    "What skills do you want to develop in the next 2 years?",
-    "What type of work environment helps you perform your best?",
+    "Name one person — real or fictional — whose career or life you admire most, and explain what specifically about their path appeals to you.",
+    "If money was not a concern, what would you spend most of your time doing? How close is that to what you are currently pursuing?",
     "Would you prefer building your career in India, abroad, or both? Why?"
   ]
-
   const totalSteps = questionBank.length 
   const progress = (absoluteStep / totalSteps) * 100
   
