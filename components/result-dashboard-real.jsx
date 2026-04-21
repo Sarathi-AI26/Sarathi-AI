@@ -15,9 +15,9 @@ import {
   Target,
   ArrowLeft,
   Loader2,
-  BookOpen, // New icon for Year 2
-  TrendingUp, // New icon for Year 4
-  Timer // Icon for Immediate Action Plan
+  BookOpen, 
+  TrendingUp, 
+  Timer 
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -105,7 +105,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   const analysis = assessment?.ai_analysis || {}
   const profile = analysis?.psychometric_profile || {}
   const roadmap = analysis?.five_year_roadmap || {}
-  // 🚀 Added extraction for the new immediate action plan
   const immediateAction = analysis?.immediate_action_plan || {}
   
   const executiveSummaryParagraphs = String(analysis?.executive_summary || '')
@@ -159,12 +158,15 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
   return (
     <main className={`${isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}`}>
       
+      {/* 🚀 FIX: Restored inline-block ONLY for the exact avoid-page-break elements to stop slicing! */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{__html: `
           .avoid-page-break {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
-            display: block !important;
+            display: inline-block !important;
+            width: 100% !important;
+            vertical-align: top !important;
           }
         `}} />
       )}
@@ -195,7 +197,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           
           <div className={isPdfMode ? 'block' : 'lg:col-span-2 space-y-4'}>
             
-            {/* 🚀 The Card container is allowed to break, but the text inside it is protected */}
             <Card className={`border-0 shadow-sm ${isPdfMode ? 'mb-5 border border-slate-200 bg-white' : 'overflow-hidden'}`}>
               <div>
                 <CardHeader className={`bg-slate-50 border-b border-slate-100 ${isPdfMode ? 'p-4' : ''}`}>
@@ -284,18 +285,18 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           </div>
         </div>
 
-       {/* 🚀 NEW: Immediate Action Plan Banner */}
+       {/* 🚀 NEW COLOR: Vibrant Emerald/Teal Action Banner */}
        {immediateAction?.next_30_days && (
          <section className={isPdfMode ? 'mt-4 mb-5' : 'mt-8'}>
-           <Card className="border-0 shadow-lg bg-gradient-to-r from-[#0A2351] to-[#1a3a75] text-white">
+           <Card className="border-0 shadow-lg bg-gradient-to-r from-emerald-600 to-teal-800 text-white">
              <CardContent className={isPdfMode ? 'p-5' : 'p-8'}>
                <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
                  <div className="space-y-2">
-                   <div className="flex items-center gap-2 text-[#F57D14] font-bold text-sm tracking-widest uppercase avoid-page-break">
+                   <div className="flex items-center gap-2 text-emerald-100 font-bold text-sm tracking-widest uppercase avoid-page-break">
                      <Timer className="h-5 w-5" /> Immediate Action Plan
                    </div>
                    <h3 className="text-xl md:text-2xl font-bold avoid-page-break">{immediateAction.next_30_days}</h3>
-                   <p className="text-white/80 text-sm avoid-page-break"><span className="font-semibold text-white">Success Metric:</span> {immediateAction.success_metric}</p>
+                   <p className="text-emerald-50 text-sm avoid-page-break"><span className="font-semibold text-white">Success Metric:</span> {immediateAction.success_metric}</p>
                  </div>
                </div>
              </CardContent>
@@ -315,7 +316,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                icon: Target, 
                color: 'bg-blue-600' 
              },
-             // 🚀 NEW: Added Year 2
              { 
                label: 'Year 2', 
                title: 'Skill Application & Execution', 
@@ -330,7 +330,6 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                icon: Sparkles, 
                color: 'bg-[#F57D14]' 
              },
-             // 🚀 NEW: Added Year 4
              { 
                label: 'Year 4', 
                title: 'Strategic Positioning', 
@@ -345,7 +344,7 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
                icon: Network, 
                color: 'bg-[#0A2351]' 
              }
-           ].filter(step => step.data).map((step, i) => ( // 🚀 .filter ensures older reports don't show empty cards!
+           ].filter(step => step.data).map((step, i) => ( 
              <div key={i} className={isPdfMode ? 'mb-4' : ''}>
                <Card className={isPdfMode ? 'border border-slate-200 bg-white' : 'border-0 shadow-lg bg-white relative overflow-hidden'}>
                  <div className={`h-2 w-full ${step.color}`} />
