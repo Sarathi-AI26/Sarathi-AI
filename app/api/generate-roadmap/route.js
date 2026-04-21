@@ -272,8 +272,9 @@ async function generateValidatedRoadmap(promptData) {
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
 
+  // 🚀 FIX: Swapped to the more robust gemini-2.5-pro model to bypass the traffic jam
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-2.5-pro',
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: 'application/json',
