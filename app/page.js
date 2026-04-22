@@ -27,14 +27,12 @@ import { Button } from '@/components/ui/button'
 // DATA
 // ─────────────────────────────────────────────
 
-// FIX 2: Softened stats — only claim what you can defend right now
 const STATS = [
   { icon: Users,         value: '500+',  label: 'Assessments Completed' },
   { icon: GraduationCap, value: '6+',    label: 'Partner Colleges'       },
   { icon: CheckCircle2,  value: '60',    label: 'Psychometric Dimensions' },
 ]
 
-// FIX 5: Dashboard preview uses "AK / Aman K." — testimonial uses different students
 const TESTIMONIALS = [
   {
     name: 'Rahul S.',
@@ -54,7 +52,6 @@ const TESTIMONIALS = [
     name: 'Neha T.',
     college: 'VIT Vellore, B.Tech ECE',
     avatar: 'NT',
-    // FIX 5: Changed from "Aman K." to a different student name
     quote:
       'Within 15 minutes I had a clear Year 1 and Year 2 action plan. I had already landed two internship interviews at companies the report specifically recommended targeting.',
   },
@@ -88,7 +85,6 @@ const HOW_IT_WORKS = [
   {
     step: '01',
     title: 'Take the Assessment',
-    // FIX 6: Changed "scenario-based" to "reflective psychometric" — matches actual question format
     desc: 'Answer 60 reflective psychometric questions crafted around personality science, aptitude, motivation, and behavioural tendencies. No right or wrong answers, just honest ones.',
     icon: BrainCircuit,
   },
@@ -126,7 +122,6 @@ const FAQS = [
   {
     q: 'Can I retake the assessment?',
     a: 'Yes. We recommend revisiting every 6 to 12 months as your goals evolve. Each retake generates a fresh report accessible via your unique result link.',
-    // FIX 8: Removed "saved in your dashboard" — no dashboard feature exists yet
   },
   {
     q: 'What format is the final report?',
@@ -152,7 +147,6 @@ const COLLEGES = [
 
 // ─────────────────────────────────────────────
 // CONTACT FORM COMPONENT
-// FIX 3: Added real submit handler with loading + success state
 // ─────────────────────────────────────────────
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -225,7 +219,6 @@ const ContactForm = () => {
         />
       </div>
 
-      {/* FIX 7: Official email field — was missing in original */}
       <div className="space-y-2">
         <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Official Email *</label>
         <input
@@ -307,7 +300,6 @@ export default function Home() {
                   Know Exactly Where{' '}
                   <span className="relative whitespace-nowrap text-[#F57D14]">
                     Your Career
-                    {/* FIX 1: Corrected broken xmlns attribute */}
                     <svg
                       className="absolute -bottom-2 left-0 w-full"
                       viewBox="0 0 300 12"
@@ -339,14 +331,17 @@ export default function Home() {
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  {/* FIX 4: Sample report link now points to a real result page instead of missing PDF */}
-                  <Link
-                    href="/result?id=demo"
+                  
+                  {/* 🚀 FIX: Connected the Hero button to your real PDF */}
+                  <a
+                    href="/sample-report.pdf"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="group flex items-center gap-1 text-sm font-semibold text-white/60 transition-colors hover:text-white"
                   >
                     <span className="underline underline-offset-4">View a sample report</span>
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                  </a>
                 </div>
 
                 <p className="mt-5 text-sm font-medium text-white/40">
@@ -390,7 +385,6 @@ export default function Home() {
                   </div>
 
                   <div className="space-y-4 p-6">
-                    {/* FIX 5: Changed dashboard preview student to "RV" — different from testimonials */}
                     <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-4">
                       <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F57D14] text-sm font-extrabold text-white">
                         RV
@@ -762,7 +756,6 @@ export default function Home() {
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">
               Your career clarity is 15 minutes away.
             </h2>
-            {/* FIX 2: Updated count to match softened stats */}
             <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
               Hundreds of students have already mapped their future with SARATHI.
               The assessment is free. Your roadmap is waiting.
@@ -773,13 +766,16 @@ export default function Home() {
                   Start Free Assessment <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
-              {/* FIX 4: Consistent with hero — no broken PDF link */}
-              <Link
-                href="/result?id=demo"
+              
+              {/* 🚀 FIX: Connected the CTA button to your real PDF */}
+              <a
+                href="/sample-report.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-sm font-semibold text-white/80 underline underline-offset-4 hover:text-white transition-colors"
               >
                 View a sample report first
-              </Link>
+              </a>
             </div>
           </div>
         </section>
