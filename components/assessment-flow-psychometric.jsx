@@ -17,7 +17,7 @@ import { Progress } from '@/components/ui/progress'
 import {
   assessmentSections,
   assessmentQuestions,
-  toNumericAnswers,
+  // Removed toNumericAnswers from import as we built a safer internal parser
 } from '@/lib/psychometric-assessment'
 
 // ─────────────────────────────────────────────
@@ -97,8 +97,6 @@ const AssessmentFlowPsychometric = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
-  // answersMap: { q1: 2, q2: 4, q56: "I want to be..." }
-  // Integer values for choice questions, string for open-ended
   const [answersMap, setAnswersMap] = useState({})
   const [completedSteps, setCompletedSteps] = useState([])
   const [formData, setFormData] = useState({ name: '', email: '', college: '' })
@@ -106,15 +104,11 @@ const AssessmentFlowPsychometric = () => {
   const totalSteps = assessmentQuestions.length // 60
   const progress = (absoluteStep / totalSteps) * 100
 
-  // Current question object from the single source of truth
   const currentQuestion = assessmentQuestions[absoluteStep - 1]
   const isOpenEnded = currentQuestion?.input_type === 'text'
   const isLastStep = absoluteStep === totalSteps
-
-  // Which section are we in?
   const currentSection = assessmentSections[currentSectionIdx]
 
-  // Sync currentSectionIdx whenever absoluteStep changes
   useEffect(() => {
     let count = 0
     for (let i = 0; i < assessmentSections.length; i++) {
@@ -126,12 +120,12 @@ const AssessmentFlowPsychometric = () => {
     }
   }, [absoluteStep])
 
-  // When navigating back to an open-ended question, restore the saved text
+  // 🚀 FIX: Added answersMap to dependency array so it doesn't erase text when going "Previous"
   useEffect(() => {
     if (isOpenEnded) {
       setTextResponse(answersMap[currentQuestion.id] || '')
     }
-  }, [absoluteStep, isOpenEnded])
+  }, [absoluteStep, isOpenEnded, currentQuestion.id, answersMap])
 
   const isFormValid =
     formData.name.trim() !== '' &&
@@ -143,41 +137,20 @@ const AssessmentFlowPsychometric = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Save answer and advance — or submit on last step
-  const handleNext = async (selectedOptionValue = null) => {
-    const qId = currentQuestion.id
-
-    // Build updated answers map
-    const updatedMap = { ...answersMap }
-    if (isOpenEnded) {
-      updatedMap[qId] = textResponse.trim()
-    } else {
-      // selectedOptionValue is already an integer (1–5 or 1–4)
-      updatedMap[qId] = selectedOptionValue
-    }
-    setAnswersMap(updatedMap)
-
-    if (!completedSteps.includes(absoluteStep)) {
-      setCompletedSteps((prev) => [...prev, absoluteStep])
-    }
-
-    if (!isLastStep) {
-      setTimeout(() => {
-        setAbsoluteStep((prev) => prev + 1)
-        setTextResponse('')
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 300)
-      return
-    }
-
-    // ── FINAL SUBMISSION ──────────────────────────────────────
+  // 🚀 FIX: Extracted submission logic to run on the perfectly updated state
+  const submitAssessment = async (finalMap) => {
     setIsSubmitting(true)
     setSubmitError(null)
 
     try {
-      // toNumericAnswers converts the map to an ordered array of 60 integers
-      // Open-ended answers (strings) are kept as-is at their positions
-      const orderedAnswers = toNumericAnswers(updatedMap)
+      // Build the ordered array safely using our known IDs
+      const orderedAnswers = assessmentQuestions.map(q => finalMap[q.id])
+
+      // Verify all 60 are present with a specific, helpful error message
+      const missingIndex = orderedAnswers.findIndex(a => a === undefined || a === null || a === '')
+      if (missingIndex !== -1) {
+        throw new Error(`Question ${missingIndex + 1} was skipped or not saved properly. Please click 'Previous' to check your answers.`)
+      }
 
       const response = await fetch('/api/submit-assessment', {
         method: 'POST',
@@ -208,6 +181,34 @@ const AssessmentFlowPsychometric = () => {
     }
   }
 
+  const handleNext = async (selectedOptionValue = null) => {
+    const qId = currentQuestion.id
+    const finalAnswer = isOpenEnded ? textResponse.trim() : selectedOptionValue
+
+    if (!completedSteps.includes(absoluteStep)) {
+      setCompletedSteps((prev) => [...prev, absoluteStep])
+    }
+
+    // 🚀 FIX: Functional state update guarantees the final answer is saved before submitting!
+    setAnswersMap((prevMap) => {
+      const newMap = { ...prevMap, [qId]: finalAnswer }
+      
+      if (isLastStep) {
+        // Trigger submission asynchronously using the guaranteed fresh map
+        submitAssessment(newMap)
+      }
+      return newMap
+    })
+
+    if (!isLastStep) {
+      setTimeout(() => {
+        setAbsoluteStep((prev) => prev + 1)
+        setTextResponse('')
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 300)
+    }
+  }
+
   const handlePrevious = () => {
     if (absoluteStep > 1) {
       setAbsoluteStep((prev) => prev - 1)
@@ -217,10 +218,8 @@ const AssessmentFlowPsychometric = () => {
     }
   }
 
-  // Is the current choice question already answered?
   const currentAnswer = answersMap[currentQuestion?.id]
   const canProceedOpenEnded = isOpenEnded && textResponse.trim().length > 0
-  const isAnswered = !isOpenEnded && currentAnswer !== undefined && currentAnswer !== null
 
   // ─────────────────────────────────────────────
   // RENDER
@@ -335,7 +334,7 @@ const AssessmentFlowPsychometric = () => {
                       className="w-full h-40 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
                     />
                     {submitError && (
-                      <p className="text-sm text-red-500">{submitError}</p>
+                      <p className="text-sm text-red-500 font-medium bg-red-50 p-3 rounded-lg border border-red-100">{submitError}</p>
                     )}
                     <div className="flex items-center justify-between pt-6">
                       <Button
@@ -371,7 +370,6 @@ const AssessmentFlowPsychometric = () => {
                       </p>
                     </div>
 
-                    {/* Options — driven by question.options from psychometric-assessment.js */}
                     <div className="grid gap-3">
                       {currentQuestion.options.map((opt) => {
                         const isSelected = currentAnswer === opt.value
