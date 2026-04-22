@@ -3,9 +3,11 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_guidance-hub-78/artifacts/xatwivnm_sarathi%20logo.png'
+// 🚀 FIX: Point directly to your new horizontal logo in the public folder
+const LOGO_URL = '/logo-horizontal.png'
 
-const SarathiLogo = ({ href = '/', className, imageClassName = 'h-12 sm:h-20 w-auto max-w-full' }) => {
+// 🚀 FIX: Adjusted default height to be perfect for a horizontal layout
+const SarathiLogo = ({ href = '/', className, imageClassName = 'h-8 sm:h-12 w-auto max-w-full' }) => {
   const logoImage = (
     <img
       src={LOGO_URL}
