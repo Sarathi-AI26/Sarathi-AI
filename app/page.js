@@ -1,454 +1,348 @@
-// app/page.js
 import Link from 'next/link';
-import {
-  BrainCircuit,
-  LineChart,
-  Users,
-  Target,
-  ShieldCheck,
-  PhoneCall,
-  Mail,
-  ArrowRight,
+import { 
+  BrainCircuit, 
+  LineChart, 
+  Users, 
+  Target, 
+  ShieldCheck, 
+  PhoneCall, 
+  Mail, 
+  MapPin, 
+  ArrowRight, 
+  Sparkles,
   CheckCircle2,
   Star,
-  GraduationCap,
-  Sparkles,
-  Zap,
-  BarChart3,
-  Award,
-  Lock,
-  TrendingUp,
+  GraduationCap
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// ─── Static Data ──────────────────────────────────────────────────────────────
-
-const STATS = [
-  { icon: Users, value: '2,400+', label: 'Assessments Completed' },
-  { icon: GraduationCap, value: '18+', label: 'Partner Colleges' },
-  { icon: CheckCircle2, value: '60', label: 'Psychometric Dimensions' },
-];
-
-const TESTIMONIALS = [
-  {
-    name: 'Rahul S.',
-    college: 'SRM University · B.Tech CSE',
-    avatar: 'RS',
-    quote:
-      'I was torn between an MBA and starting a venture. The 5-year roadmap broke it down quarter by quarter and told me exactly what to do in the next 30 days. The ₹99 I paid felt like a steal.',
-  },
-  {
-    name: 'Priya M.',
-    college: 'Delhi University · B.Com Hons',
-    avatar: 'PM',
-    quote:
-      'The psychometric radar was unsettlingly accurate. It flagged my tendency to overthink before committing and recommended roles with structured decision-making. I avoided a wrong job offer because of it.',
-  },
-  {
-    name: 'Aman K.',
-    college: 'VIT Vellore · B.Tech ECE',
-    avatar: 'AK',
-    quote:
-      'Within 15 minutes I had a clear Year 1 and Year 2 action plan. I had already landed two internship interviews at companies the report specifically recommended targeting.',
-  },
-];
-
-const METHODOLOGY = [
-  {
-    icon: Target,
-    title: 'Role-Level Precision',
-    description:
-      'We go beyond broad fields like "Engineering" or "Business." SARATHI maps your profile to specific job titles, team cultures, and company archetypes — so you apply smarter, not harder.',
-    color: 'blue',
-  },
-  {
-    icon: BrainCircuit,
-    title: 'AI That Understands Context',
-    description:
-      'Our Gemini-powered engine does not just score you — it reasons about your trait combinations the way a seasoned career psychologist would, surfacing paths that generic tests miss entirely.',
-    color: 'orange',
-  },
-  {
-    icon: LineChart,
-    title: 'A Plan, Not Just a Score',
-    description:
-      'Every report includes a quarterly execution plan: skills to build, certifications to pursue, communities to join, and milestones to hit — year by year for five years.',
-    color: 'blue',
-  },
-];
-
-const FAQS = [
-  {
-    q: 'Is my personal data secure?',
-    a: 'Yes. We collect only the information needed to generate your report. All data is AES-256 encrypted in transit and at rest, and is never sold or shared with third parties.',
-  },
-  {
-    q: 'How long does the assessment take?',
-    a: 'Most students complete all 60 questions in 12 to 18 minutes. The questions are scenario-based and do not require any prior knowledge — just honest answers.',
-  },
-  {
-    q: 'Do I have to pay before taking the test?',
-    a: 'No. The assessment is completely free to take. You pay a one-time fee of ₹99 only at the end, to unlock and download your full personalised 5-Year PDF Roadmap.',
-  },
-  {
-    q: 'How is SARATHI different from free tests like MBTI or 16Personalities?',
-    a: 'Free personality tests tell you your type. SARATHI tells you what to do next. We combine 60 psychometric dimensions with real Indian career market data and AI reasoning to produce an actionable plan — not a label.',
-  },
-  {
-    q: 'Can I retake the assessment?',
-    a: 'Yes. We recommend revisiting every 6 to 12 months as your goals evolve. Each retake generates a fresh report, and your previous reports are saved in your dashboard.',
-  },
-  {
-    q: 'What format is the final report?',
-    a: 'You receive an interactive web dashboard and a beautifully formatted PDF. The PDF is yours to keep and share — with mentors, placement officers, or future employers.',
-  },
-];
-
-const INSTITUTION_FEATURES = [
-  'Cohort-level skill gap analytics by department and graduation year',
-  'Predictive placement-readiness scoring updated in real time',
-  'White-labeled portal with your institution\'s branding',
-  'TPO dashboard with exportable reports for industry partners',
-];
-
-const HOW_IT_WORKS = [
-  {
-    step: '01',
-    title: 'Take the Assessment',
-    desc: 'Answer 60 scenario-based psychometric questions crafted by career scientists and I/O psychologists. No right or wrong answers — just honest ones.',
-    icon: BrainCircuit,
-  },
-  {
-    step: '02',
-    title: 'AI Builds Your Profile',
-    desc: 'Gemini AI analyses your responses across 60 dimensions — personality, motivations, cognitive style, risk tolerance, and more — in seconds.',
-    icon: Sparkles,
-  },
-  {
-    step: '03',
-    title: 'Receive Your 5-Year Roadmap',
-    desc: 'Get a role-specific, quarter-by-quarter execution plan with skill benchmarks, communities to join, and milestones to hit every year.',
-    icon: Target,
-  },
-];
-
-const COLLEGES = [
-  'SRM University',
-  'Delhi University',
-  'VIT Vellore',
-  'Amity University',
-  'KIIT',
-  'Manipal',
-];
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white antialiased">
+    <div className="min-h-screen bg-white">
       <main>
-
-        {/* ── HERO ─────────────────────────────────────────────────────────── */}
-        <section id="home" className="relative overflow-hidden bg-[#0A2351] py-24 lg:py-32">
-          {/* Grid bg */}
-          <div
-            className="pointer-events-none absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage:
-                'linear-gradient(#fff 1px, transparent 1px), linear-gradient(to right, #fff 1px, transparent 1px)',
-              backgroundSize: '48px 48px',
-            }}
-          />
-          <div className="pointer-events-none absolute -top-40 left-1/2 h-[600px] w-[600px] -translate-x-1/2 rounded-full bg-[#F57D14] opacity-10 blur-[120px]" />
-          <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-blue-500 opacity-10 blur-[100px]" />
-
-          <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid items-center gap-16 lg:grid-cols-2">
-
-              {/* Left */}
+        {/* 🚀 HERO SECTION */}
+        <section id="home" className="relative overflow-hidden bg-white py-20 lg:py-24">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
               <div className="max-w-2xl">
-                <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-blue-200 backdrop-blur-sm">
-                  <Sparkles className="h-4 w-4 text-[#F57D14]" />
-                  Gemini AI · 60 Psychometric Dimensions · Built for India
+                <div className="mb-6 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-semibold text-blue-800">
+                  <BrainCircuit className="mr-2 h-4 w-4 text-[#F57D14]" />
+                  Powered by AI trained on 15,000+ career trajectories
                 </div>
-
-                <h1 className="text-5xl font-extrabold leading-tight tracking-tight text-white sm:text-6xl xl:text-7xl">
-                  Know Exactly Where{' '}
-                  <span className="relative whitespace-nowrap text-[#F57D14]">
-                    Your Career
-                    <svg
-                      className="absolute -bottom-2 left-0 w-full"
-                      viewBox="0 0 300 12"
-                      fill="none"
-                      xmlns="[w3.org](http://www.w3.org/2000/svg)"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M2 9C60 3 150 1 298 9"
-                        stroke="#F57D14"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        opacity="0.5"
-                      />
-                    </svg>
-                  </span>{' '}
-                  Is Headed
+                
+                <h1 className="text-5xl font-extrabold tracking-tight text-[#0A2351] sm:text-6xl xl:text-7xl">
+                  Get Your Personalized <br className="hidden lg:block"/><span className="text-[#F57D14]">5-Year Career Roadmap</span>
                 </h1>
-
-                <p className="mt-8 text-lg leading-relaxed text-white/70 sm:max-w-lg">
-                  SARATHI is an AI-powered psychometric career platform built
-                  specifically for Indian college students. In 15 minutes, we map
-                  your personality, strengths, and motivations to a concrete
-                  5-year roadmap — complete with role matches, quarterly
-                  milestones, and the exact skills to build.
+                <p className="mt-6 text-xl font-bold text-[#0A2351]">
+                  Find Your True North in 15 Minutes.
                 </p>
 
-                <div className="mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
-                  <Button
-                    asChild
-                    className="h-14 rounded-full bg-[#F57D14] px-8 text-base font-bold text-white shadow-2xl shadow-[#F57D14]/30 transition-all hover:scale-105 hover:bg-[#dd6f11]"
-                  >
-                    <Link href="/assessment">
-                      Start Free Assessment
-                      <ArrowRight className="ml-2 h-5 w-5" />
+                <p className="mt-4 text-lg leading-8 text-slate-600 sm:max-w-md lg:max-w-none">
+                  Stop guessing. Use the science of psychometrics and the power of Gemini AI to map your intrinsic traits to a personalized 5-year roadmap for career success.
+                </p>
+                <div className="mt-10 flex flex-col items-start gap-4">
+                  {/* 🚀 FIX 1: Added Sample Report Link next to CTA */}
+                  <div className="flex flex-col sm:flex-row items-center gap-5 w-full sm:w-auto">
+                    <Button asChild className="h-14 w-full sm:w-auto rounded-full bg-[#F57D14] px-8 text-base font-bold text-white hover:bg-[#dd6f11] shadow-xl shadow-[#F57D14]/20 transition-all hover:scale-105">
+                      <Link href="/assessment">Start the Assessment <ArrowRight className="ml-2 h-5 w-5" /></Link>
+                    </Button>
+                    <Link href="/sample-report.pdf" target="_blank" className="flex items-center text-sm font-bold text-[#0A2351] hover:text-[#F57D14] transition-colors group">
+                       <span className="underline underline-offset-4">See a sample report</span> <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
-                  </Button>
-                  <a
-                    href="/sample-report.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-1 text-sm font-semibold text-white/60 transition-colors hover:text-white"
-                  >
-                    <span className="underline underline-offset-4">View a sample report</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </a>
+                  </div>
+                  <p className="text-sm font-medium text-slate-500 sm:ml-4">
+                    Take the test for free. Full 5-Year PDF Roadmap for just ₹99.
+                  </p>
                 </div>
+              </div>
 
-                <p className="mt-5 text-sm font-medium text-white/40">
-                  Free to take &nbsp;·&nbsp; Full PDF Roadmap for{' '}
-                  <span className="text-white/70">₹99</span>
-                  &nbsp;·&nbsp; No subscription
+              <div className="relative mx-auto w-full max-w-lg lg:max-w-none">
+                <div className="rounded-[32px] bg-[#0A2351] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
+                  <div className="mb-6 rounded-2xl bg-white/10 p-5 backdrop-blur-sm border border-white/10">
+                    <div className="flex items-center justify-between">
+                      <p className="text-[10px] font-bold text-white/60 uppercase tracking-[0.2em]">Predictive Insights</p>
+                      <ShieldCheck className="h-5 w-5 text-[#F57D14]" />
+                    </div>
+                    <p className="mt-3 text-lg font-bold text-white">Clarity score improves with each step</p>
+                  </div>
+
+                  <div className="rounded-2xl bg-white p-6 shadow-inner">
+                    <p className="mb-4 text-xs font-bold uppercase tracking-wider text-slate-400">Industry Alignment Match</p>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between border-b border-slate-50 pb-3">
+                        <p className="text-sm font-bold text-[#0A2351]">Technical Product Manager</p>
+                        <span className="rounded-full bg-[#F57D14]/10 px-3 py-1 text-[10px] font-extrabold uppercase text-[#F57D14] whitespace-nowrap">
+                          93% Compatibility
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <p className="text-sm font-bold text-[#0A2351]">UX Research Lead</p>
+                        <span className="rounded-full bg-[#F57D14]/10 px-3 py-1 text-[10px] font-extrabold uppercase text-[#F57D14] whitespace-nowrap">
+                          88% Compatibility
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* STATS BAR */}
+        <section className="bg-[#0A2351] py-12">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-white/10">
+            <div className="pt-4 md:pt-0">
+              <div className="flex justify-center mb-2"><Users className="text-[#F57D14] h-6 w-6" /></div>
+              <p className="text-3xl font-bold text-white">500+</p>
+              <p className="text-blue-200 text-sm mt-1">Students Guided</p>
+            </div>
+            <div className="pt-4 md:pt-0">
+              <div className="flex justify-center mb-2"><GraduationCap className="text-[#F57D14] h-6 w-6" /></div>
+              <p className="text-3xl font-bold text-white">12+</p>
+              <p className="text-blue-200 text-sm mt-1">Colleges Across India</p>
+            </div>
+            <div className="pt-4 md:pt-0">
+              <div className="flex justify-center mb-2"><CheckCircle2 className="text-[#F57D14] h-6 w-6" /></div>
+              <p className="text-3xl font-bold text-white">60</p>
+              <p className="text-blue-200 text-sm mt-1">Deep Psychometric Metrics</p>
+            </div>
+          </div>
+        </section>
+
+        {/* TESTIMONIALS */}
+        <section id="about" className="scroll-mt-24 py-12 lg:py-16 bg-white px-4 sm:px-6 lg:px-8 border-b border-slate-100">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Trusted by students across India</h2>
+              <p className="mt-4 text-slate-500">Real outcomes from our 15-minute psychometric analysis.</p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-8">
+              {[
+                { name: "Rahul S.", college: "SRM University", quote: "I was confused between an MBA and starting a business. The 5-year roadmap gave me exactly what I needed to do in my next 30 days. Best ₹99 I've spent." },
+                { name: "Priya M.", college: "Delhi University", quote: "The radar chart was scary accurate. It pointed out my procrastination habit and told me exactly which roles to avoid. Highly recommend it!" },
+                { name: "Aman K.", college: "VIT Vellore", quote: "Got clarity on my career path in 15 minutes. The actionable steps for Year 1 and Year 2 are already helping me apply for the right internships." }
+              ].map((testimonial, i) => (
+                <div key={i} className="bg-slate-50 p-8 rounded-3xl border border-slate-200 hover:shadow-md transition-shadow">
+                  <div className="flex gap-1 mb-5">
+                    {[1,2,3,4,5].map(star => <Star key={star} className="h-4 w-4 fill-[#F57D14] text-[#F57D14]" />)}
+                  </div>
+                  <p className="text-slate-700 leading-relaxed mb-6 italic">"{testimonial.quote}"</p>
+                  <div>
+                    <p className="font-bold text-[#0A2351]">{testimonial.name}</p>
+                    <p className="text-sm text-slate-500">{testimonial.college}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 🚀 FIX 3: METHODOLOGY SECTION (Reframed to be Student-Centric) */}
+        <section id="methodology" className="scroll-mt-24 bg-slate-50 py-12 lg:py-16 border-t border-slate-100">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">The Science Behind Your Roadmap</h2>
+              <p className="mx-auto mt-4 max-w-3xl text-base leading-relaxed text-slate-600">
+                SARATHI eliminates the "hit-or-miss" approach of traditional counseling. We leverage your unique psychometric data and the Gemini 2.5 Flash engine to build a blueprint tailored exactly to you.
+              </p>
+            </div>
+            
+            <div className="grid gap-6 md:grid-cols-3">
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-center transition-all hover:shadow-xl hover:-translate-y-2 group">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0A2351]/5 text-[#0A2351] group-hover:bg-[#0A2351] group-hover:text-white transition-colors duration-300">
+                  <Target className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0A2351]">Absolute Clarity</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  You'll discover exactly which roles fit you best through a deep-dive into your unique personality, interests, and motivations.
                 </p>
+              </div>
 
-                <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-center transition-all hover:shadow-xl hover:-translate-y-2 group">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F57D14]/10 text-[#F57D14] group-hover:bg-[#F57D14] group-hover:text-white transition-colors duration-300">
+                  <BrainCircuit className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0A2351]">Uncover Hidden Strengths</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  You'll learn about career paths you never knew existed, matched perfectly to your profile using our unbiased AI engine.
+                </p>
+              </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8 text-center transition-all hover:shadow-xl hover:-translate-y-2 group">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#0A2351]/5 text-[#0A2351] group-hover:bg-[#0A2351] group-hover:text-white transition-colors duration-300">
+                  <LineChart className="h-8 w-8" />
+                </div>
+                <h3 className="text-xl font-bold text-[#0A2351]">Step-by-Step Execution</h3>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                  You won't just get a generic score. You'll receive a concrete, quarterly action plan telling you exactly what to do next.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FOR INSTITUTIONS SECTION */}
+        <section id="institutions" className="scroll-mt-24 bg-white py-12 lg:py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
+              <div className="order-2 lg:order-1">
+                <div className="mb-4 inline-flex items-center rounded-full border border-[#0A2351]/10 bg-[#0A2351]/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0A2351]">
+                  Institutional Partnership
+                </div>
+                <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Empowering College Placement Cells</h2>
+                <p className="mt-4 text-base leading-relaxed text-slate-600">
+                  SARATHI partners with forward-thinking universities to modernize their placement infrastructure. Our bulk-assessment platform gives TPOs real-time data to bridge the gap between student potential and industry requirements.
+                </p>
+                <ul className="mt-8 space-y-4">
                   {[
-                    { icon: Lock, text: 'AES-256 Encrypted' },
-                    { icon: Zap, text: '15-Minute Test' },
-                    { icon: Award, text: 'AI-Powered Insights' },
-                  ].map(({ icon: Icon, text }) => (
-                    <div key={text} className="flex items-center gap-2 text-sm font-medium text-white/50">
-                      <Icon className="h-4 w-4 text-[#F57D14]" />
-                      {text}
-                    </div>
+                    'Batch-level aptitude and skill gap analytics', 
+                    'Predictive placement-readiness reporting', 
+                    'White-labeled student transformation portal'
+                  ].map((feature) => (
+                    <li key={feature} className="flex items-center gap-3 text-sm font-semibold text-[#0A2351]">
+                      <CheckCircle2 className="h-5 w-5 text-[#F57D14]" /> {feature}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
-
-              {/* Right — Dashboard card */}
-              <div className="relative mx-auto w-full max-w-md">
-                <div className="absolute -top-4 -right-4 z-20 flex items-center gap-2 rounded-full bg-[#F57D14] px-4 py-2 text-xs font-bold text-white shadow-xl">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-white" />
-                  </span>
-                  Live AI Analysis
-                </div>
-
-                <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur-sm">
-                  <div className="border-b border-white/10 bg-white/5 px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <div className="h-3 w-3 rounded-full bg-red-400/70" />
-                      <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
-                      <div className="h-3 w-3 rounded-full bg-green-400/70" />
-                      <p className="ml-3 text-xs font-semibold text-white/40">
-                        sarathi-ai.in · Career Report
-                      </p>
-                    </div>
+              
+              {/* 🚀 FIX 2: "Coming Soon" Replaced with "Now in Beta" */}
+              <div className="order-1 lg:order-2 relative aspect-square overflow-hidden rounded-[32px] bg-[#0A2351] shadow-2xl lg:aspect-auto lg:h-[500px]">
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center border border-white/10 m-4 rounded-2xl bg-white/5 backdrop-blur-sm">
+                  <Users className="mb-4 h-16 w-16 text-[#F57D14]" />
+                  <div className="mb-3 inline-flex items-center rounded-full bg-[#F57D14]/20 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-[#F57D14]">
+                    Now in Beta
                   </div>
-
-                  <div className="space-y-4 p-6">
-                    <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F57D14] text-sm font-extrabold text-white">
-                        AK
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-white">Aman K.</p>
-                        <p className="text-xs text-white/50">VIT Vellore · B.Tech ECE</p>
-                      </div>
-                      <span className="ml-auto rounded-full bg-green-500/20 px-3 py-1 text-[10px] font-bold uppercase text-green-400">
-                        Report Ready
-                      </span>
-                    </div>
-
-                    <div className="rounded-2xl bg-white p-5">
-                      <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                        Top Role Matches
-                      </p>
-                      <div className="space-y-4">
-                        {[
-                          { role: 'Technical Product Manager', pct: 93 },
-                          { role: 'UX Research Lead', pct: 88 },
-                          { role: 'Data Analyst', pct: 81 },
-                        ].map(({ role, pct }) => (
-                          <div key={role}>
-                            <div className="mb-1 flex items-center justify-between">
-                              <p className="text-xs font-semibold text-[#0A2351]">{role}</p>
-                              <span className="text-xs font-extrabold text-[#F57D14]">{pct}%</span>
-                            </div>
-                            <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-                              <div
-                                className="h-full rounded-full bg-gradient-to-r from-[#F57D14] to-[#ffaa5e]"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 rounded-2xl bg-white/10 p-4">
-                      <TrendingUp className="mt-0.5 h-5 w-5 shrink-0 text-[#F57D14]" />
-                      <div>
-                        <p className="text-xs font-bold text-white">Year 1 Priority Action</p>
-                        <p className="mt-1 text-[11px] leading-relaxed text-white/60">
-                          High analytical drive + systems thinking detected. Build a
-                          public GitHub portfolio with 2 data projects before semester end.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
+                  <h3 className="text-2xl font-bold text-white mb-6">Placement Intelligence Dashboard</h3>
+                  <Button asChild variant="outline" className="rounded-full bg-transparent text-white border-white/20 hover:bg-white hover:text-[#0A2351] transition-all">
+                    <Link href="#contact">Request Early Access</Link>
+                  </Button>
                 </div>
+                <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-3xl"></div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── SOCIAL PROOF BAR ──────────────────────────────────────────────── */}
-        <section className="border-b border-slate-100 bg-white py-14">
-          <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <p className="mb-10 text-center text-xs font-bold uppercase tracking-widest text-slate-400">
-              Trusted by students from
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-8 opacity-40 grayscale">
-              {COLLEGES.map((college) => (
-                <span key={college} className="text-sm font-bold text-slate-700">
-                  {college}
-                </span>
+        {/* FAQ SECTION */}
+        <section className="bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
+          <div className="container mx-auto max-w-3xl">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Frequently Asked Questions</h2>
+            </div>
+            <div className="space-y-4">
+              {[
+                { q: "Is my personal data secure?", a: "Absolutely. We only collect basic profile details to generate your report. Your data is encrypted and never sold to third parties." },
+                { q: "How long does the assessment take?", a: "The assessment consists of 60 targeted psychological and situational questions and takes approximately 15 minutes to complete." },
+                { q: "Do I have to pay before taking the test?", a: "No! The assessment is 100% free to take. You only pay a small one-time fee of ₹99 at the very end to unlock and download your full 5-year PDF roadmap." },
+                { q: "Can I retake the assessment?", a: "Yes, you can retake the assessment if you feel your goals or interests have significantly changed, though we recommend acting on your first roadmap for at least 6 months." },
+                { q: "What format is the final report?", a: "You will receive a highly detailed, interactive web dashboard mapping out your 5-year plan, along with a downloadable PDF document that you can keep forever." }
+              ].map((faq, i) => (
+                <details key={i} className="group rounded-2xl bg-white p-6 shadow-sm border border-slate-200 [&_summary::-webkit-details-marker]:hidden cursor-pointer transition-all hover:border-[#F57D14]">
+                  <summary className="flex items-center justify-between font-bold text-[#0A2351] text-lg">
+                    {faq.q}
+                    <span className="transition duration-300 group-open:rotate-180 text-[#F57D14]">
+                      <svg fill="none" height="24" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="24"><path d="M6 9l6 6 6-6"></path></svg>
+                    </span>
+                  </summary>
+                  <p className="mt-4 text-slate-600 leading-relaxed font-medium">{faq.a}</p>
+                </details>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── STATS ─────────────────────────────────────────────────────────── */}
-        <section className="bg-slate-50 py-14">
-          <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:divide-x md:divide-slate-200">
-              {STATS.map(({ icon: Icon, value, label }) => (
-                <div key={label} className="group flex flex-col items-center gap-2 pt-4 md:pt-0">
-                  <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0A2351]/5 transition-colors group-hover:bg-[#0A2351]">
-                    <Icon className="h-6 w-6 text-[#F57D14]" />
-                  </div>
-                  <p className="text-4xl font-extrabold text-[#0A2351]">{value}</p>
-                  <p className="text-sm font-medium text-slate-500">{label}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── HOW IT WORKS ──────────────────────────────────────────────────── */}
-        <section className="bg-white py-20 lg:py-28">
+        {/* CONTACT SECTION */}
+       <section id="contact" className="scroll-mt-24 bg-[#0A2351] py-12 lg:py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">
-                How It Works
-              </p>
-              <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">
-                From Confusion to Clarity in 3 Steps
-              </h2>
-              <p className="mt-4 text-base text-slate-500">
-                No counselor appointments. No vague advice. A personalized,
-                AI-generated roadmap built around you.
-              </p>
-            </div>
+            <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-center">
+              <div className="space-y-10">
+                <div>
+                  <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl">
+                    Bring SARATHI to <br className="hidden sm:block" /> Your Campus
+                  </h2>
+                  <p className="mt-4 max-w-lg text-base leading-relaxed text-white/80">
+                    Join the ranks of institutions transforming student outcomes. Schedule a 15-minute demo to see how our predictive data can boost your placement records.
+                  </p>
+                </div>
 
-            <div className="mt-16 grid gap-8 md:grid-cols-3">
-              {HOW_IT_WORKS.map(({ step, title, desc, icon: Icon }) => (
-                <div
-                  key={step}
-                  className="relative rounded-3xl border border-slate-100 bg-slate-50 p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-xl"
-                >
-                  <div className="mb-5 flex items-center justify-between">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#0A2351] text-white">
-                      <Icon className="h-7 w-7" />
+                <div className="space-y-6 border-t border-white/10 pt-8">
+                  <div className="flex items-center gap-4 group">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/5 group-hover:bg-[#F57D14] transition-colors">
+                      <PhoneCall className="h-5 w-5 text-[#F57D14] group-hover:text-white" />
                     </div>
-                    <span className="text-5xl font-extrabold text-slate-100">{step}</span>
+                    <div>
+                      <p className="text-sm font-medium text-white/60 uppercase tracking-widest">Enterprise Sales</p>
+                      <p className="text-lg font-semibold text-white">+91 8920857008</p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-[#0A2351]">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{desc}</p>
+                  
+                  <div className="flex items-center gap-4 group">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/5 group-hover:bg-[#F57D14] transition-colors">
+                      <Mail className="h-5 w-5 text-[#F57D14] group-hover:text-white" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-white/60 uppercase tracking-widest">Partnerships</p>
+                      <p className="text-lg font-semibold text-white">partners@sarathi-ai.in</p>
+                    </div>
+                  </div>
                 </div>
-              ))}
+              </div>
+
+              {/* B2B Demo Form */}
+              <div className="rounded-3xl bg-white p-6 sm:p-8 shadow-2xl text-slate-900 border border-slate-100">
+                <h3 className="text-2xl font-bold text-[#0A2351]">Request a Campus Preview</h3>
+                <p className="mt-3 text-sm text-slate-500">Discover how SARATHI can elevate your placement strategy.</p>
+
+                <form className="mt-8 space-y-5">
+                  <div className="grid gap-5 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Representative Name</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Dr. Sharma" 
+                        className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Designation</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. TPO / Principal" 
+                        className="w-full rounded-2xl border border-slate-100 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Institution Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="Enter full college name" 
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Official Email</label>
+                    <input 
+                      type="email" 
+                      placeholder="e.g. director@college.edu" 
+                      className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14] transition-all"
+                    />
+                  </div>
+
+                  <Button type="button" className="mt-4 h-14 w-full rounded-full bg-[#F57D14] text-base font-bold text-white hover:bg-[#dd6f11] shadow-xl shadow-[#F57D14]/20 transition-all hover:scale-105">
+                    Book Campus Demo
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Button>
+                </form>
+              </div>
             </div>
           </div>
         </section>
-
-        {/* ── METHODOLOGY ───────────────────────────────────────────────────── */}
-        <section id="methodology" className="scroll-mt-24 bg-slate-50 py-20 lg:py-28">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">
-                Our Methodology
-              </p>
-              <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">
-                The Science Behind Your Roadmap
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-slate-500">
-                SARATHI combines validated psychometric frameworks — Big Five personality
-                theory, Holland Codes, and Self-Determination Theory — with Gemini 2.5
-                Flash to generate insights no generic test can match.
-              </p>
-            </div>
-
-            <div className="mt-16 grid gap-6 md:grid-cols-3">
-              {METHODOLOGY.map(({ icon: Icon, title, description, color }) => (
-                <div
-                  key={title}
-                  className="group rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:-translate-y-1 hover:border-[#F57D14]/30 hover:shadow-xl"
-                >
-                  <div
-                    className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl transition-colors duration-300 ${
-                      color === 'orange'
-                        ? 'bg-[#F57D14]/10 text-[#F57D14] group-hover:bg-[#F57D14] group-hover:text-white'
-                        : 'bg-[#0A2351]/5 text-[#0A2351] group-hover:bg-[#0A2351] group-hover:text-white'
-                    }`}
-                  >
-                    <Icon className="h-7 w-7" />
-                  </div>
-                  <h3 className="text-xl font-bold text-[#0A2351]">{title}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-slate-500">{description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── TESTIMONIALS ──────────────────────────────────────────────────── */}
-        <section id="about" className="scroll-mt-24 bg-[#0A2351] py-20 lg:py-28">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">
-                Student Stories
-              </p>
-              <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                What Students Are Saying
-              </h2>
-              <p className="mt-4 text-base text-white/50">
-                Unfiltered feedback from students who found their direction with SARATHI.
-              </p>
-            </div>
-
-            <div className="mt-16 grid gap-6 md:grid-cols-3">
-              {TESTIMONIALS.map((t) => (
-                <div
-                  key={t.name}
-                  className="flex flex-col rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition-all hover:border-[#F57D14]/40 hover:bg
+      </main>
+    </div>
+  );
+}
