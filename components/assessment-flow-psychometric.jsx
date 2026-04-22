@@ -2,37 +2,42 @@
 
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  CheckCircle2, 
-  ClipboardCheck, 
-  Star, 
-  Loader2, 
-  Sparkles, 
-  BrainCircuit, 
-  LineChart,
-  Lock 
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle2,
+  ClipboardCheck,
+  Loader2,
+  Sparkles,
+  Lock,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import {
+  assessmentSections,
+  assessmentQuestions,
+  toNumericAnswers,
+} from '@/lib/psychometric-assessment'
 
+// ─────────────────────────────────────────────
+// PROCESSING VIEW
+// ─────────────────────────────────────────────
 const ProcessingView = () => {
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(0)
   const messages = [
-    "Synthesizing your 60-point profile...",
-    "Gemini AI mapping intrinsic traits...",
-    "Evaluating industry compatibility...",
-    "Generating 5-year transformation roadmap..."
-  ];
+    'Synthesizing your 60-point profile...',
+    'Gemini AI mapping intrinsic traits...',
+    'Evaluating industry compatibility...',
+    'Generating 5-year transformation roadmap...',
+  ]
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setStep((prev) => (prev < messages.length - 1 ? prev + 1 : prev));
-    }, 2500);
-    return () => clearInterval(interval);
-  }, [messages.length]);
+      setStep((prev) => (prev < messages.length - 1 ? prev + 1 : prev))
+    }, 2500)
+    return () => clearInterval(interval)
+  }, [messages.length])
 
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center animate-in fade-in zoom-in duration-500">
@@ -43,311 +48,381 @@ const ProcessingView = () => {
         </div>
       </div>
       <h3 className="text-2xl font-bold text-[#0A2351] mb-2">Creating Your Future</h3>
-      <p className="text-slate-500 mb-8 text-sm">Please do not refresh. Our AI engine is building your roadmap.</p>
-      
+      <p className="text-slate-500 mb-8 text-sm">
+        Please do not refresh. Our AI engine is building your roadmap.
+      </p>
       <div className="w-full max-w-xs space-y-4">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex items-center gap-3 transition-all duration-500 ${i === step ? 'opacity-100 translate-x-2' : i < step ? 'opacity-40' : 'opacity-10'}`}>
-            {i < step ? <CheckCircle2 className="w-4 h-4 text-green-500" /> : <Sparkles className={`w-4 h-4 ${i === step ? 'text-[#F57D14]' : 'text-slate-300'}`} />}
-            <span className={`text-xs font-bold uppercase tracking-wider ${i === step ? 'text-[#0A2351]' : 'text-slate-400'}`}>{msg}</span>
+          <div
+            key={i}
+            className={`flex items-center gap-3 transition-all duration-500 ${
+              i === step
+                ? 'opacity-100 translate-x-2'
+                : i < step
+                ? 'opacity-40'
+                : 'opacity-10'
+            }`}
+          >
+            {i < step ? (
+              <CheckCircle2 className="w-4 h-4 text-green-500" />
+            ) : (
+              <Sparkles
+                className={`w-4 h-4 ${i === step ? 'text-[#F57D14]' : 'text-slate-300'}`}
+              />
+            )}
+            <span
+              className={`text-xs font-bold uppercase tracking-wider ${
+                i === step ? 'text-[#0A2351]' : 'text-slate-400'
+              }`}
+            >
+              {msg}
+            </span>
           </div>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
+// ─────────────────────────────────────────────
+// MAIN COMPONENT
+// ─────────────────────────────────────────────
 const AssessmentFlowPsychometric = () => {
   const router = useRouter()
-  
+
   const [isFormCompleted, setIsFormCompleted] = useState(false)
-  const [currentSection, setCurrentSection] = useState(0) 
-  const [absoluteStep, setAbsoluteStep] = useState(1) 
-  const [textResponse, setTextResponse] = useState("")
+  const [absoluteStep, setAbsoluteStep] = useState(1)
+  const [currentSectionIdx, setCurrentSectionIdx] = useState(0)
+  const [textResponse, setTextResponse] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [allAnswers, setAllAnswers] = useState(Array(60).fill(null))
-  
-  const [formData, setFormData] = useState({ name: "", email: "", college: "" })
+  const [submitError, setSubmitError] = useState(null)
+
+  // answersMap: { q1: 2, q2: 4, q56: "I want to be..." }
+  // Integer values for choice questions, string for open-ended
+  const [answersMap, setAnswersMap] = useState({})
   const [completedSteps, setCompletedSteps] = useState([])
+  const [formData, setFormData] = useState({ name: '', email: '', college: '' })
 
-  const sections = [
-    { name: "Personality Traits", questions: 15 },
-    { name: "Career Interests", questions: 12 },
-    { name: "Aptitude Indicators", questions: 10 },
-    { name: "Motivation & Drivers", questions: 10 },
-    { name: "Behavioural Tendencies", questions: 8 },
-    { name: "Open Reflections", questions: 5 }
-  ]
-
-  const questionBank = [
-    // Section 1: Personality Traits
-    "I enjoy solving problems that require deep thinking and analysis.",
-    "I like having a clear plan and structure for my daily tasks.",
-    "When I disagree with someone in a group, I usually voice my opinion even if it creates tension.",
-    "I often think of creative ideas or new ways of doing things.",
-    "I remain calm even during stressful situations.",
-    "I naturally take the lead when working in a group.",
-    "I think carefully before making important decisions.",
-    "When facing an unfamiliar problem, I prefer to figure it out myself before asking for help.",
-    "I avoid taking risks unless I'm confident about the outcome.",
-    "I adapt quickly when situations change suddenly.",
-    "I make important decisions quickly and course-correct later, rather than waiting until I'm fully certain.",
-    "I can stay focused on tasks for long periods without distraction.",
-    "I find it easy to switch between very different tasks or subjects in the same day.",
-    "I like keeping my workspace and schedule organized.",
-    "I often notice when someone is uncomfortable in a conversation, even if they don't say anything.",
-
-    // Section 2: Career Interests
-    "Rate your interest: Analyzing data, numbers, or patterns.",
-    "Rate your interest: Designing visuals such as graphics, videos, or UI screens.",
-    "Rate your interest: Understanding how machines, software, or technology systems work.",
-    "Rate your interest: Helping people with academic, emotional, or career problems.",
-    "Rate your interest: Leading teams, planning events, or managing projects.",
-    "Rate your interest: Writing articles, blogs, scripts, or social media content.",
-    "Rate your interest: Conducting research in science, humanities, commerce, or social studies.",
-    "Rate your interest: Exploring business ideas, startups, or entrepreneurial ventures.",
-    "Rate your interest: Working in healthcare, medicine, nursing, or medical technology.",
-    "Rate your interest: Working in finance, banking, investment, or insurance sectors.",
-    "Rate your interest: Working in law, policy-making, public administration, or governance.",
-    "Rate your interest: Pursuing higher studies abroad for exposure and global career opportunities.",
-
-    // Section 3: Aptitude Indicators
-    "My teachers or peers often ask me to explain concepts they find difficult.",
-    "I understand diagrams, charts, and visual data quickly.",
-    "In school or college, I consistently scored higher in Maths or Science than in other subjects.",
-    "I learn new software or technology faster than most people.",
-    "When I read instructions for a new device or app, I rarely need to read them twice.",
-    "I can think of multiple solutions when faced with a problem.",
-    "I can stay focused even when tasks are repetitive or long.",
-    "I notice patterns or inconsistencies in data or information that others tend to miss.",
-    "I easily understand abstract concepts like theories, algorithms, or frameworks.",
-    "I am comfortable analyzing large amounts of information to reach conclusions.",
-
-    // Section 4: Motivation & Drivers
-    "Rate importance: Earning a high salary early in my career.",
-    "Rate importance: Having long-term job stability and security.",
-    "Rate importance: Having opportunities to innovate or build new ideas.",
-    "Rate importance: Getting leadership roles and recognition at work.",
-    "Rate importance: Having a good work-life balance and manageable workload.",
-    "Rate importance: Contributing to society and making a positive impact.",
-    "Rate importance: Working in roles that allow international travel or relocation.",
-    "Rate importance: Being able to take calculated risks and try new things, even if some fail.",
-    "Rate importance: Having my family's approval and support for my career choices.",
-    "Rate importance: Mastering a specific skill or subject deeply, rather than knowing a little of many things.",
-
-    // Section 5: Behavioural Tendencies
-    "When I have a long deadline, I tend to start seriously only in the final few days.",
-    "I feel stressed when too many tasks pile up at once.",
-    "I enjoy collaborating with others and working in teams.",
-    "If I disagree with how a team decision was made, I find it hard to commit fully to it.",
-    "I actively use feedback to improve myself.",
-    "I feel confident presenting or speaking in front of groups.",
-    "I tend to keep trying a difficult problem even after multiple failures, rather than moving on.",
-    "I often research a topic extensively on my own, beyond what was required in class.",
-
-    // Section 6: Open Reflections
-    "What is your dream career, and why does it inspire you?",
-    "Describe a challenge you faced and how you overcame it.",
-    "Name one person — real or fictional — whose career or life you admire most, and explain what specifically about their path appeals to you.",
-    "If money was not a concern, what would you spend most of your time doing? How close is that to what you are currently pursuing?",
-    "Would you prefer building your career in India, abroad, or both? Why?"
-  ]
-  const totalSteps = questionBank.length 
+  const totalSteps = assessmentQuestions.length // 60
   const progress = (absoluteStep / totalSteps) * 100
-  
-  const isFormValid = 
-    formData.name.trim() !== "" && 
-    formData.email.includes("@") && 
-    formData.college.trim() !== ""
 
-  const updateSection = (step) => {
+  // Current question object from the single source of truth
+  const currentQuestion = assessmentQuestions[absoluteStep - 1]
+  const isOpenEnded = currentQuestion?.input_type === 'text'
+  const isLastStep = absoluteStep === totalSteps
+
+  // Which section are we in?
+  const currentSection = assessmentSections[currentSectionIdx]
+
+  // Sync currentSectionIdx whenever absoluteStep changes
+  useEffect(() => {
     let count = 0
-    for (let i = 0; i < sections.length; i++) {
-      count += sections[i].questions
-      if (step <= count) {
-        setCurrentSection(i)
+    for (let i = 0; i < assessmentSections.length; i++) {
+      count += assessmentSections[i].questions.length
+      if (absoluteStep <= count) {
+        setCurrentSectionIdx(i)
         break
       }
     }
-  }
+  }, [absoluteStep])
+
+  // When navigating back to an open-ended question, restore the saved text
+  useEffect(() => {
+    if (isOpenEnded) {
+      setTextResponse(answersMap[currentQuestion.id] || '')
+    }
+  }, [absoluteStep, isOpenEnded])
+
+  const isFormValid =
+    formData.name.trim() !== '' &&
+    formData.email.includes('@') &&
+    formData.college.trim() !== ''
 
   const handleStartTest = () => {
     setIsFormCompleted(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const handleNext = async (selectedOption) => {
-    const updatedAnswers = [...allAnswers]
-    if (currentSection === 5) {
-      updatedAnswers[absoluteStep - 1] = textResponse.trim()
+  // Save answer and advance — or submit on last step
+  const handleNext = async (selectedOptionValue = null) => {
+    const qId = currentQuestion.id
+
+    // Build updated answers map
+    const updatedMap = { ...answersMap }
+    if (isOpenEnded) {
+      updatedMap[qId] = textResponse.trim()
     } else {
-      updatedAnswers[absoluteStep - 1] = selectedOption
+      // selectedOptionValue is already an integer (1–5 or 1–4)
+      updatedMap[qId] = selectedOptionValue
     }
-    setAllAnswers(updatedAnswers)
+    setAnswersMap(updatedMap)
 
     if (!completedSteps.includes(absoluteStep)) {
-      setCompletedSteps([...completedSteps, absoluteStep])
+      setCompletedSteps((prev) => [...prev, absoluteStep])
     }
-    
-    if (absoluteStep < totalSteps) {
+
+    if (!isLastStep) {
       setTimeout(() => {
-        const nextStep = absoluteStep + 1
-        const nextSavedAnswer = updatedAnswers[nextStep - 1]
-        setTextResponse(nextSavedAnswer || "")
-        setAbsoluteStep(nextStep)
-        updateSection(nextStep)
+        setAbsoluteStep((prev) => prev + 1)
+        setTextResponse('')
         window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 300);
-    } else {
-      setIsSubmitting(true)
-      try {
-        const response = await fetch('/api/submit-assessment', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: formData.name,
-            email: formData.email,
-            college: formData.college,
-            answers: updatedAnswers 
-          })
-        });
-        
-        const data = await response.json();
-        if (data.assessmentId) {
-          router.push(`/result?id=${data.assessmentId}`);
-        } else {
-          setIsSubmitting(false)
-        }
-      } catch (error) {
-        setIsSubmitting(false)
+      }, 300)
+      return
+    }
+
+    // ── FINAL SUBMISSION ──────────────────────────────────────
+    setIsSubmitting(true)
+    setSubmitError(null)
+
+    try {
+      // toNumericAnswers converts the map to an ordered array of 60 integers
+      // Open-ended answers (strings) are kept as-is at their positions
+      const orderedAnswers = toNumericAnswers(updatedMap)
+
+      const response = await fetch('/api/submit-assessment', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          college: formData.college,
+          answers: orderedAnswers,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Submission failed')
       }
+
+      if (data.assessmentId) {
+        router.push(`/result?id=${data.assessmentId}`)
+      } else {
+        throw new Error('No assessment ID returned')
+      }
+    } catch (error) {
+      console.error('Submission error:', error)
+      setSubmitError(error.message || 'Something went wrong. Please try again.')
+      setIsSubmitting(false)
     }
   }
 
   const handlePrevious = () => {
     if (absoluteStep > 1) {
-      const prevStep = absoluteStep - 1
-      const prevSavedAnswer = allAnswers[prevStep - 1]
-      setTextResponse(prevSavedAnswer || "")
-      setAbsoluteStep(prevStep)
-      updateSection(prevStep)
+      setAbsoluteStep((prev) => prev - 1)
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
       setIsFormCompleted(false)
     }
   }
 
- return (
+  // Is the current choice question already answered?
+  const currentAnswer = answersMap[currentQuestion?.id]
+  const canProceedOpenEnded = isOpenEnded && textResponse.trim().length > 0
+  const isAnswered = !isOpenEnded && currentAnswer !== undefined && currentAnswer !== null
+
+  // ─────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────
+  return (
     <main className="min-h-screen bg-slate-50 py-12 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+
+          {/* ── MAIN CARD ── */}
           <Card className="overflow-hidden rounded-3xl border-slate-200 bg-white shadow-xl">
-            
+
+            {/* Progress Header */}
             <div className="bg-[#0A2351] px-6 py-4 text-white">
               {!isFormCompleted ? (
                 <div className="flex items-center justify-between">
-                  {/* 🚀 FIX: Progress Label Added */}
                   <span className="text-sm font-medium opacity-80">Step 1 of 2: Profile Setup</span>
-                  <span className="text-xs font-bold text-[#F57D14] uppercase tracking-wider">Profile → Assessment</span>
+                  <span className="text-xs font-bold text-[#F57D14] uppercase tracking-wider">
+                    Profile → Assessment
+                  </span>
                 </div>
               ) : (
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium opacity-80">
-                      Section {currentSection + 1}: {sections[currentSection]?.name}
+                    Section {currentSectionIdx + 1}: {currentSection?.title}
                   </span>
                   <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">
-                      Step {absoluteStep} of {totalSteps}
+                    Q{absoluteStep} of {totalSteps}
                   </span>
                 </div>
               )}
-              <Progress value={!isFormCompleted ? 0 : progress} className="mt-4 h-1.5 bg-white/20" indicatorClassName="bg-[#F57D14]" />
+              <Progress
+                value={!isFormCompleted ? 0 : progress}
+                className="mt-4 h-1.5 bg-white/20"
+                indicatorClassName="bg-[#F57D14]"
+              />
             </div>
 
             <CardContent className="p-6 sm:p-8">
               <div className="mx-auto max-w-xl">
-                
+
+                {/* ── PROCESSING ── */}
                 {isSubmitting ? (
                   <ProcessingView />
+
                 ) : !isFormCompleted ? (
+                  /* ── PROFILE FORM ── */
                   <div className="space-y-6">
                     <div>
                       <h3 className="text-xl font-bold text-[#0A2351]">Tell us who you are</h3>
-                      <p className="text-sm text-slate-500 mt-1">Takes ~15 minutes. No payment required to start.</p>
+                      <p className="text-sm text-slate-500 mt-1">
+                        Takes ~15 minutes. No payment required to start.
+                      </p>
                     </div>
                     <div className="space-y-4">
-                      <input type="text" placeholder="Full Name *" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
-                      <input type="email" placeholder="Email Address (Where to send the report) *" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
-                      <input type="text" placeholder="College Name *" value={formData.college} onChange={(e) => setFormData({...formData, college: e.target.value})} className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none" />
+                      <input
+                        type="text"
+                        placeholder="Full Name *"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none"
+                      />
+                      <input
+                        type="email"
+                        placeholder="Email Address *"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        placeholder="College Name *"
+                        value={formData.college}
+                        onChange={(e) => setFormData({ ...formData, college: e.target.value })}
+                        className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm focus:border-[#F57D14] focus:outline-none"
+                      />
                     </div>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4">
                       <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400 order-2 sm:order-1">
-                        <Lock className="w-3.5 h-3.5" /> 
+                        <Lock className="w-3.5 h-3.5" />
                         <span>Data is secure. Full report unlocks for ₹99.</span>
                       </div>
-                      {/* 🚀 FIX: Orange Pill CTA Styling */}
-                      <Button onClick={handleStartTest} disabled={!isFormValid} className={`order-1 sm:order-2 w-full sm:w-auto h-14 rounded-full px-8 font-bold text-white transition-all shadow-lg ${isFormValid ? 'bg-[#F57D14] hover:bg-[#dd6f11] shadow-[#F57D14]/20 hover:scale-105' : 'bg-[#F57D14]/50 cursor-not-allowed'}`}>
+                      <Button
+                        onClick={handleStartTest}
+                        disabled={!isFormValid}
+                        className={`order-1 sm:order-2 w-full sm:w-auto h-14 rounded-full px-8 font-bold text-white transition-all shadow-lg ${
+                          isFormValid
+                            ? 'bg-[#F57D14] hover:bg-[#dd6f11] shadow-[#F57D14]/20 hover:scale-105'
+                            : 'bg-[#F57D14]/50 cursor-not-allowed'
+                        }`}
+                      >
                         Start the Assessment <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
                     </div>
                   </div>
-                ) : currentSection === 5 ? (
+
+                ) : isOpenEnded ? (
+                  /* ── OPEN-ENDED QUESTION ── */
                   <div className="space-y-8 py-4">
                     <div className="space-y-3">
-                      <h3 className="text-lg font-bold text-[#0A2351]">Self-Reflection</h3>
-                      <p className="text-base text-slate-700 font-medium leading-relaxed">{questionBank[absoluteStep - 1]}</p>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#F57D14]">
+                        {currentSection?.title}
+                      </span>
+                      <p className="text-base text-slate-700 font-medium leading-relaxed">
+                        {currentQuestion.question}
+                      </p>
                     </div>
-                    <textarea value={textResponse} onChange={(e) => setTextResponse(e.target.value)} placeholder="Type your reflection here. AI uses this to measure career clarity..." className="w-full h-40 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]" />
+                    <textarea
+                      value={textResponse}
+                      onChange={(e) => setTextResponse(e.target.value)}
+                      placeholder="Type your reflection here. AI uses this to build your personalised roadmap..."
+                      className="w-full h-40 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
+                    />
+                    {submitError && (
+                      <p className="text-sm text-red-500">{submitError}</p>
+                    )}
                     <div className="flex items-center justify-between pt-6">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
+                      <Button
+                        variant="ghost"
+                        onClick={handlePrevious}
+                        className="text-slate-500 hover:text-[#0A2351]"
+                      >
                         <ArrowLeft className="mr-2 h-4 w-4" /> Previous
                       </Button>
-                      {/* 🚀 FIX: Orange Pill CTA Styling on final step */}
-                      <Button onClick={() => handleNext(null)} disabled={!textResponse.trim()} className="h-14 rounded-full bg-[#F57D14] px-4 sm:px-8 font-bold text-white shadow-xl hover:bg-[#dd6f11] transition-all hover:scale-105">
-                        {absoluteStep === totalSteps ? "Finish & View Results" : "Next Reflection"} <ArrowRight className="ml-2 h-5 w-5" />
+                      <Button
+                        onClick={() => handleNext(null)}
+                        disabled={!canProceedOpenEnded}
+                        className="h-14 rounded-full bg-[#F57D14] px-4 sm:px-8 font-bold text-white shadow-xl hover:bg-[#dd6f11] transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isLastStep ? 'Finish & View Results' : 'Next Reflection'}{' '}
+                        <ArrowRight className="ml-2 h-5 w-5" />
                       </Button>
                     </div>
                   </div>
+
                 ) : (
+                  /* ── CHOICE QUESTION ── */
                   <div className="space-y-8 py-4">
                     <div className="space-y-3">
-                      <h3 className="text-lg font-bold text-[#0A2351]">Question {absoluteStep}</h3>
-                      <p className="text-base text-slate-700 font-medium leading-relaxed">{questionBank[absoluteStep - 1]}</p>
+                      <span className="text-xs font-bold uppercase tracking-wider text-[#F57D14]">
+                        {currentSection?.title}
+                      </span>
+                      <h3 className="text-lg font-bold text-[#0A2351]">
+                        Question {absoluteStep}
+                      </h3>
+                      <p className="text-base text-slate-700 font-medium leading-relaxed">
+                        {currentQuestion.question}
+                      </p>
                     </div>
+
+                    {/* Options — driven by question.options from psychometric-assessment.js */}
                     <div className="grid gap-3">
-                      {[
-                        currentSection === 1 ? 'Very Interested' : 'Strongly Agree', 
-                        currentSection === 1 ? 'Interested' : 'Agree', 
-                        'Neutral', 
-                        currentSection === 1 ? 'Less Interested' : 'Disagree', 
-                        currentSection === 1 ? 'Not Interested' : 'Strongly Disagree'
-                      ].map((opt) => {
-                        const isSelected = allAnswers[absoluteStep - 1] === opt;
+                      {currentQuestion.options.map((opt) => {
+                        const isSelected = currentAnswer === opt.value
                         return (
-                          <button key={`${absoluteStep}-${opt}`} onClick={() => handleNext(opt)} className={`w-full rounded-2xl border p-4 text-left text-sm font-medium transition-all ${isSelected ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]' : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'}`}>
-                            {opt}
+                          <button
+                            key={opt.value}
+                            onClick={() => handleNext(opt.value)}
+                            className={`w-full rounded-2xl border p-4 text-left text-sm font-medium transition-all ${
+                              isSelected
+                                ? 'border-[#F57D14] bg-[#F57D14]/5 text-[#F57D14]'
+                                : 'border-slate-200 hover:border-[#F57D14] hover:bg-[#F57D14]/5 hover:text-[#F57D14]'
+                            }`}
+                          >
+                            {opt.label}
                           </button>
                         )
                       })}
                     </div>
+
                     <div className="flex justify-start pt-6 border-t border-slate-100">
-                      <Button variant="ghost" onClick={handlePrevious} className="text-slate-500 hover:text-[#0A2351]">
-                        <ArrowLeft className="mr-2 h-4 w-4" /> {absoluteStep === 1 ? 'Back to Details' : 'Previous Question'}
+                      <Button
+                        variant="ghost"
+                        onClick={handlePrevious}
+                        className="text-slate-500 hover:text-[#0A2351]"
+                      >
+                        <ArrowLeft className="mr-2 h-4 w-4" />
+                        {absoluteStep === 1 ? 'Back to Details' : 'Previous Question'}
                       </Button>
                     </div>
                   </div>
                 )}
               </div>
 
+              {/* ── ASSESSMENT MAP ── */}
               {isFormCompleted && !isSubmitting && (
                 <div className="mt-12 border-t border-slate-100 pt-8">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">Assessment Map</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-4">
+                    Assessment Map
+                  </p>
                   <div className="flex flex-wrap gap-2">
-                    {questionBank.map((_, i) => {
-                      const stepNum = i + 1;
-                      const isCompleted = completedSteps.includes(stepNum);
-                      const isCurrent = absoluteStep === stepNum;
+                    {assessmentQuestions.map((_, i) => {
+                      const stepNum = i + 1
+                      const isCompleted = completedSteps.includes(stepNum)
+                      const isCurrent = absoluteStep === stepNum
                       return (
-                        <div key={i} className={`flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold transition-all ${isCompleted ? 'bg-[#F57D14] text-white' : 'bg-slate-100 text-slate-400'} ${isCurrent ? 'ring-2 ring-[#0A2351] ring-offset-2' : ''}`}>
+                        <div
+                          key={i}
+                          className={`flex h-8 w-8 items-center justify-center rounded-full text-[10px] font-bold transition-all ${
+                            isCompleted ? 'bg-[#F57D14] text-white' : 'bg-slate-100 text-slate-400'
+                          } ${isCurrent ? 'ring-2 ring-[#0A2351] ring-offset-2' : ''}`}
+                        >
                           {stepNum}
                         </div>
                       )
@@ -358,6 +433,7 @@ const AssessmentFlowPsychometric = () => {
             </CardContent>
           </Card>
 
+          {/* ── SIDEBAR ── */}
           <aside className="space-y-6 hidden lg:block">
             <Card className="border-0 rounded-3xl bg-[#0A2351] text-white shadow-lg">
               <CardContent className="p-6">
@@ -371,14 +447,25 @@ const AssessmentFlowPsychometric = () => {
                   </div>
                 </div>
                 <div className="mt-6 space-y-4">
-                  {sections.map((s, i) => {
-                    const isPassed = isFormCompleted && currentSection > i;
-                    const isActive = isFormCompleted && currentSection === i;
-                    const isUpcoming = !isFormCompleted || currentSection < i;
+                  {assessmentSections.map((s, i) => {
+                    const isPassed = isFormCompleted && currentSectionIdx > i
+                    const isActive = isFormCompleted && currentSectionIdx === i
+                    const isUpcoming = !isFormCompleted || currentSectionIdx < i
                     return (
-                      <div key={s.name} className={`flex items-center gap-3 text-sm transition-opacity ${isUpcoming ? 'opacity-40' : 'opacity-100'}`}>
-                        <CheckCircle2 className={`h-4 w-4 shrink-0 ${isPassed || isActive ? 'text-[#F57D14]' : 'text-white'}`} />
-                        <span className={isActive ? "font-bold text-[#F57D14]" : ""}>{s.name}</span>
+                      <div
+                        key={s.id}
+                        className={`flex items-center gap-3 text-sm transition-opacity ${
+                          isUpcoming ? 'opacity-40' : 'opacity-100'
+                        }`}
+                      >
+                        <CheckCircle2
+                          className={`h-4 w-4 shrink-0 ${
+                            isPassed || isActive ? 'text-[#F57D14]' : 'text-white'
+                          }`}
+                        />
+                        <span className={isActive ? 'font-bold text-[#F57D14]' : ''}>
+                          {s.title}
+                        </span>
                       </div>
                     )
                   })}
@@ -386,6 +473,7 @@ const AssessmentFlowPsychometric = () => {
               </CardContent>
             </Card>
           </aside>
+
         </div>
       </div>
     </main>
