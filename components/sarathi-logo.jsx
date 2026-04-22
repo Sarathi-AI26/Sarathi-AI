@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 const LOGO_URL = '/logo-horizontal.png'
 
 // 🚀 FIX: Adjusted default height to be perfect for a horizontal layout
-const SarathiLogo = ({ href = '/', className, imageClassName = 'h-14 sm:h-[72px] w-auto max-w-[200px] sm:max-w-[300px] object-contain' }) => {
+const SarathiLogo = ({ href = '/', className, imageClassName = 'h-auto w-[140px] sm:w-[180px] lg:w-[220px] object-contain' }) => {
   const logoImage = (
     <img
       src={LOGO_URL}
