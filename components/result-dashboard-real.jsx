@@ -393,10 +393,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
               <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
             </div>
-            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl">
+            
+            {/* 🚀 FIX: Added text-white to this h1 tag right here! */}
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
               {studentName}, you are a{' '}
               <span className="text-[#F57D14]">{analysis.user_archetype}</span>
             </h1>
+            
             <p className="mt-4 text-lg text-white/70 max-w-2xl">
               This roadmap was built from your 60 answers — every word of it is specific to you.
             </p>
