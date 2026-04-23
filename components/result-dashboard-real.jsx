@@ -44,7 +44,7 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// PDF HEADER — updated to use your real logo
+// PDF HEADER — LARGER LOGO
 // ─────────────────────────────────────────────
 const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   <div style={{
@@ -57,104 +57,32 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
       
-      {/* 🚀 FIX: Pulling in your actual image file.  */}
+      {/* 🚀 FIX: Doubled the logo height from 40px to 80px */}
       <img 
         src="/logo-horizontal.png" 
         alt="SARATHI" 
-        style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
+        style={{ height: '80px', width: 'auto', objectFit: 'contain' }} 
       />
 
       {/* Vertical Divider */}
-      <div style={{ height: '32px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
+      <div style={{ height: '48px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
 
       {/* Empowering Tagline */}
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
-        <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
+        <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
+        <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
       </div>
 
     </div>
     <div style={{ textAlign: 'right' }}>
-      <div style={{ fontSize: '13px', fontWeight: '600', color: '#0A2351' }}>{studentName}</div>
-      <div style={{ fontSize: '11px', color: '#F57D14', fontWeight: '600' }}>{archetype}</div>
-      <div style={{ fontSize: '10px', color: '#aaa', marginTop: '2px' }}>
+      <div style={{ fontSize: '15px', fontWeight: '700', color: '#0A2351' }}>{studentName}</div>
+      <div style={{ fontSize: '12px', color: '#F57D14', fontWeight: '700', marginTop: '4px' }}>{archetype}</div>
+      <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px' }}>
         Generated {generatedDate}
       </div>
     </div>
   </div>
 )
-
-// ─────────────────────────────────────────────
-// PDF FOOTER — page branding
-// ─────────────────────────────────────────────
-const PdfFooter = () => (
-  <div style={{
-    marginTop: '32px',
-    paddingTop: '12px',
-    borderTop: '1px solid #e2e8f0',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }}>
-    <div style={{ fontSize: '10px', color: '#aaa' }}>
-      © 2026 SARATHI | Your Roadmap to Success | Empowering Careers in India
-    </div>
-    <div style={{ fontSize: '10px', color: '#aaa' }}>
-      This report is confidential and personalised for the recipient.
-    </div>
-  </div>
-)
-
-// ─────────────────────────────────────────────
-// PDF PAGE NUMBER INJECTOR
-// ─────────────────────────────────────────────
-const PDF_PAGE_BREAK_SENTINEL = 'html2pdf__page-break'
-
-const PdfPageNumberInjector = () => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const container = document.querySelector('.pdf-numbering-target')
-      if (!container) return
-
-      container.querySelectorAll('.sarathi-page-num').forEach(el => el.remove())
-
-      const pageBreaks = Array.from(
-        container.querySelectorAll(`.${PDF_PAGE_BREAK_SENTINEL}`)
-      )
-
-      const totalPages = pageBreaks.length + 1
-
-      const makeNumEl = (pageNum) => {
-        const el = document.createElement('div')
-        el.className = 'sarathi-page-num'
-        el.style.cssText = `
-          text-align: center;
-          font-size: 10px;
-          color: #bbb;
-          font-family: sans-serif;
-          letter-spacing: 0.05em;
-          padding: 6px 0 2px 0;
-          width: 100%;
-        `
-        el.textContent = `Page ${pageNum} of ${totalPages}`
-        return el
-      }
-
-      pageBreaks.forEach((breakEl, i) => {
-        breakEl.parentNode.insertBefore(makeNumEl(i + 1), breakEl)
-      })
-
-      const footer = container.querySelector('.sarathi-pdf-footer')
-      if (footer) {
-        footer.parentNode.insertBefore(makeNumEl(totalPages), footer)
-      }
-    }, 150)
-
-    return () => clearTimeout(timer)
-  }, [])
-
-  return null
-}
 
 // ─────────────────────────────────────────────
 // SHARED COMPONENTS
@@ -242,7 +170,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// CAREER COMPATIBILITY BARS (FIXED FOR PDF)
+// CAREER COMPATIBILITY BARS
 // ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
@@ -280,7 +208,6 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
           <div className={isPdfMode ? 'h-[140px]' : 'h-[180px]'}>
-            {/* 🚀 FIX: Use hardcoded dimensions for PDF to prevent squashing */}
             {isPdfMode ? (
               <div style={{ width: '700px', height: '140px' }}>
                 <BarChart width={700} height={140} data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
@@ -347,7 +274,7 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
 const RoadmapTimeline = ({ steps, isPdfMode }) => {
   const colors = ['#3b82f6', '#6366f1', '#F57D14', '#f59e0b', '#0A2351']
   return (
-    <div className={isPdfMode ? 'block space-y-3' : 'relative'}>
+    <div className={isPdfMode ? 'block space-y-2' : 'relative'}>
       {!isPdfMode && (
         <div className="absolute left-[22px] top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-300 via-[#F57D14] to-[#0A2351] opacity-30" />
       )}
@@ -356,7 +283,7 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
         return (
           <div
             key={i}
-            className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-4' : 'mb-6'}`}
+            className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-2' : 'mb-6'}`}
             style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
           >
             {/* Timeline dot — web only */}
@@ -370,14 +297,14 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
                 </div>
               </div>
             )}
-            <div className={`flex-1 rounded-2xl border border-slate-100 bg-white ${isPdfMode ? 'p-4 shadow-none' : 'p-5 shadow-sm hover:shadow-md transition-all'}`}>
+            <div className={`flex-1 rounded-2xl border border-slate-100 bg-white ${isPdfMode ? 'p-3 shadow-none' : 'p-5 shadow-sm hover:shadow-md transition-all'}`}>
               <div className="flex items-center gap-3 mb-2">
                 {isPdfMode && (
                   <div
-                    className="flex h-8 w-8 items-center justify-center rounded-lg text-white shrink-0"
+                    className="flex h-6 w-6 items-center justify-center rounded-md text-white shrink-0"
                     style={{ backgroundColor: colors[i] }}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-3 w-3" />
                   </div>
                 )}
                 <div>
@@ -404,7 +331,7 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
 // ─────────────────────────────────────────────
 const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const sp = isPdfMode
-    ? { section: 'mb-3', text: 'text-sm' }
+    ? { section: 'mb-4', text: 'text-sm' }
     : { section: 'mb-8', text: 'text-lg' }
 
   const profile = analysis?.psychometric_profile || {}
@@ -439,20 +366,16 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   })
 
   return (
-    // ── pdf-numbering-target: PdfPageNumberInjector queries this wrapper ──
-    <div className={isPdfMode ? 'block pdf-numbering-target' : 'space-y-8'}>
+    <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
       {/* ── PDF-only print styles ── */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          section { margin-bottom: 12px !important; }
+          section { margin-bottom: 16px !important; }
         `}} />
       )}
-
-      {/* ── Page number injector — fires after DOM paint ── */}
-      {isPdfMode && <PdfPageNumberInjector />}
 
       {/* ── PDF HEADER ── */}
       {isPdfMode && (
@@ -507,7 +430,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={BrainCircuit}
-                    title="Your Psychometric Summary"
+          title="Your Psychometric Summary"
           subtitle="What your 60 answers actually say about you."
           isPdfMode={isPdfMode}
         />
@@ -771,19 +694,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── PAGE BREAK before 5-Year Roadmap ── */}
-      {isPdfMode && (
-        <div
-          className="html2pdf__page-break"
-          style={{ pageBreakBefore: 'always', breakBefore: 'page', display: 'block', height: '1px' }}
-        />
-      )}
-
       {/* ── 5-YEAR ROADMAP ── */}
-      <section
-        className={isPdfMode ? 'pt-2' : 'mt-4'}
-        style={isPdfMode ? { pageBreakBefore: 'always', breakBefore: 'page' } : {}}
-      >
+      <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
         <SectionHeading
           icon={TrendingUp}
           title="Your 5-Year Roadmap"
@@ -792,13 +704,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
-
-      {/* ── PDF FOOTER ── */}
-      {isPdfMode && (
-        <div className="sarathi-pdf-footer">
-          <PdfFooter />
-        </div>
-      )}
 
     </div>
   )
@@ -850,7 +755,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           return
         }
 
-        // Unpaid — redirect to checkout
         window.location.href = `/checkout?assessmentId=${assessmentId}`
 
       } catch (err) {
@@ -873,39 +777,50 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
-  // 🚀 THE NEW DOWNLOAD LOGIC
+  // 🚀 THE NEW NATIVE PDF DOWNLOAD LOGIC
   const handleDownloadPdf = async () => {
     setIsDownloading(true)
-    setIsPdfMode(true) // Switch layout to PDF mode
+    setIsPdfMode(true) 
 
-    // 1. Wait 1500ms for charts and fonts to fully render before the snapshot!
     await new Promise(resolve => setTimeout(resolve, 1500)) 
 
-    // 2. Import html2pdf dynamically
     const html2pdf = (await import('html2pdf.js')).default
-
-    // 3. Grab the wrapper element
     const element = document.getElementById('pdf-wrapper')
 
     const opt = {
-      margin:       [10, 10, 10, 10], 
+      margin:       [15, 10, 15, 10], // Increased top/bottom margins to fit footer and header safely
       filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        windowWidth: 1024 // 🚀 FIX: Forces mobile phones to render a desktop-sized PDF
+        windowWidth: 1024 
       },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:    { mode: 'css', before: '#nextpage1' } // Forces clean breaks
     }
 
-    // 4. Generate the PDF
-    await html2pdf().set(opt).from(element).save()
-
-    // 5. Switch back to Web mode
-    setIsPdfMode(false)
-    setIsDownloading(false)
+    // 🚀 FIX: Using html2pdf native Promise system to inject footers BEFORE saving
+    html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
+      const totalPages = pdf.internal.getNumberOfPages();
+      
+      for (let i = 1; i <= totalPages; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(8);
+        pdf.setTextColor(150);
+        // The text printed at the bottom of EVERY page
+        const text = `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`; 
+        
+        // Positioning the text perfectly in the bottom margin
+        pdf.text(text, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 8, {
+          align: 'center'
+        });
+      }
+    }).save().then(() => {
+        setIsPdfMode(false)
+        setIsDownloading(false)
+    });
   }
 
   if (loading || analyzing) return <LoadingView analyzing={analyzing} />
@@ -927,7 +842,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-      {/* 🚀 THE DOWNLOAD BUTTON AREA - Now safely outside the PDF wrapper */}
+      {/* 🚀 THE DOWNLOAD BUTTON AREA */}
       {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
           <Button 
