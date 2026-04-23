@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import SarathiLogo from './sarathi-logo' 
 
 export default function Header() {
@@ -11,23 +10,22 @@ export default function Header() {
 
   return (
     <header className="border-b border-slate-100 bg-white sticky top-0 z-50 shadow-sm">
-      <div className="container mx-auto flex h-20 sm:h-24 items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto flex h-16 sm:h-24 items-center justify-between px-4 sm:px-6 lg:px-8">
         
         {/* 🚀 STRIP-STYLE LOGO WITH TAGLINE */}
         <div className="flex items-center">
-          {/* Reduced desktop gap from sm:gap-5 to sm:gap-4, and mobile to gap-2 */}
           <Link href="/" className="flex items-center gap-2 sm:gap-4 hover:opacity-90 transition-opacity">
             
-            {/* 🚀 FIX: Reduced mobile height to h-7, and laptop desktop height to sm:h-9 (36px) */}
-            <div className="h-7 sm:h-9 flex items-center [&>svg]:h-full [&>svg]:w-auto [&>img]:h-full [&>img]:w-auto">
+            {/* Logo scaling: h-6 on mobile, h-9 on laptop */}
+            <div className="h-6 sm:h-9 flex items-center [&>svg]:h-full [&>svg]:w-auto [&>img]:h-full [&>img]:w-auto">
                <SarathiLogo />
             </div>
             
-            {/* 🚀 FIX: Shrunk the vertical divider to match the new logo sizes */}
-            <div className="h-5 sm:h-7 w-[2px] bg-slate-200"></div>
+            {/* Hidden divider on phones */}
+            <div className="hidden sm:block h-5 sm:h-7 w-[2px] bg-slate-200"></div>
             
-            {/* 🚀 FIX: Drastically reduced text size for mobile, and capped laptop size at 10px */}
-            <div className="flex flex-col justify-center">
+            {/* Hidden tagline on phones */}
+            <div className="hidden sm:flex flex-col justify-center">
               <span className="text-[7px] sm:text-[8px] lg:text-[10px] font-bold uppercase tracking-tight sm:tracking-widest text-slate-400 leading-tight">Empowering</span>
               <span className="text-[7px] sm:text-[8px] lg:text-[10px] font-bold uppercase tracking-tight sm:tracking-widest text-slate-400 leading-tight">Student Clarity</span>
             </div>
@@ -35,7 +33,8 @@ export default function Header() {
         </div>
 
         {/* 💻 Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-bold text-slate-600">
+        {/* Adjusted ml-auto to push links to the right since the button is gone */}
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 text-sm font-bold text-slate-600 ml-auto">
           <Link href="/" className="hover:text-[#F57D14] transition-colors">Home</Link>
           <Link href="/about" className="hover:text-[#F57D14] transition-colors">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors">Methodology</Link>
@@ -43,21 +42,14 @@ export default function Header() {
           <Link href="/#contact" className="hover:text-[#F57D14] transition-colors">Contact</Link>
         </div>
 
-        {/* 📱&💻 Action Buttons Wrapper */}
-        <div className="flex items-center gap-3 ml-auto lg:ml-0">
-          
-          {/* Persistent Mobile CTA + Standardized Desktop Orange Pill */}
-          <Button asChild className="rounded-full bg-[#F57D14] px-4 sm:px-6 h-10 sm:h-12 text-xs sm:text-sm font-bold text-white hover:bg-[#dd6f11] shadow-md shadow-[#F57D14]/20 transition-all hover:scale-105">
-            <Link href="/assessment">Take the Test</Link>
-          </Button>
-
-          {/* 📱 Mobile Hamburger Button */}
+        {/* 📱 Mobile Hamburger Button */}
+        <div className="flex items-center lg:hidden ml-auto">
           <button 
-            className="p-2 text-[#0A2351] lg:hidden" 
+            className="p-1 sm:p-2 text-[#0A2351]" 
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle Menu"
           >
-            {isOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
+            {isOpen ? <X className="h-6 w-6 sm:h-7 sm:w-7" /> : <Menu className="h-6 w-6 sm:h-7 sm:w-7" />}
           </button>
         </div>
 
