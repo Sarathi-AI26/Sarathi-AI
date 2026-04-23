@@ -47,7 +47,7 @@ const ICON_MAP = {
 // SARATHI LOGO — inline SVG, works in PDF
 // ─────────────────────────────────────────────
 const SarathiLogo = ({ size = 32 }) => (
-  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="[w3.org](http://www.w3.org/2000/svg)">
     <rect width="40" height="40" rx="8" fill="#0A2351"/>
     <path d="M8 28 L20 12 L32 28" stroke="#F57D14" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
     <path d="M14 28 L20 20 L26 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -99,13 +99,71 @@ const PdfFooter = () => (
     alignItems: 'center',
   }}>
     <div style={{ fontSize: '10px', color: '#aaa' }}>
-      © {new Date().getFullYear()} SARATHI · sarathi-ai.in · Empowering Student Clarity
+      © 2026 SARATHI | Your Roadmap to Success | Empowering Careers in India
     </div>
     <div style={{ fontSize: '10px', color: '#aaa' }}>
       This report is confidential and personalised for the recipient.
     </div>
   </div>
 )
+
+// ─────────────────────────────────────────────
+// PDF PAGE NUMBER INJECTOR
+// Inserts real DOM <div>Page X of Y</div> nodes
+// just before each html2pdf__page-break sentinel
+// and before the footer — so html2pdf captures them.
+// No @bottom-center or margin.bottom config needed.
+// ─────────────────────────────────────────────
+const PDF_PAGE_BREAK_SENTINEL = 'html2pdf__page-break'
+
+const PdfPageNumberInjector = () => {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const container = document.querySelector('.pdf-numbering-target')
+      if (!container) return
+
+      // Remove any previously injected numbers (idempotent on re-render)
+      container.querySelectorAll('.sarathi-page-num').forEach(el => el.remove())
+
+      const pageBreaks = Array.from(
+        container.querySelectorAll(`.${PDF_PAGE_BREAK_SENTINEL}`)
+      )
+
+      const totalPages = pageBreaks.length + 1
+
+      const makeNumEl = (pageNum) => {
+        const el = document.createElement('div')
+        el.className = 'sarathi-page-num'
+        el.style.cssText = `
+          text-align: center;
+          font-size: 10px;
+          color: #bbb;
+          font-family: sans-serif;
+          letter-spacing: 0.05em;
+          padding: 6px 0 2px 0;
+          width: 100%;
+        `
+        el.textContent = `Page ${pageNum} of ${totalPages}`
+        return el
+      }
+
+      // Insert a page number just BEFORE each page-break sentinel
+      pageBreaks.forEach((breakEl, i) => {
+        breakEl.parentNode.insertBefore(makeNumEl(i + 1), breakEl)
+      })
+
+      // Insert the final page number just before the footer
+      const footer = container.querySelector('.sarathi-pdf-footer')
+      if (footer) {
+        footer.parentNode.insertBefore(makeNumEl(totalPages), footer)
+      }
+    }, 150)
+
+    return () => clearTimeout(timer)
+  }, [])
+
+  return null
+}
 
 // ─────────────────────────────────────────────
 // SHARED COMPONENTS
@@ -142,7 +200,7 @@ const LoadingView = ({ analyzing }) => (
 )
 
 // ─────────────────────────────────────────────
-// IDENTITY STATEMENT — new, most prominent section
+// IDENTITY STATEMENT
 // ─────────────────────────────────────────────
 const IdentityStatement = ({ statement, isPdfMode }) => (
   <div className={`avoid-break relative overflow-hidden rounded-2xl bg-[#0A2351] ${isPdfMode ? 'p-5 mb-4' : 'p-8 mb-8'}`}>
@@ -150,7 +208,7 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
       <Quote className="h-16 w-16 text-[#F57D14]" />
     </div>
     <div className="relative z-10">
-      <p className={`text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-3`}>
+      <p className="text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-3">
         Your Identity
       </p>
       <p className={`font-bold text-white leading-relaxed ${isPdfMode ? 'text-lg' : 'text-2xl sm:text-3xl'}`}>
@@ -162,7 +220,7 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
 )
 
 // ─────────────────────────────────────────────
-// STRENGTH SIGNALS — visual cards for strengths
+// STRENGTH SIGNALS
 // ─────────────────────────────────────────────
 const StrengthSignals = ({ signals, isPdfMode }) => {
   if (!signals?.length) return null
@@ -193,7 +251,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// CAREER COMPATIBILITY BARS — visual match %
+// CAREER COMPATIBILITY BARS
 // ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
@@ -243,7 +301,7 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// WHAT TO AVOID — new section
+// WHAT TO AVOID
 // ─────────────────────────────────────────────
 const WhatToAvoid = ({ items, isPdfMode }) => {
   if (!items?.length) return null
@@ -291,9 +349,9 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
           <div
             key={i}
             className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-4' : 'mb-6'}`}
-            style={{ pageBreakInside: 'avoid' }}
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
           >
-            {/* Timeline dot */}
+            {/* Timeline dot — web only */}
             {!isPdfMode && (
               <div className="relative flex-shrink-0">
                 <div
@@ -368,10 +426,15 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     { label: 'Year 5', title: 'Leadership & Mastery',          key: 'year_5', icon: Network    },
   ].map(s => ({ ...s, data: roadmap?.[s.key] })).filter(s => s.data)
 
-  const generatedDate = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })
+  const generatedDate = new Date().toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  })
 
   return (
-    <div className={isPdfMode ? 'block' : 'space-y-8'}>
+    // ── pdf-numbering-target: PdfPageNumberInjector queries this wrapper ──
+    <div className={isPdfMode ? 'block pdf-numbering-target' : 'space-y-8'}>
+
+      {/* ── PDF-only print styles ── */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -380,7 +443,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         `}} />
       )}
 
-      {/* PDF HEADER — branded, only in PDF mode */}
+      {/* ── Page number injector — fires after DOM paint ── */}
+      {isPdfMode && <PdfPageNumberInjector />}
+
+      {/* ── PDF HEADER ── */}
       {isPdfMode && (
         <PdfHeader
           studentName={studentName}
@@ -389,7 +455,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
       )}
 
-      {/* ── HERO BANNER ── */}
+      {/* ── HERO BANNER (web) ── */}
       {!isPdfMode && (
         <section className="avoid-break rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
@@ -408,14 +474,15 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* PDF hero (compact) */}
+      {/* ── HERO BANNER (PDF compact) ── */}
       {isPdfMode && (
         <section className="avoid-break rounded-xl bg-[#0A2351] p-5 mb-4 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-2">
             <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
           </div>
           <h1 className="text-2xl font-extrabold text-white">
-            {studentName}, you are a <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+            {studentName}, you are a{' '}
+            <span className="text-[#F57D14]">{analysis.user_archetype}</span>
           </h1>
           <p className="mt-2 text-sm text-white/70">
             This roadmap was built from your 60 answers — every word is specific to you.
@@ -423,14 +490,19 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── IDENTITY STATEMENT — new ── */}
+      {/* ── IDENTITY STATEMENT ── */}
       {analysis.identity_statement && (
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
       {/* ── EXECUTIVE SUMMARY ── */}
       <section className={`avoid-break ${sp.section}`}>
-        <SectionHeading icon={BrainCircuit} title="Your Psychometric Summary" subtitle="What your 60 answers actually say about you." isPdfMode={isPdfMode} />
+        <SectionHeading
+          icon={BrainCircuit}
+                    title="Your Psychometric Summary"
+          subtitle="What your 60 answers actually say about you."
+          isPdfMode={isPdfMode}
+        />
         <Card className="border-0 shadow-sm">
           <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
             {executiveSummaryParagraphs.map((para, i) => <p key={i}>{para}</p>)}
@@ -438,7 +510,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </Card>
       </section>
 
-      {/* ── STRENGTH SIGNALS — new visual ── */}
+      {/* ── STRENGTH SIGNALS ── */}
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
       {/* ── RADAR + DNA ── */}
@@ -451,15 +523,28 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
                     <PolarGrid stroke="#cbd5e1" />
-                    <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }} />
+                    <PolarAngleAxis
+                      dataKey="subject"
+                      tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }}
+                    />
                     <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                    <Radar name="Score" dataKey="score" stroke="#F57D14" fill="#F57D14" fillOpacity={0.35} isAnimationActive={false} />
+                    <Radar
+                      name="Score"
+                      dataKey="score"
+                      stroke="#F57D14"
+                      fill="#F57D14"
+                      fillOpacity={0.35}
+                      isAnimationActive={false}
+                    />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
                 {chartData.map(d => (
-                  <div key={d.subject} className="flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1">
+                  <div
+                    key={d.subject}
+                    className="flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1"
+                  >
                     <span className="text-xs font-bold text-[#0A2351]">{d.subject}</span>
                     <span className="text-xs font-bold text-[#F57D14]">{d.score}</span>
                   </div>
@@ -475,30 +560,49 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
               {profile.dominant_personality_traits?.length > 0 && (
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Dominant Traits</label>
+                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                    Dominant Traits
+                  </label>
                   <div className="mt-2 flex flex-wrap gap-2">
                     {profile.dominant_personality_traits.map(trait => (
-                      <span key={trait} className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100">{trait}</span>
+                      <span
+                        key={trait}
+                        className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100"
+                      >
+                        {trait}
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
               {profile.learning_style && (
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">How You Learn Best</label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600 italic">{profile.learning_style}</p>
+                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                    How You Learn Best
+                  </label>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600 italic">
+                    {profile.learning_style}
+                  </p>
                 </div>
               )}
               {profile.work_environment_fit && (
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">Where You'll Thrive</label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{profile.work_environment_fit}</p>
+                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                    Where You'll Thrive
+                  </label>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    {profile.work_environment_fit}
+                  </p>
                 </div>
               )}
               {profile.collaboration_style && (
                 <div>
-                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">How You Work With Others</label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">{profile.collaboration_style}</p>
+                  <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
+                    How You Work With Others
+                  </label>
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    {profile.collaboration_style}
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -506,34 +610,56 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
-      {/* ── CAREER COMPATIBILITY CHART — new visual ── */}
+      {/* ── CAREER COMPATIBILITY CHART ── */}
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
       {/* ── CAREER MATCH DETAIL CARDS ── */}
       <section className={`avoid-break ${sp.section}`}>
-        <SectionHeading icon={Target} title="Your Career Matches — In Detail" subtitle="Each matched to your specific scores." isPdfMode={isPdfMode} />
+        <SectionHeading
+          icon={Target}
+          title="Your Career Matches — In Detail"
+          subtitle="Each matched to your specific scores."
+          isPdfMode={isPdfMode}
+        />
         <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
           {(analysis.top_career_matches || []).map((match, i) => (
-            <Card key={i} className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}>
+            <Card
+              key={i}
+              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+            >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                    Prime Match
+                  </p>
                   {match.compatibility_score && (
                     <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
                       {match.compatibility_score}% match
                     </span>
                   )}
                 </div>
-                <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>{match.career_title}</h3>
-                <p className="text-sm text-slate-500 mb-2">{match.match_reason || match.why_it_fits}</p>
-                {match.growth_path && <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>}
+                <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
+                  {match.career_title}
+                </h3>
+                <p className="text-sm text-slate-500 mb-2">
+                  {match.match_reason || match.why_it_fits}
+                </p>
+                {match.growth_path && (
+                  <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
+                )}
                 <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
-                  <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />{match.starting_salary_inr}
+                  <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
+                  {match.starting_salary_inr}
                 </div>
                 {match.key_certifications?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {match.key_certifications.map(cert => (
-                      <span key={cert} className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]">{cert}</span>
+                      <span
+                        key={cert}
+                        className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
+                      >
+                        {cert}
+                      </span>
                     ))}
                   </div>
                 )}
@@ -543,13 +669,18 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       </section>
 
-      {/* ── WHAT TO AVOID — new section ── */}
+      {/* ── WHAT TO AVOID ── */}
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
       {/* ── GROWTH WARNINGS ── */}
       {blindSpots.length > 0 && (
         <section className={`avoid-break ${sp.section}`}>
-          <SectionHeading icon={Lightbulb} title="Growth Warnings" subtitle="Things to watch out for as you build your career." isPdfMode={isPdfMode} />
+          <SectionHeading
+            icon={Lightbulb}
+            title="Growth Warnings"
+            subtitle="Things to watch out for as you build your career."
+            isPdfMode={isPdfMode}
+          />
           <Card className="border-0 bg-orange-50/60 border border-orange-100">
             <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
               <ul className="space-y-3">
@@ -574,7 +705,12 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* ── ACTION PLAN ── */}
       {immediateAction?.next_30_days && (
         <section className={`avoid-break ${sp.section}`}>
-          <SectionHeading icon={Timer} title="Your Action Plan" subtitle="Start here. Right now. This week." isPdfMode={isPdfMode} />
+          <SectionHeading
+            icon={Timer}
+            title="Your Action Plan"
+            subtitle="Start here. Right now. This week."
+            isPdfMode={isPdfMode}
+          />
           <Card className={`border-0 text-white ${isPdfMode ? 'bg-[#0A5C44] shadow-none' : 'shadow-lg bg-gradient-to-r from-emerald-600 to-teal-800'}`}>
             <CardContent className={isPdfMode ? 'p-4' : 'p-8'}>
               <div className="space-y-4">
@@ -582,14 +718,18 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isPdfMode ? 'text-white/80' : 'text-emerald-200'}`}>
                     This month — next 30 days
                   </p>
-                  <p className={`font-bold ${isPdfMode ? 'text-base' : 'text-lg'}`}>{immediateAction.next_30_days}</p>
+                  <p className={`font-bold ${isPdfMode ? 'text-base' : 'text-lg'}`}>
+                    {immediateAction.next_30_days}
+                  </p>
                 </div>
                 {immediateAction.next_90_days && (
                   <div>
                     <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isPdfMode ? 'text-white/80' : 'text-emerald-200'}`}>
                       This quarter — next 90 days
                     </p>
-                    <p className="text-sm font-medium text-white/90">{immediateAction.next_90_days}</p>
+                    <p className="text-sm font-medium text-white/90">
+                      {immediateAction.next_90_days}
+                    </p>
                   </div>
                 )}
                 <div className="border-t border-white/20 pt-3">
@@ -607,21 +747,35 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* ── INDIA VS ABROAD ── */}
       {analysis.india_vs_abroad_guidance && (
         <section className={`avoid-break ${sp.section}`}>
-          <SectionHeading icon={Globe} title="India vs Abroad — Your Path" subtitle="Based on what you told us in Question 60." isPdfMode={isPdfMode} />
+          <SectionHeading
+            icon={Globe}
+            title="India vs Abroad — Your Path"
+            subtitle="Based on what you told us in Question 60."
+            isPdfMode={isPdfMode}
+          />
           <Card className="border-0 bg-blue-50/60 border border-blue-100">
             <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-              <p className="text-sm leading-relaxed text-slate-700">{analysis.india_vs_abroad_guidance}</p>
+              <p className="text-sm leading-relaxed text-slate-700">
+                {analysis.india_vs_abroad_guidance}
+              </p>
             </CardContent>
           </Card>
         </section>
       )}
 
+      {/* ── PAGE BREAK before 5-Year Roadmap ── */}
       {isPdfMode && (
-        <div className="html2pdf__page-break" style={{ pageBreakBefore: 'always', display: 'block', height: '1px' }} />
+        <div
+          className="html2pdf__page-break"
+          style={{ pageBreakBefore: 'always', breakBefore: 'page', display: 'block', height: '1px' }}
+        />
       )}
 
-      {/* ── 5-YEAR ROADMAP — new timeline layout ── */}
-      <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
+      {/* ── 5-YEAR ROADMAP ── */}
+      <section
+        className={isPdfMode ? 'pt-2' : 'mt-4'}
+        style={isPdfMode ? { pageBreakBefore: 'always', breakBefore: 'page' } : {}}
+      >
         <SectionHeading
           icon={TrendingUp}
           title="Your 5-Year Roadmap"
@@ -631,8 +785,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
-      {/* PDF FOOTER */}
-      {isPdfMode && <PdfFooter />}
+      {/* ── PDF FOOTER ── */}
+      {isPdfMode && (
+        <div className="sarathi-pdf-footer">
+          <PdfFooter />
+        </div>
+      )}
+
     </div>
   )
 }
@@ -648,7 +807,11 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 
   useEffect(() => {
     const load = async () => {
-      if (!assessmentId) { setError('No assessment ID found.'); setLoading(false); return }
+      if (!assessmentId) {
+        setError('No assessment ID found.')
+        setLoading(false)
+        return
+      }
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
         const data = await res.json()
@@ -657,7 +820,9 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
         const current = data?.assessment
 
         if (current?.payment_status && hasFullAnalysis(current?.ai_analysis_result)) {
-          setAssessment(current); setLoading(false); return
+          setAssessment(current)
+          setLoading(false)
+          return
         }
 
         if (current?.payment_status) {
@@ -670,7 +835,9 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
           const d = await r.json()
           if (!r.ok) throw new Error(d?.error || 'Generation failed')
           setAssessment(d?.assessment)
-          setAnalyzing(false); setLoading(false); return
+          setAnalyzing(false)
+          setLoading(false)
+          return
         }
 
         // Unpaid — redirect to checkout
@@ -728,3 +895,4 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 }
 
 export default ResultDashboardReal
+
