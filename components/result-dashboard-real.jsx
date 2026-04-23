@@ -44,19 +44,7 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// SARATHI LOGO — inline SVG, works in PDF
-// ─────────────────────────────────────────────
-const SarathiLogo = ({ size = 32 }) => (
-  <svg width={size} height={size} viewBox="0 0 40 40" fill="none" xmlns="[w3.org](http://www.w3.org/2000/svg)">
-    <rect width="40" height="40" rx="8" fill="#0A2351"/>
-    <path d="M8 28 L20 12 L32 28" stroke="#F57D14" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M14 28 L20 20 L26 28" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="20" cy="10" r="2.5" fill="#F57D14"/>
-  </svg>
-)
-
-// ─────────────────────────────────────────────
-// PDF HEADER — only shown in PDF mode
+// PDF HEADER — updated to use your real logo
 // ─────────────────────────────────────────────
 const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   <div style={{
@@ -67,14 +55,25 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
     borderBottom: '2px solid #F57D14',
     marginBottom: '24px',
   }}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-      <SarathiLogo size={36} />
-      <div>
-        <div style={{ fontSize: '16px', fontWeight: '700', color: '#0A2351' }}>SARATHI</div>
-        <div style={{ fontSize: '10px', color: '#888', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          Career Roadmap Report
-        </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+      
+      {/* 🚀 FIX: Pulling in your actual image file. 
+          Make sure the src matches the exact filename of your logo in the public folder! */}
+      <img 
+        src="/logo-horizontal.png" 
+        alt="SARATHI" 
+        style={{ height: '40px', width: 'auto', objectFit: 'contain' }} 
+      />
+
+      {/* Vertical Divider */}
+      <div style={{ height: '32px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
+
+      {/* Empowering Tagline */}
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
+        <span style={{ fontSize: '10px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
       </div>
+
     </div>
     <div style={{ textAlign: 'right' }}>
       <div style={{ fontSize: '13px', fontWeight: '600', color: '#0A2351' }}>{studentName}</div>
@@ -799,11 +798,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
-const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
+const ResultDashboardReal = ({ assessmentId, onReady }) => { // 🚀 REMOVED isPdfMode from props
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [assessment, setAssessment] = useState(null)
   const [error, setError] = useState('')
+  const [isPdfMode, setIsPdfMode] = useState(false) // 🚀 ADDED: Local state to control PDF mode
+  const [isDownloading, setIsDownloading] = useState(false) // 🚀 ADDED: Loading state for the button
 
   useEffect(() => {
     const load = async () => {
@@ -863,6 +864,36 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
     [assessment]
   )
 
+  // 🚀 THE NEW DOWNLOAD LOGIC
+  const handleDownloadPdf = async () => {
+    setIsDownloading(true)
+    setIsPdfMode(true) // Switch layout to PDF mode
+
+    // 1. Wait a tiny bit for React to re-render the DOM with PDF styles
+    await new Promise(resolve => setTimeout(resolve, 500)) 
+
+    // 2. Import html2pdf dynamically so it doesn't break Next.js SSR
+    const html2pdf = (await import('html2pdf.js')).default
+
+    // 3. Grab the wrapper element
+    const element = document.getElementById('pdf-wrapper')
+
+    const opt = {
+      margin:       [10, 10, 10, 10], // top, left, bottom, right in mm
+      filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
+      image:        { type: 'jpeg', quality: 0.98 },
+      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    }
+
+    // 4. Generate the PDF
+    await html2pdf().set(opt).from(element).save()
+
+    // 5. Switch back to Web mode
+    setIsPdfMode(false)
+    setIsDownloading(false)
+  }
+
   if (loading || analyzing) return <LoadingView analyzing={analyzing} />
 
   if (error) {
@@ -882,7 +913,25 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-      <div className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
+      {/* 🚀 THE DOWNLOAD BUTTON AREA */}
+      {!isPdfMode && (
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
+          <Button 
+            onClick={handleDownloadPdf} 
+            disabled={isDownloading}
+            className="bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
+          >
+            {isDownloading ? (
+              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
+            ) : (
+              'Download Career Roadmap PDF'
+            )}
+          </Button>
+        </div>
+      )}
+
+      {/* 🚀 THE WRAPPER html2pdf WILL CAPTURE */}
+      <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
         <FullReportView
           analysis={fullAnalysis}
           studentName={studentName}
@@ -895,4 +944,3 @@ const ResultDashboardReal = ({ assessmentId, onReady, isPdfMode }) => {
 }
 
 export default ResultDashboardReal
-
