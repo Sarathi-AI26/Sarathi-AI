@@ -3,39 +3,8 @@
 import React, { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import ResultDashboardReal from '@/components/result-dashboard-real'
-import { Download, Loader2, Share2, CheckCircle2 } from 'lucide-react'
+import { Loader2, Share2, CheckCircle2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-
-// ─────────────────────────────────────────────
-// PDF GENERATION CONFIG
-// ─────────────────────────────────────────────
-const PDF_OPTIONS = {
-  margin: [0.5, 0.5, 0.5, 0.5],
-  filename: 'SARATHI_Career_Roadmap.pdf',
-  image: { type: 'jpeg', quality: 0.98 },
-  html2canvas: {
-    scale: 2,
-    useCORS: true,
-    windowWidth: 900,         // wider for the new layout
-    letterRendering: true,
-    logging: false,
-    onclone: (clonedDoc) => {
-      // Ensure all fonts and colors render correctly in the clone
-      clonedDoc.documentElement.style.webkitPrintColorAdjust = 'exact'
-    },
-  },
-  jsPDF: {
-    unit: 'in',
-    format: 'a4',
-    orientation: 'portrait',
-    compress: true,
-  },
-  pagebreak: {
-    mode: ['css', 'legacy'],
-    avoid: '.avoid-break',
-    before: '.html2pdf__page-break',
-  },
-}
 
 // ─────────────────────────────────────────────
 // RESULT PAGE
@@ -44,36 +13,8 @@ const ResultPage = () => {
   const searchParams = useSearchParams()
   const assessmentId = searchParams.get('id') || ''
 
-  const [isDownloading, setIsDownloading] = useState(false)
   const [isReportReady, setIsReportReady] = useState(false)
-  const [isPdfMode, setIsPdfMode] = useState(false)
   const [copied, setCopied] = useState(false)
-
-  const handleDownloadPDF = async () => {
-    setIsDownloading(true)
-    setIsPdfMode(true)
-
-    // Wait for React to repaint in PDF mode
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    try {
-      const html2pdf = (await import('html2pdf.js')).default
-      const element = document.getElementById('sarathi-report')
-      if (!element) throw new Error('Report element not found')
-
-      await html2pdf()
-        .set(PDF_OPTIONS)
-        .from(element)
-        .save()
-
-    } catch (error) {
-      console.error('PDF generation failed:', error)
-      alert('PDF generation failed. Please try again.')
-    } finally {
-      setIsPdfMode(false)
-      setIsDownloading(false)
-    }
-  }
 
   const handleCopyLink = async () => {
     try {
@@ -107,17 +48,7 @@ const ResultPage = () => {
                   <><Share2 className="mr-2 h-4 w-4" /> Share</>
                 )}
               </Button>
-              <Button
-                onClick={handleDownloadPDF}
-                disabled={isDownloading}
-                className="h-12 rounded-2xl bg-[#F57D14] px-6 font-bold text-white shadow-lg hover:bg-[#dd6f11] transition-all disabled:opacity-70"
-              >
-                {isDownloading ? (
-                  <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
-                ) : (
-                  <><Download className="mr-2 h-4 w-4" /> Download PDF</>
-                )}
-              </Button>
+              {/* The Orange Download Button and its logic have been successfully removed from here */}
             </div>
           </div>
         )}
@@ -125,16 +56,11 @@ const ResultPage = () => {
         {/* Report */}
         <div
           id="sarathi-report"
-          className={`bg-white ${
-            isPdfMode
-              ? 'm-0 p-0'
-              : 'rounded-3xl border border-slate-100 shadow-sm overflow-hidden'
-          }`}
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden"
         >
           <ResultDashboardReal
             assessmentId={assessmentId}
             onReady={() => setIsReportReady(true)}
-            isPdfMode={isPdfMode}
           />
         </div>
 
