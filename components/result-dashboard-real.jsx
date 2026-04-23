@@ -879,10 +879,15 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => { // 🚀 REMOVED isP
     const element = document.getElementById('pdf-wrapper')
 
     const opt = {
-      margin:       [10, 10, 10, 10], // top, left, bottom, right in mm
+      margin:       [10, 10, 10, 10], 
       filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { scale: 2, useCORS: true, scrollY: 0 },
+      html2canvas:  { 
+        scale: 2, 
+        useCORS: true, 
+        scrollY: 0,
+        windowWidth: 1024 // 🚀 FIX: Forces mobile phones to render a desktop-sized PDF
+      },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
     }
 
