@@ -57,8 +57,7 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
       
-      {/* 🚀 FIX: Pulling in your actual image file. 
-          Make sure the src matches the exact filename of your logo in the public folder! */}
+      {/* 🚀 FIX: Pulling in your actual image file.  */}
       <img 
         src="/logo-horizontal.png" 
         alt="SARATHI" 
@@ -108,10 +107,6 @@ const PdfFooter = () => (
 
 // ─────────────────────────────────────────────
 // PDF PAGE NUMBER INJECTOR
-// Inserts real DOM <div>Page X of Y</div> nodes
-// just before each html2pdf__page-break sentinel
-// and before the footer — so html2pdf captures them.
-// No @bottom-center or margin.bottom config needed.
 // ─────────────────────────────────────────────
 const PDF_PAGE_BREAK_SENTINEL = 'html2pdf__page-break'
 
@@ -121,7 +116,6 @@ const PdfPageNumberInjector = () => {
       const container = document.querySelector('.pdf-numbering-target')
       if (!container) return
 
-      // Remove any previously injected numbers (idempotent on re-render)
       container.querySelectorAll('.sarathi-page-num').forEach(el => el.remove())
 
       const pageBreaks = Array.from(
@@ -146,12 +140,10 @@ const PdfPageNumberInjector = () => {
         return el
       }
 
-      // Insert a page number just BEFORE each page-break sentinel
       pageBreaks.forEach((breakEl, i) => {
         breakEl.parentNode.insertBefore(makeNumEl(i + 1), breakEl)
       })
 
-      // Insert the final page number just before the footer
       const footer = container.querySelector('.sarathi-pdf-footer')
       if (footer) {
         footer.parentNode.insertBefore(makeNumEl(totalPages), footer)
@@ -250,7 +242,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// CAREER COMPATIBILITY BARS
+// CAREER COMPATIBILITY BARS (FIXED FOR PDF)
 // ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
@@ -259,34 +251,51 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
     score: c.compatibility_score || 85,
   }))
 
+  const ChartContent = (
+    <BarChart data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
+      <XAxis type="number" domain={[0, 100]} hide />
+      <YAxis
+        type="category"
+        dataKey="name"
+        width={isPdfMode ? 130 : 160}
+        tick={{ fontSize: 11, fill: '#0A2351', fontWeight: 600 }}
+        tickLine={false}
+        axisLine={false}
+      />
+      <Tooltip
+        formatter={(val) => [`${val}% match`, 'Compatibility']}
+        contentStyle={{ borderRadius: '10px', border: 'none', fontSize: '12px' }}
+      />
+      <Bar dataKey="score" radius={[0, 6, 6, 0]} maxBarSize={28}>
+        {data.map((_, i) => (
+          <Cell key={i} fill={i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'} />
+        ))}
+      </Bar>
+    </BarChart>
+  )
+
   return (
     <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
       <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
           <div className={isPdfMode ? 'h-[140px]' : 'h-[180px]'}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
-                <XAxis type="number" domain={[0, 100]} hide />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  width={isPdfMode ? 130 : 160}
-                  tick={{ fontSize: 11, fill: '#0A2351', fontWeight: 600 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  formatter={(val) => [`${val}% match`, 'Compatibility']}
-                  contentStyle={{ borderRadius: '10px', border: 'none', fontSize: '12px' }}
-                />
-                <Bar dataKey="score" radius={[0, 6, 6, 0]} maxBarSize={28}>
-                  {data.map((_, i) => (
-                    <Cell key={i} fill={i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {/* 🚀 FIX: Use hardcoded dimensions for PDF to prevent squashing */}
+            {isPdfMode ? (
+              <div style={{ width: '700px', height: '140px' }}>
+                <BarChart width={700} height={140} data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
+                  <XAxis type="number" domain={[0, 100]} hide />
+                  <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11, fill: '#0A2351', fontWeight: 600 }} tickLine={false} axisLine={false} />
+                  <Bar dataKey="score" radius={[0, 6, 6, 0]} maxBarSize={28}>
+                    {data.map((_, i) => <Cell key={i} fill={i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'} />)}
+                  </Bar>
+                </BarChart>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                {ChartContent}
+              </ResponsiveContainer>
+            )}
           </div>
           <div className="mt-3 flex gap-4 text-xs text-slate-400 flex-wrap">
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#F57D14]"/>Best match</span>
@@ -405,7 +414,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
   const rawScores = analysis?.radar_chart_scores || {}
   const chartData = [
-    { subject: 'Personality', score: Number(rawScores['Personality'])           || 0, fullMark: 100 },
+    { subject: 'Personality', score: Number(rawScores['Personality'])            || 0, fullMark: 100 },
     { subject: 'Aptitude',    score: Number(rawScores['Aptitude'])               || 0, fullMark: 100 },
     { subject: 'Motivation',  score: Number(rawScores['Motivation'])             || 0, fullMark: 100 },
     { subject: 'Interests',   score: Number(rawScores['Career Interests'])       || 0, fullMark: 100 },
@@ -798,13 +807,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // ─────────────────────────────────────────────
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
-const ResultDashboardReal = ({ assessmentId, onReady }) => { // 🚀 REMOVED isPdfMode from props
+const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [assessment, setAssessment] = useState(null)
   const [error, setError] = useState('')
-  const [isPdfMode, setIsPdfMode] = useState(false) // 🚀 ADDED: Local state to control PDF mode
-  const [isDownloading, setIsDownloading] = useState(false) // 🚀 ADDED: Loading state for the button
+  const [isPdfMode, setIsPdfMode] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   useEffect(() => {
     const load = async () => {
@@ -869,10 +878,10 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => { // 🚀 REMOVED isP
     setIsDownloading(true)
     setIsPdfMode(true) // Switch layout to PDF mode
 
-    // 1. Wait a tiny bit for React to re-render the DOM with PDF styles
-    await new Promise(resolve => setTimeout(resolve, 500)) 
+    // 1. Wait 1500ms for charts and fonts to fully render before the snapshot!
+    await new Promise(resolve => setTimeout(resolve, 1500)) 
 
-    // 2. Import html2pdf dynamically so it doesn't break Next.js SSR
+    // 2. Import html2pdf dynamically
     const html2pdf = (await import('html2pdf.js')).default
 
     // 3. Grab the wrapper element
@@ -918,7 +927,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => { // 🚀 REMOVED isP
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-      {/* 🚀 THE DOWNLOAD BUTTON AREA */}
+      {/* 🚀 THE DOWNLOAD BUTTON AREA - Now safely outside the PDF wrapper */}
       {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
           <Button 
