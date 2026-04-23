@@ -15,17 +15,21 @@ export default function Header() {
         
         {/* 🚀 STRIP-STYLE LOGO WITH TAGLINE */}
         <div className="flex items-center">
-          <Link href="/" className="flex items-center gap-3 sm:gap-5 hover:opacity-90 transition-opacity">
-            {/* 🚀 FIX: Simplified wrapper for the new horizontal logo */}
-            <div className="flex items-center">
+          {/* Reduced desktop gap from sm:gap-5 to sm:gap-4, and mobile to gap-2 */}
+          <Link href="/" className="flex items-center gap-2 sm:gap-4 hover:opacity-90 transition-opacity">
+            
+            {/* 🚀 FIX: Reduced mobile height to h-7, and laptop desktop height to sm:h-9 (36px) */}
+            <div className="h-7 sm:h-9 flex items-center [&>svg]:h-full [&>svg]:w-auto [&>img]:h-full [&>img]:w-auto">
                <SarathiLogo />
             </div>
-            {/* Vertical Divider Line */}
-            <div className="h-8 sm:h-10 w-[2px] bg-slate-200"></div>
-            {/* Empowering Tagline */}
+            
+            {/* 🚀 FIX: Shrunk the vertical divider to match the new logo sizes */}
+            <div className="h-5 sm:h-7 w-[2px] bg-slate-200"></div>
+            
+            {/* 🚀 FIX: Drastically reduced text size for mobile, and capped laptop size at 10px */}
             <div className="flex flex-col justify-center">
-              <span className="text-[8px] sm:text-[10px] lg:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400 leading-tight">Empowering</span>
-              <span className="text-[8px] sm:text-[10px] lg:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.2em] text-slate-400 leading-tight">Student Clarity</span>
+              <span className="text-[7px] sm:text-[8px] lg:text-[10px] font-bold uppercase tracking-tight sm:tracking-widest text-slate-400 leading-tight">Empowering</span>
+              <span className="text-[7px] sm:text-[8px] lg:text-[10px] font-bold uppercase tracking-tight sm:tracking-widest text-slate-400 leading-tight">Student Clarity</span>
             </div>
           </Link>
         </div>
@@ -42,7 +46,7 @@ export default function Header() {
         {/* 📱&💻 Action Buttons Wrapper */}
         <div className="flex items-center gap-3 ml-auto lg:ml-0">
           
-          {/* 🚀 FIX: Persistent Mobile CTA + Standardized Desktop Orange Pill */}
+          {/* Persistent Mobile CTA + Standardized Desktop Orange Pill */}
           <Button asChild className="rounded-full bg-[#F57D14] px-4 sm:px-6 h-10 sm:h-12 text-xs sm:text-sm font-bold text-white hover:bg-[#dd6f11] shadow-md shadow-[#F57D14]/20 transition-all hover:scale-105">
             <Link href="/assessment">Take the Test</Link>
           </Button>
