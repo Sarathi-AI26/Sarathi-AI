@@ -567,20 +567,25 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* Strength Signals */}
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      {/* 🚀 FIX 1: Radar + DNA Swap */}
+      {/* 🚀 FIX 1: Swapped Grid to Flexbox for PDF Mode (HTML2Canvas breaks on Grid) */}
       <div
         style={isPdfMode ? {
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '12px',
-          marginBottom: '16px',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+          marginBottom: '24px',
+          alignItems: 'stretch'
         } : undefined}
         className={isPdfMode ? '' : 'grid gap-6 lg:grid-cols-2 mb-8'}
       >
         {/* Psychometric DNA (MOVED TO THE LEFT) */}
-        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
+        <section
+          className={`avoid-break ${isPdfMode ? '' : sp.section}`}
+          style={isPdfMode ? { width: '48%', margin: 0 } : {}}
+        >
           <SectionHeading icon={Compass} title="Psychometric DNA" isPdfMode={isPdfMode} />
-          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+          <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
               {profile.dominant_personality_traits?.length > 0 && (
                 <div>
@@ -634,9 +639,12 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
 
         {/* Psychometric Dimensions (MOVED TO THE RIGHT) */}
-        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
+        <section
+          className={`avoid-break ${isPdfMode ? '' : sp.section}`}
+          style={isPdfMode ? { width: '48%', margin: 0 } : {}}
+        >
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
-          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+          <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
               <div style={{ height: isPdfMode ? 220 : 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -674,63 +682,61 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
-      {/* 🚀 FIX 2: Grouped Compatibility and Matches into a single avoid-break block */}
-      <div className={isPdfMode ? 'avoid-break' : ''}>
-        <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
+      {/* 🚀 FIX 2: Let Compatibility and Matches flow naturally to prevent page spilling */}
+      <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
-        <section className={sp.section}>
-          <SectionHeading
-            icon={Target}
-            title="Your Career Matches — In Detail"
-            subtitle="Each matched to your specific scores."
-            isPdfMode={isPdfMode}
-          />
-          <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
-            {(analysis.top_career_matches || []).map((match, i) => (
-              <Card
-                key={i}
-                className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
-              >
-                <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
-                    {match.compatibility_score && (
-                      <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
-                        {match.compatibility_score}% match
+      <section className={sp.section}>
+        <SectionHeading
+          icon={Target}
+          title="Your Career Matches — In Detail"
+          subtitle="Each matched to your specific scores."
+          isPdfMode={isPdfMode}
+        />
+        <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
+          {(analysis.top_career_matches || []).map((match, i) => (
+            <Card
+              key={i}
+              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+            >
+              <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
+                  {match.compatibility_score && (
+                    <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
+                      {match.compatibility_score}% match
+                    </span>
+                  )}
+                </div>
+                <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
+                  {match.career_title}
+                </h3>
+                <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
+                  {match.match_reason || match.why_it_fits}
+                </p>
+                {match.growth_path && (
+                  <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
+                )}
+                <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
+                  <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
+                  {match.starting_salary_inr}
+                </div>
+                {match.key_certifications?.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    {match.key_certifications.map(cert => (
+                      <span
+                        key={cert}
+                        className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
+                      >
+                        {cert}
                       </span>
-                    )}
+                    ))}
                   </div>
-                  <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
-                    {match.career_title}
-                  </h3>
-                  <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
-                    {match.match_reason || match.why_it_fits}
-                  </p>
-                  {match.growth_path && (
-                    <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
-                  )}
-                  <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
-                    <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
-                    {match.starting_salary_inr}
-                  </div>
-                  {match.key_certifications?.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {match.key_certifications.map(cert => (
-                        <span
-                          key={cert}
-                          className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
-                        >
-                          {cert}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
 
       {/* What to Avoid */}
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
@@ -739,7 +745,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {blindSpots.length > 0 && (
         <section 
           className={`avoid-break ${sp.section}`}
-          style={isPdfMode ? { marginTop: '80px' } : {}}
+          style={isPdfMode ? { marginTop: '120px' } : {}}
         >
           <SectionHeading
             icon={Lightbulb}
@@ -817,7 +823,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {analysis.india_vs_abroad_guidance && (
         <section 
           className={`avoid-break ${sp.section}`}
-          style={isPdfMode ? { marginTop: '80px' } : {}}
+          style={isPdfMode ? { marginTop: '120px' } : {}}
         >
           <SectionHeading
             icon={Globe}
