@@ -62,10 +62,8 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
         style={{ height: '80px', width: 'auto', objectFit: 'contain' }} 
       />
 
-      {/* Vertical Divider */}
       <div style={{ height: '48px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
 
-      {/* Empowering Tagline */}
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
@@ -82,9 +80,6 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────
-// SHARED COMPONENTS
-// ─────────────────────────────────────────────
 const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   <div className={`flex items-center gap-3 ${isPdfMode ? 'mb-3' : 'mb-6'}`}>
     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] shrink-0">
@@ -97,10 +92,11 @@ const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   </div>
 )
 
-const LoadingView = ({ analyzing }) => (
+// 🚀 NEW: Timer-aware Loading View
+const LoadingView = ({ analyzing, elapsed }) => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center">
     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-[#F57D14]/10">
-      <BrainCircuit className="h-10 w-10 text-[#F57D14] animate-pulse" />
+      <BrainCircuit className={`h-10 w-10 text-[#F57D14] ${analyzing ? 'animate-pulse' : ''}`} />
     </div>
     <h1 className="text-2xl font-bold text-[#0A2351]">
       {analyzing ? 'Building your personalised roadmap...' : 'Loading your results...'}
@@ -110,15 +106,28 @@ const LoadingView = ({ analyzing }) => (
         ? 'Our AI is reading all 60 of your answers. This takes about 30 seconds — please do not refresh.'
         : 'Fetching your results...'}
     </p>
+
+    {/* 🚀 NEW: Dynamic Retry Warning if taking longer than 20 seconds */}
+    {analyzing && elapsed > 20 && (
+      <div className="mt-6 max-w-md rounded-xl bg-amber-50 border border-amber-200 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
+        <div className="flex items-start gap-3">
+          <AlertTriangle className="h-5 w-5 text-amber-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-bold text-amber-800">Still working — retrying automatically...</p>
+            <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+              Gemini AI is currently experiencing peak traffic. We are actively retrying your request. This can take up to 60 seconds. Please do not close the page.
+            </p>
+          </div>
+        </div>
+      </div>
+    )}
+
     <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
-      <Loader2 className="h-4 w-4 animate-spin" /> Processing...
+      <Loader2 className="h-4 w-4 animate-spin" /> {analyzing && elapsed > 0 ? `Processing... (${elapsed}s)` : 'Processing...'}
     </div>
   </div>
 )
 
-// ─────────────────────────────────────────────
-// IDENTITY STATEMENT
-// ─────────────────────────────────────────────
 const IdentityStatement = ({ statement, isPdfMode }) => (
   <div className={`avoid-break relative overflow-hidden rounded-2xl bg-[#0A2351] ${isPdfMode ? 'p-5 mb-4' : 'p-8 mb-8'}`}>
     <div className="absolute top-4 left-6 opacity-10">
@@ -136,9 +145,6 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
   </div>
 )
 
-// ─────────────────────────────────────────────
-// STRENGTH SIGNALS
-// ─────────────────────────────────────────────
 const StrengthSignals = ({ signals, isPdfMode }) => {
   if (!signals?.length) return null
   return (
@@ -167,9 +173,6 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
   )
 }
 
-// ─────────────────────────────────────────────
-// CAREER COMPATIBILITY BARS
-// ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
   
@@ -212,9 +215,6 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   )
 }
 
-// ─────────────────────────────────────────────
-// WHAT TO AVOID
-// ─────────────────────────────────────────────
 const WhatToAvoid = ({ items, isPdfMode }) => {
   if (!items?.length) return null
   return (
@@ -245,9 +245,6 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
   )
 }
 
-// ─────────────────────────────────────────────
-// 5-YEAR TIMELINE VISUAL
-// ─────────────────────────────────────────────
 const RoadmapTimeline = ({ steps, isPdfMode }) => {
   const colors = ['#3b82f6', '#6366f1', '#F57D14', '#f59e0b', '#0A2351']
   return (
@@ -302,9 +299,6 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
   )
 }
 
-// ─────────────────────────────────────────────
-// FULL REPORT VIEW
-// ─────────────────────────────────────────────
 const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const sp = isPdfMode
     ? { section: 'mb-4', text: 'text-sm' }
@@ -684,6 +678,24 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [error, setError] = useState('')
   const [isPdfMode, setIsPdfMode] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
+  
+  // 🚀 NEW: Timer and Retry states
+  const [elapsed, setElapsed] = useState(0)
+  const [retryTrigger, setRetryTrigger] = useState(0)
+
+  // 🚀 NEW: Elapsed timer logic
+  useEffect(() => {
+    let timer;
+    if (analyzing) {
+      setElapsed(0);
+      timer = setInterval(() => {
+        setElapsed(prev => prev + 1);
+      }, 1000);
+    } else {
+      setElapsed(0);
+    }
+    return () => clearInterval(timer);
+  }, [analyzing]);
 
   useEffect(() => {
     const load = async () => {
@@ -692,6 +704,10 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         setLoading(false)
         return
       }
+      
+      // Clear past errors when retry is triggered
+      setError('')
+
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
         const data = await res.json()
@@ -729,7 +745,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       }
     }
     load()
-  }, [assessmentId])
+  }, [assessmentId, retryTrigger]) // 🚀 NEW: Added retryTrigger as a dependency
 
   useEffect(() => {
     if (!loading && !analyzing && !error && assessment) {
@@ -751,18 +767,16 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     const html2pdf = (await import('html2pdf.js')).default
     const element = document.getElementById('pdf-wrapper')
 
-    // 🚀 NEW: Pre-load the watermark image safely
     const watermarkUrl = typeof window !== 'undefined' ? `${window.location.origin}/icon.png` : '/icon.png';
     const watermarkImg = new Image();
     watermarkImg.crossOrigin = "anonymous";
     watermarkImg.src = watermarkUrl;
     
-    // Wait for the image to load to ensure it's ready for jsPDF
     await new Promise((resolve) => {
       watermarkImg.onload = resolve;
       watermarkImg.onerror = () => {
         console.warn("Watermark image failed to load. Proceeding without it.");
-        resolve(); // resolve anyway so PDF generation doesn't block
+        resolve(); 
       };
     });
 
@@ -785,7 +799,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Calculate watermark size (100x100mm) and center it
       const wmSize = 100;
       const wmX = (pageWidth - wmSize) / 2;
       const wmY = (pageHeight - wmSize) / 2;
@@ -793,14 +806,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       for (let i = 1; i <= totalPages; i++) {
         pdf.setPage(i);
         
-        // 🚀 NEW: Stamp the watermark at 5% opacity
         if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
           pdf.setGState(new pdf.GState({ opacity: 0.05 }));
           pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
-          pdf.setGState(new pdf.GState({ opacity: 1.0 })); // Reset opacity for the footer
+          pdf.setGState(new pdf.GState({ opacity: 1.0 }));
         }
 
-        // Draw the Footer
         pdf.setFontSize(8);
         pdf.setTextColor(150);
         const text = `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`; 
@@ -815,16 +826,33 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     });
   }
 
-  if (loading || analyzing) return <LoadingView analyzing={analyzing} />
+  // 🚀 NEW: Pass elapsed to LoadingView
+  if (loading || analyzing) return <LoadingView analyzing={analyzing} elapsed={elapsed} />
 
   if (error) {
+    // 🚀 NEW: Determine if this is a generation error vs a payment/setup error
+    const isGenerationError = error.toLowerCase().includes('503') || 
+                              error.toLowerCase().includes('failed') || 
+                              error.toLowerCase().includes('ai') || 
+                              error.toLowerCase().includes('generation');
+
     return (
       <div className="container mx-auto py-20 text-center">
-        <Card className="mx-auto max-w-md border-red-100 bg-red-50 p-8">
-          <p className="font-bold text-red-600">{error}</p>
-          <Button asChild className="mt-6 bg-[#0A2351]">
-            <Link href="/assessment">Retake Assessment</Link>
-          </Button>
+        <Card className="mx-auto max-w-md border-red-100 bg-red-50 p-8 shadow-sm">
+          <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+          <p className="font-bold text-red-700 text-lg mb-2">Oops! Something went wrong.</p>
+          <p className="text-sm text-red-600/80 mb-6">{error}</p>
+          
+          {/* 🚀 NEW: Smart Error Recovery Buttons */}
+          {isGenerationError ? (
+            <Button onClick={() => setRetryTrigger(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
+              Try Again (Data is Saved)
+            </Button>
+          ) : (
+            <Button asChild className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
+              <Link href="/assessment">Return to Home</Link>
+            </Button>
+          )}
         </Card>
       </div>
     )
