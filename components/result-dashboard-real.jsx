@@ -11,7 +11,6 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-// 🚀 FIX 3: Removed BarChart, Bar, XAxis, YAxis, Cell imports
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis,
   ResponsiveContainer, Tooltip,
@@ -174,7 +173,6 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
   
-  // 🚀 FIX 1: Map the data for our pure HTML/CSS bars
   const data = careers.map((c, i) => ({
     name: c.career_title?.split(',')[0] || c.career_title,
     score: c.compatibility_score || 85,
@@ -186,7 +184,6 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
       <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-          {/* 🚀 FIX 1: Pure HTML/CSS Bars instead of SVG Recharts to guarantee PDF capture */}
           <div className="flex flex-col gap-4 py-2">
             {data.map((item, index) => (
               <div key={index} className="flex items-center">
@@ -266,7 +263,6 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
             className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-2' : 'mb-6'}`}
             style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
           >
-            {/* Timeline dot — web only */}
             {!isPdfMode && (
               <div className="relative flex-shrink-0">
                 <div
@@ -348,7 +344,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
-      {/* ── PDF-only print styles ── */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -357,7 +352,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         `}} />
       )}
 
-      {/* ── PDF HEADER ── */}
       {isPdfMode && (
         <PdfHeader
           studentName={studentName}
@@ -366,7 +360,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
       )}
 
-      {/* ── HERO BANNER (web) ── */}
       {!isPdfMode && (
         <section className="avoid-break rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
@@ -387,7 +380,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── HERO BANNER (PDF compact) ── */}
       {isPdfMode && (
         <section className="avoid-break rounded-xl bg-[#0A2351] p-5 mb-4 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-2">
@@ -403,12 +395,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── IDENTITY STATEMENT ── */}
       {analysis.identity_statement && (
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* ── EXECUTIVE SUMMARY ── */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={BrainCircuit}
@@ -416,10 +406,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           subtitle="What your 60 answers actually say about you."
           isPdfMode={isPdfMode}
         />
-        {/* 🚀 FIX 4: Added avoid-break to Card so paragraphs don't randomly chop off */}
         <Card className="border-0 shadow-sm avoid-break">
           <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
-            {/* 🚀 FIX 4: Added orphans and widows rules for typography protection */}
             {executiveSummaryParagraphs.map((para, i) => (
               <p key={i} style={{ orphans: 3, widows: 3 }}>{para}</p>
             ))}
@@ -427,10 +415,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </Card>
       </section>
 
-      {/* ── STRENGTH SIGNALS ── */}
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      {/* ── RADAR + DNA ── */}
       <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'}>
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
@@ -527,10 +513,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
-      {/* ── CAREER COMPATIBILITY CHART ── */}
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
-      {/* ── CAREER MATCH DETAIL CARDS ── */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={Target}
@@ -586,10 +570,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       </section>
 
-      {/* ── WHAT TO AVOID ── */}
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
-      {/* ── GROWTH WARNINGS ── */}
       {blindSpots.length > 0 && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -619,7 +601,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── ACTION PLAN ── */}
       {immediateAction?.next_30_days && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -635,7 +616,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isPdfMode ? 'text-white/80' : 'text-emerald-200'}`}>
                     This month — next 30 days
                   </p>
-                  {/* 🚀 FIX: Added 'text-white' to the line below */}
                   <p className={`font-bold text-white ${isPdfMode ? 'text-base' : 'text-lg'}`}>
                     {immediateAction.next_30_days}
                   </p>
@@ -662,7 +642,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── INDIA VS ABROAD ── */}
       {analysis.india_vs_abroad_guidance && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -681,8 +660,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* ── 5-YEAR ROADMAP ── */}
-      {/* 🚀 FIX 4: Added avoid-break to this top-level section container */}
       <section className={`avoid-break ${isPdfMode ? 'pt-2' : 'mt-4'}`}>
         <SectionHeading
           icon={TrendingUp}
@@ -774,6 +751,21 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     const html2pdf = (await import('html2pdf.js')).default
     const element = document.getElementById('pdf-wrapper')
 
+    // 🚀 NEW: Pre-load the watermark image safely
+    const watermarkUrl = typeof window !== 'undefined' ? `${window.location.origin}/icon.png` : '/icon.png';
+    const watermarkImg = new Image();
+    watermarkImg.crossOrigin = "anonymous";
+    watermarkImg.src = watermarkUrl;
+    
+    // Wait for the image to load to ensure it's ready for jsPDF
+    await new Promise((resolve) => {
+      watermarkImg.onload = resolve;
+      watermarkImg.onerror = () => {
+        console.warn("Watermark image failed to load. Proceeding without it.");
+        resolve(); // resolve anyway so PDF generation doesn't block
+      };
+    });
+
     const opt = {
       margin:       [15, 10, 15, 10], 
       filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
@@ -782,7 +774,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        // 🚀 FIX 3: Changed windowWidth to 780 to perfectly map to A4 proportions
         windowWidth: 780 
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
@@ -791,14 +782,30 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
       const totalPages = pdf.internal.getNumberOfPages();
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Calculate watermark size (100x100mm) and center it
+      const wmSize = 100;
+      const wmX = (pageWidth - wmSize) / 2;
+      const wmY = (pageHeight - wmSize) / 2;
       
       for (let i = 1; i <= totalPages; i++) {
         pdf.setPage(i);
+        
+        // 🚀 NEW: Stamp the watermark at 5% opacity
+        if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
+          pdf.setGState(new pdf.GState({ opacity: 0.05 }));
+          pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
+          pdf.setGState(new pdf.GState({ opacity: 1.0 })); // Reset opacity for the footer
+        }
+
+        // Draw the Footer
         pdf.setFontSize(8);
         pdf.setTextColor(150);
         const text = `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`; 
         
-        pdf.text(text, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 8, {
+        pdf.text(text, pageWidth / 2, pageHeight - 8, {
           align: 'center'
         });
       }
