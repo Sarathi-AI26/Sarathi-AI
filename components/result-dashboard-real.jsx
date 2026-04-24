@@ -981,7 +981,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           pdf.setFontSize(8)
           pdf.setTextColor(150)
           pdf.text(
-            `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`,
+            `SARATHI Career Roadmap Report | ${studentName} | Page ${i} of ${totalPages} | This report is personalised and confidential`,
             pageWidth / 2,
             pageHeight - 8,
             { align: 'center' }
