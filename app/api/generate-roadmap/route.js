@@ -182,83 +182,79 @@ OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 // ─────────────────────────────────────────────
 const OUTPUT_SCHEMA = `{
   "user_archetype": "2-3 word label derived from their top scoring dimensions. Clinical but human. E.g. 'Pragmatic Social Founder', 'Analytical Deep Specialist'.",
-
-  "identity_statement": "THE most important field. One powerful, emotionally resonant sentence that captures who this student is at their core — grounded in their actual Q scores and open-ended answers. Not a label. A mirror. Must feel like only they could have received this sentence. Example: 'You are someone who needs to build things that matter, and you will be quietly miserable in any role that asks you to maintain what someone else already created.'",
-
+  "identity_statement": "THE most important field. One powerful, emotionally resonant sentence that captures who this student is at their core...",
   "executive_summary": {
-    "paragraph_1": "Their core cognitive and behavioural wiring. Written directly to them using 'you'. Every sentence cites a Q number and score. Short sentences. Warm but precise. 4-5 sentences.",
-    "paragraph_2": "Their risk profile and decisiveness pattern — what kind of environment they will thrive or struggle in. Must explicitly cite Q45 (risk tolerance) and Q11 (decisiveness) by name. 3-4 sentences.",
-    "paragraph_3": "Connect their role model (Q58) to their intrinsic motivation (Q59) and show the gap — or the alignment — with where they currently are. Quote their open-ended answers directly. 3-4 sentences."
+    "paragraph_1": "Their core cognitive and behavioural wiring...",
+    "paragraph_2": "Their risk profile and decisiveness pattern...",
+    "paragraph_3": "Connect their role model (Q58) to their intrinsic motivation (Q59)..."
   },
-
   "radar_chart_scores": {
-    "Personality": 0,
-    "Aptitude": 0,
-    "Motivation": 0,
-    "Career Interests": 0,
-    "Behavioural Tendencies": 0
+    "Personality": 0, "Aptitude": 0, "Motivation": 0, "Career Interests": 0, "Behavioural Tendencies": 0
   },
-
   "strength_signals": [
     {
       "label": "3-4 word strength label",
-      "evidence": "One sentence citing the exact Q score that proves this strength. Direct and specific.",
+      "evidence": "One sentence citing the exact Q score...",
       "icon_hint": "one of: brain | target | users | trending-up | lightbulb | globe | shield | zap"
     }
   ],
-
   "top_career_matches": [
     {
-      "career_title": "Specific Job Title — not a broad category",
+      "career_title": "Specific Job Title",
       "compatibility_score": 90,
-      "match_reason": "2-3 sentences written directly to the student. Must cite specific Q scores. Explain exactly why this role fits their wiring.",
+      "match_reason": "2-3 sentences written directly to the student...",
       "growth_path": "Entry Level Role → Mid Level Role → Senior Role",
       "starting_salary_inr": "₹X LPA - ₹Y LPA",
-      "key_certifications": ["Specific Cert Name", "Specific Cert Name"]
+      "key_certifications": ["Specific Cert Name"]
     }
   ],
-
   "psychometric_profile": {
-    "dominant_personality_traits": ["Trait with Q score evidence", "Trait with Q score evidence", "Trait with Q score evidence"],
-    "learning_style": "How this specific student learns best — derived from Section 3 aptitude scores. Written to them directly.",
-    "work_environment_fit": "The specific type of environment where they will do their best work. Cite behavioural scores.",
-    "collaboration_style": "How they actually work with others. Based on Q3, Q50, Q51 scores. Honest and specific."
+    "dominant_personality_traits": ["Trait with Q score evidence"],
+    "learning_style": "How this specific student learns best...",
+    "work_environment_fit": "The specific type of environment...",
+    "collaboration_style": "How they actually work with others..."
   },
-
   "what_to_avoid": [
     {
       "category": "Role Type OR Work Environment OR Career Habit",
-      "warning": "The specific thing to avoid — name it clearly.",
-      "reason": "Exactly why — citing the specific score that makes this a bad fit for them."
+      "warning": "The specific thing to avoid.",
+      "reason": "Exactly why."
     }
   ],
-
   "potential_blind_spots": [
-    "If Q48 Strongly Agree or Agree: 'SEVERE OPERATIONAL RISK — [name the real consequence in a work scenario]'",
-    "Other specific risk with Q score evidence."
+    "Specific risk with Q score evidence."
   ],
-
   "immediate_action_plan": {
-    "next_30_days": "One concrete, specific action. Specific enough that they know exactly what to do this Monday morning.",
-    "next_90_days": "One skill or credential to pursue. Name the specific course, exam, or platform if possible.",
-    "success_metric": "Exactly how they will know they completed it — measurable."
+    "next_30_days": "One concrete action.",
+    "next_90_days": "One skill or credential to pursue.",
+    "success_metric": "Exactly how they will know they completed it."
   },
-
   "five_year_roadmap": {
-    "year_1": "Foundation — what to learn, which certifications or exams to target, what type of first role to aim for. Written directly to them.",
-    "year_2": "Skill Application — first real role type and what to focus on building. Include an abroad milestone here if Q60 mentions it.",
-    "year_3": "Market Acceleration — the mid-level target role, realistic salary expectation, and what will differentiate them.",
-    "year_4": "Strategic Positioning — advanced credentials, network moves, or groundwork for entrepreneurship if that is their path.",
-    "year_5": "Mastery — a specific leadership or impact milestone explicitly modelled on their Q58 role model. Should feel like a destiny, not just a job title."
+    "year_1": "Foundation...",
+    "year_2": "Skill Application...",
+    "year_3": "Market Acceleration...",
+    "year_4": "Strategic Positioning...",
+    "year_5": "Mastery..."
   },
-
-  "india_vs_abroad_guidance": "Specific routing advice based on their exact Q60 answer and Q27 score. If India — name specific cities and ecosystems. If abroad — name specific countries or programs to target."
+  "india_vs_abroad_guidance": "Specific routing advice based on their exact Q60 answer..."
 }`
 
 // ─────────────────────────────────────────────
-// GEMINI CALL
+// 🚀 NEW: EXPONENTIAL BACKOFF RETRY LOGIC
 // ─────────────────────────────────────────────
-async function generateRoadmap({ student_profile, assessment_context }) {
+function isRetryableError(error) {
+  const msg = error?.message?.toLowerCase() || ''
+  return (
+    msg.includes('503') ||
+    msg.includes('service unavailable') ||
+    msg.includes('high demand') ||
+    msg.includes('429') ||
+    msg.includes('resource_exhausted') ||
+    msg.includes('overloaded')
+  )
+}
+
+async function generateRoadmapCore({ student_profile, assessment_context }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
@@ -280,21 +276,32 @@ ${assessment_context}
 
 Generate the complete career roadmap. Return ONLY valid JSON matching this schema exactly:
 ${OUTPUT_SCHEMA}
-
-FINAL CHECKLIST — verify before writing:
-- Did you write "you/your" throughout? Not "the subject"?
-- Did you cite Q11 (decisiveness) in the executive summary?
-- Did you cite Q45 (risk tolerance) in the executive summary?
-- Did you quote Q58 (role model) directly in paragraph 3?
-- Is the identity_statement truly unique to this student — could it apply to anyone else?
-- If Q48 <= 2 (procrastination risk) — is it the first item in what_to_avoid?
-- Does Year 5 roadmap explicitly connect to their Q58 role model's path?
-- Does india_vs_abroad_guidance reflect Q60's exact words?
-- Are strength_signals based on actual high-scoring dimensions — not generic?
 `
-
   const result = await model.generateContent(userPrompt)
   return JSON.parse(result.response.text())
+}
+
+// 🚀 WRAPPER WITH EXPONENTIAL BACKOFF
+async function generateRoadmapWithRetry(params) {
+  const maxRetries = 5
+  // Delays: 3s, 8s, 15s, 25s (Total 51s max wait to stay under Vercel 60s timeout)
+  const delays = [3000, 8000, 15000, 25000] 
+
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      return await generateRoadmapCore(params)
+    } catch (error) {
+      console.error(`Gemini Attempt ${attempt + 1} failed:`, error.message)
+
+      if (attempt === maxRetries - 1 || !isRetryableError(error)) {
+        throw error // Throw on final attempt or if error is not traffic-related
+      }
+
+      const waitTime = delays[attempt]
+      console.log(`Gemini overloaded. Waiting ${waitTime}ms before retry...`)
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+    }
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -326,12 +333,12 @@ export async function POST(request) {
 
     if (fetchError || !assessment) return jsonResponse({ error: 'Assessment not found' }, 404)
 
-    // Return cached report if it exists
     if (assessment.ai_analysis_result?.user_archetype) {
       return jsonResponse({ ok: true, assessment: normalizeAssessment(assessment) })
     }
 
-    const aiAnalysis = await generateRoadmap({
+    // 🚀 NEW: Call the Retry Wrapper instead of the direct core
+    const aiAnalysis = await generateRoadmapWithRetry({
       student_profile: {
         name: assessment?.users?.name || 'Student',
         college: assessment?.users?.college || '',
