@@ -635,7 +635,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <p className={`text-xs font-bold uppercase tracking-widest mb-1 ${isPdfMode ? 'text-white/80' : 'text-emerald-200'}`}>
                     This month — next 30 days
                   </p>
-                  <p className={`font-bold ${isPdfMode ? 'text-base' : 'text-lg'}`}>
+                  {/* 🚀 FIX: Added 'text-white' to the line below */}
+                  <p className={`font-bold text-white ${isPdfMode ? 'text-base' : 'text-lg'}`}>
                     {immediateAction.next_30_days}
                   </p>
                 </div>
@@ -650,7 +651,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   </div>
                 )}
                 <div className="border-t border-white/20 pt-3">
-                  {/* 🚀 FIX 2: Changed text-white/80 to text-white for pure #ffffff contrast */}
                   <p className="text-sm text-white">
                     <span className="font-bold text-white">How you'll know it's done: </span>
                     {immediateAction.success_metric}
