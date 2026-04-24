@@ -11,10 +11,10 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+// 🚀 FIX 3: Removed BarChart, Bar, XAxis, YAxis, Cell imports
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis,
-  ResponsiveContainer, Tooltip, BarChart, Bar,
-  XAxis, YAxis, Cell,
+  ResponsiveContainer, Tooltip,
 } from 'recharts'
 
 // ─────────────────────────────────────────────
@@ -57,7 +57,6 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
       
-      {/* 🚀 FIX: Doubled the logo height from 40px to 80px */}
       <img 
         src="/logo-horizontal.png" 
         alt="SARATHI" 
@@ -174,57 +173,38 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 // ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
-  const data = careers.map(c => ({
+  
+  // 🚀 FIX 1: Map the data for our pure HTML/CSS bars
+  const data = careers.map((c, i) => ({
     name: c.career_title?.split(',')[0] || c.career_title,
     score: c.compatibility_score || 85,
+    color: i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'
   }))
-
-  const ChartContent = (
-    <BarChart data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
-      <XAxis type="number" domain={[0, 100]} hide />
-      <YAxis
-        type="category"
-        dataKey="name"
-        width={isPdfMode ? 130 : 160}
-        tick={{ fontSize: 11, fill: '#0A2351', fontWeight: 600 }}
-        tickLine={false}
-        axisLine={false}
-      />
-      <Tooltip
-        formatter={(val) => [`${val}% match`, 'Compatibility']}
-        contentStyle={{ borderRadius: '10px', border: 'none', fontSize: '12px' }}
-      />
-      <Bar dataKey="score" radius={[0, 6, 6, 0]} maxBarSize={28}>
-        {data.map((_, i) => (
-          <Cell key={i} fill={i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'} />
-        ))}
-      </Bar>
-    </BarChart>
-  )
 
   return (
     <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
       <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-          <div className={isPdfMode ? 'h-[140px]' : 'h-[180px]'}>
-            {isPdfMode ? (
-              <div style={{ width: '700px', height: '140px' }}>
-                <BarChart width={700} height={140} data={data} layout="vertical" margin={{ left: 0, right: 40, top: 4, bottom: 4 }}>
-                  <XAxis type="number" domain={[0, 100]} hide />
-                  <YAxis type="category" dataKey="name" width={130} tick={{ fontSize: 11, fill: '#0A2351', fontWeight: 600 }} tickLine={false} axisLine={false} />
-                  <Bar dataKey="score" radius={[0, 6, 6, 0]} maxBarSize={28}>
-                    {data.map((_, i) => <Cell key={i} fill={i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'} />)}
-                  </Bar>
-                </BarChart>
+          {/* 🚀 FIX 1: Pure HTML/CSS Bars instead of SVG Recharts to guarantee PDF capture */}
+          <div className="flex flex-col gap-4 py-2">
+            {data.map((item, index) => (
+              <div key={index} className="flex items-center">
+                <div className="w-[140px] shrink-0 text-right pr-4 text-[11px] font-semibold text-[#0A2351] leading-tight">
+                  {item.name}
+                </div>
+                <div className="flex-1 flex items-center h-7 bg-white rounded-r-md overflow-hidden border border-slate-100">
+                  <div
+                    className="h-full flex items-center justify-end pr-2 transition-all duration-700"
+                    style={{ width: `${item.score}%`, backgroundColor: item.color }}
+                  >
+                    <span className="text-[10px] font-bold text-white">{item.score}%</span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <ResponsiveContainer width="100%" height="100%">
-                {ChartContent}
-              </ResponsiveContainer>
-            )}
+            ))}
           </div>
-          <div className="mt-3 flex gap-4 text-xs text-slate-400 flex-wrap">
+          <div className="mt-4 flex gap-4 text-xs text-slate-400 flex-wrap">
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#F57D14]"/>Best match</span>
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#0A2351]"/>Strong match</span>
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-300"/>Good match</span>
@@ -394,7 +374,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
               <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
             </div>
             
-            {/* 🚀 FIX: Added text-white to this h1 tag right here! */}
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
               {studentName}, you are a{' '}
               <span className="text-[#F57D14]">{analysis.user_archetype}</span>
@@ -437,9 +416,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           subtitle="What your 60 answers actually say about you."
           isPdfMode={isPdfMode}
         />
-        <Card className="border-0 shadow-sm">
+        {/* 🚀 FIX 4: Added avoid-break to Card so paragraphs don't randomly chop off */}
+        <Card className="border-0 shadow-sm avoid-break">
           <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
-            {executiveSummaryParagraphs.map((para, i) => <p key={i}>{para}</p>)}
+            {/* 🚀 FIX 4: Added orphans and widows rules for typography protection */}
+            {executiveSummaryParagraphs.map((para, i) => (
+              <p key={i} style={{ orphans: 3, widows: 3 }}>{para}</p>
+            ))}
           </CardContent>
         </Card>
       </section>
@@ -514,7 +497,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
                     How You Learn Best
                   </label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600 italic">
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600 italic" style={{ orphans: 3, widows: 3 }}>
                     {profile.learning_style}
                   </p>
                 </div>
@@ -524,7 +507,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
                     Where You'll Thrive
                   </label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600" style={{ orphans: 3, widows: 3 }}>
                     {profile.work_environment_fit}
                   </p>
                 </div>
@@ -534,7 +517,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <label className="text-[10px] font-bold uppercase text-slate-400 tracking-widest">
                     How You Work With Others
                   </label>
-                  <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                  <p className="mt-1 text-sm leading-relaxed text-slate-600" style={{ orphans: 3, widows: 3 }}>
                     {profile.collaboration_style}
                   </p>
                 </div>
@@ -667,7 +650,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   </div>
                 )}
                 <div className="border-t border-white/20 pt-3">
-                  <p className="text-sm text-white/80">
+                  {/* 🚀 FIX 2: Changed text-white/80 to text-white for pure #ffffff contrast */}
+                  <p className="text-sm text-white">
                     <span className="font-bold text-white">How you'll know it's done: </span>
                     {immediateAction.success_metric}
                   </p>
@@ -689,7 +673,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           />
           <Card className="border-0 bg-blue-50/60 border border-blue-100">
             <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-              <p className="text-sm leading-relaxed text-slate-700">
+              <p className="text-sm leading-relaxed text-slate-700" style={{ orphans: 3, widows: 3 }}>
                 {analysis.india_vs_abroad_guidance}
               </p>
             </CardContent>
@@ -698,7 +682,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       )}
 
       {/* ── 5-YEAR ROADMAP ── */}
-      <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
+      {/* 🚀 FIX 4: Added avoid-break to this top-level section container */}
+      <section className={`avoid-break ${isPdfMode ? 'pt-2' : 'mt-4'}`}>
         <SectionHeading
           icon={TrendingUp}
           title="Your 5-Year Roadmap"
@@ -780,7 +765,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
-  // 🚀 THE NEW NATIVE PDF DOWNLOAD LOGIC
   const handleDownloadPdf = async () => {
     setIsDownloading(true)
     setIsPdfMode(true) 
@@ -791,20 +775,20 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     const element = document.getElementById('pdf-wrapper')
 
     const opt = {
-      margin:       [15, 10, 15, 10], // Increased top/bottom margins to fit footer and header safely
+      margin:       [15, 10, 15, 10], 
       filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        windowWidth: 1024 
+        // 🚀 FIX 3: Changed windowWidth to 780 to perfectly map to A4 proportions
+        windowWidth: 780 
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: 'css', before: '#nextpage1' } // Forces clean breaks
+      pagebreak:    { mode: 'css', before: '#nextpage1' } 
     }
 
-    // 🚀 FIX: Using html2pdf native Promise system to inject footers BEFORE saving
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
       const totalPages = pdf.internal.getNumberOfPages();
       
@@ -812,10 +796,8 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         pdf.setPage(i);
         pdf.setFontSize(8);
         pdf.setTextColor(150);
-        // The text printed at the bottom of EVERY page
         const text = `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`; 
         
-        // Positioning the text perfectly in the bottom margin
         pdf.text(text, pdf.internal.pageSize.getWidth() / 2, pdf.internal.pageSize.getHeight() - 8, {
           align: 'center'
         });
@@ -845,7 +827,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-      {/* 🚀 THE DOWNLOAD BUTTON AREA */}
       {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
           <Button 
@@ -862,7 +843,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         </div>
       )}
 
-      {/* 🚀 THE WRAPPER html2pdf WILL CAPTURE */}
       <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
         <FullReportView
           analysis={fullAnalysis}
