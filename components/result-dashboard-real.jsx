@@ -43,7 +43,7 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// PDF HEADER — uses your actual logo image
+// PDF HEADER
 // ─────────────────────────────────────────────
 const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   <div style={{
@@ -74,10 +74,8 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   </div>
 )
 
-
 // ─────────────────────────────────────────────
-// PROFILE BADGE — percentile ranking visual
-// Pure inline styles — renders perfectly in PDF
+// PROFILE BADGE
 // ─────────────────────────────────────────────
 const ProfileBadge = ({ radarScores, isPdfMode }) => {
   if (!radarScores) return null
@@ -126,7 +124,6 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
         alignItems: 'stretch',
       }}
     >
-      {/* Main badge */}
       <div style={{
         flex: '1 1 220px',
         background: tier.bg,
@@ -175,7 +172,6 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
         </div>
       </div>
 
-      {/* Score pills */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -228,7 +224,7 @@ const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
 )
 
 // ─────────────────────────────────────────────
-// LOADING VIEW — timer-aware with retry warning
+// LOADING VIEW
 // ─────────────────────────────────────────────
 const LoadingView = ({ analyzing, elapsed }) => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center">
@@ -315,8 +311,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// CAREER COMPATIBILITY CHART — pure CSS bars
-// Always renders in PDF (no Recharts SVG dependency)
+// CAREER COMPATIBILITY CHART
 // ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
@@ -549,7 +544,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* Profile Badge — sits right after identity, fills page 1 */}
+      {/* Profile Badge */}
       <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
 
       {/* Executive Summary */}
@@ -572,7 +567,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* Strength Signals */}
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      {/* Radar + DNA — side-by-side in PDF using CSS grid */}
+      {/* 🚀 FIX 1: Radar + DNA Swap */}
       <div
         style={isPdfMode ? {
           display: 'grid',
@@ -582,47 +577,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         } : undefined}
         className={isPdfMode ? '' : 'grid gap-6 lg:grid-cols-2 mb-8'}
       >
-        {/* Psychometric Dimensions */}
-        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
-          <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
-          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
-            <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
-              <div style={{ height: isPdfMode ? 220 : 250 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
-                    <PolarGrid stroke="#cbd5e1" />
-                    <PolarAngleAxis
-                      dataKey="subject"
-                      tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }}
-                    />
-                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                    <Radar
-                      name="Score"
-                      dataKey="score"
-                      stroke="#F57D14"
-                      fill="#F57D14"
-                      fillOpacity={0.35}
-                      isAnimationActive={false}
-                    />
-                  </RadarChart>
-                </ResponsiveContainer>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {chartData.map(d => (
-                  <div
-                    key={d.subject}
-                    className="flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1"
-                  >
-                    <span className="text-xs font-bold text-[#0A2351]">{d.subject}</span>
-                    <span className="text-xs font-bold text-[#F57D14]">{d.score}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
-
-        {/* Psychometric DNA */}
+        {/* Psychometric DNA (MOVED TO THE LEFT) */}
         <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Compass} title="Psychometric DNA" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none">
@@ -677,71 +632,115 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             </CardContent>
           </Card>
         </section>
+
+        {/* Psychometric Dimensions (MOVED TO THE RIGHT) */}
+        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
+          <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
+          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+            <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
+              <div style={{ height: isPdfMode ? 220 : 250 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                    <PolarGrid stroke="#cbd5e1" />
+                    <PolarAngleAxis
+                      dataKey="subject"
+                      tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }}
+                    />
+                    <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
+                    <Radar
+                      name="Score"
+                      dataKey="score"
+                      stroke="#F57D14"
+                      fill="#F57D14"
+                      fillOpacity={0.35}
+                      isAnimationActive={false}
+                    />
+                  </RadarChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {chartData.map(d => (
+                  <div
+                    key={d.subject}
+                    className="flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1"
+                  >
+                    <span className="text-xs font-bold text-[#0A2351]">{d.subject}</span>
+                    <span className="text-xs font-bold text-[#F57D14]">{d.score}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </section>
       </div>
 
-      {/* Career Compatibility Chart */}
-      <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
+      {/* 🚀 FIX 2: Grouped Compatibility and Matches into a single avoid-break block */}
+      <div className={isPdfMode ? 'avoid-break' : ''}>
+        <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
-      {/* Career Match Detail Cards */}
-      <section className={`avoid-break ${sp.section}`}>
-        <SectionHeading
-          icon={Target}
-          title="Your Career Matches — In Detail"
-          subtitle="Each matched to your specific scores."
-          isPdfMode={isPdfMode}
-        />
-        <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
-          {(analysis.top_career_matches || []).map((match, i) => (
-            <Card
-              key={i}
-              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
-            >
-              <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
-                  {match.compatibility_score && (
-                    <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
-                      {match.compatibility_score}% match
-                    </span>
-                  )}
-                </div>
-                <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
-                  {match.career_title}
-                </h3>
-                <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
-                  {match.match_reason || match.why_it_fits}
-                </p>
-                {match.growth_path && (
-                  <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
-                )}
-                <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
-                  <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
-                  {match.starting_salary_inr}
-                </div>
-                {match.key_certifications?.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {match.key_certifications.map(cert => (
-                      <span
-                        key={cert}
-                        className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
-                      >
-                        {cert}
+        <section className={sp.section}>
+          <SectionHeading
+            icon={Target}
+            title="Your Career Matches — In Detail"
+            subtitle="Each matched to your specific scores."
+            isPdfMode={isPdfMode}
+          />
+          <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
+            {(analysis.top_career_matches || []).map((match, i) => (
+              <Card
+                key={i}
+                className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              >
+                <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
+                    {match.compatibility_score && (
+                      <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
+                        {match.compatibility_score}% match
                       </span>
-                    ))}
+                    )}
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+                  <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
+                    {match.career_title}
+                  </h3>
+                  <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
+                    {match.match_reason || match.why_it_fits}
+                  </p>
+                  {match.growth_path && (
+                    <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
+                  )}
+                  <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
+                    <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
+                    {match.starting_salary_inr}
+                  </div>
+                  {match.key_certifications?.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {match.key_certifications.map(cert => (
+                        <span
+                          key={cert}
+                          className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
+                        >
+                          {cert}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+      </div>
 
       {/* What to Avoid */}
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
-      {/* Growth Warnings */}
+      {/* 🚀 FIX 3: Added dynamic top margin to push Growth Warnings down in PDF */}
       {blindSpots.length > 0 && (
-        <section className={`avoid-break ${sp.section}`}>
+        <section 
+          className={`avoid-break ${sp.section}`}
+          style={isPdfMode ? { marginTop: '80px' } : {}}
+        >
           <SectionHeading
             icon={Lightbulb}
             title="Growth Warnings"
@@ -814,9 +813,12 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* India vs Abroad */}
+      {/* 🚀 FIX 4: Added dynamic top margin to push India vs Abroad down in PDF */}
       {analysis.india_vs_abroad_guidance && (
-        <section className={`avoid-break ${sp.section}`}>
+        <section 
+          className={`avoid-break ${sp.section}`}
+          style={isPdfMode ? { marginTop: '80px' } : {}}
+        >
           <SectionHeading
             icon={Globe}
             title="India vs Abroad — Your Path"
@@ -843,8 +845,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
-      
-      {/* FIX: Removed the leftover <PdfFooter /> tag that was causing the crash */}
 
     </div>
   )
@@ -863,7 +863,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [elapsed,      setElapsed]      = useState(0)
   const [retryTrigger, setRetryTrigger] = useState(0)
 
-  // Elapsed timer while analyzing
   useEffect(() => {
     let timer
     if (analyzing) {
@@ -875,7 +874,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     return () => clearInterval(timer)
   }, [analyzing])
 
-  // Load / generate report
   useEffect(() => {
     const load = async () => {
       if (!assessmentId) { setError('No assessment ID found.'); setLoading(false); return }
@@ -926,7 +924,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
-  // PDF download with watermark + page numbers
   const handleDownloadPdf = async () => {
     setIsDownloading(true)
     setIsPdfMode(true)
@@ -1030,8 +1027,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-
-      {/* Download button — web only */}
       {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
           <Button
