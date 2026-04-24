@@ -75,27 +75,6 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 )
 
 // ─────────────────────────────────────────────
-// PDF FOOTER — branding at bottom of last page
-// ─────────────────────────────────────────────
-const PdfFooter = () => (
-  <div style={{
-    marginTop: '32px',
-    paddingTop: '12px',
-    borderTop: '1px solid #e2e8f0',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }}>
-    <div style={{ fontSize: '9px', color: '#94a3b8' }}>
-      © {new Date().getFullYear()} SARATHI · sarathi-ai.in · Empowering Student Clarity
-    </div>
-    <div style={{ fontSize: '9px', color: '#cbd5e1' }}>
-      This report is personalised and confidential.
-    </div>
-  </div>
-)
-
-// ─────────────────────────────────────────────
 // PROFILE BADGE — percentile ranking visual
 // Pure inline styles — renders perfectly in PDF
 // ─────────────────────────────────────────────
