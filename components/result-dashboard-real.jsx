@@ -80,6 +80,140 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   </div>
 )
 
+// ─────────────────────────────────────────────
+// 🚀 ADDED: PROFILE BADGE DEFINITION
+// ─────────────────────────────────────────────
+const ProfileBadge = ({ radarScores, isPdfMode }) => {
+  if (!radarScores) return null
+
+  const dims = [
+    { key: 'Personality',            label: 'Personality'  },
+    { key: 'Aptitude',               label: 'Aptitude'     },
+    { key: 'Motivation',             label: 'Motivation'   },
+    { key: 'Career Interests',       label: 'Career Focus' },
+    { key: 'Behavioural Tendencies', label: 'Behaviour'    },
+  ]
+    .map(d => ({ ...d, score: Number(radarScores[d.key]) || 0 }))
+    .sort((a, b) => b.score - a.score)
+
+  const top1    = dims[0]
+  const top2    = dims[1]
+  const overall = Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length)
+
+  const toPercentile = (score) => {
+    if (score >= 90) return 10
+    if (score >= 85) return 15
+    if (score >= 80) return 20
+    if (score >= 75) return 25
+    if (score >= 70) return 30
+    return Math.max(5, 100 - score)
+  }
+
+  const percentile = toPercentile(top1.score)
+
+  const BADGE_TIERS = [
+    { min: 85, color: '#F57D14', bg: 'rgba(245,125,20,0.08)',  border: 'rgba(245,125,20,0.25)',  label: 'Elite Profile'    },
+    { min: 75, color: '#0A2351', bg: 'rgba(10,35,81,0.06)',    border: 'rgba(10,35,81,0.18)',    label: 'Strong Profile'   },
+    { min: 65, color: '#3b82f6', bg: 'rgba(59,130,246,0.06)',  border: 'rgba(59,130,246,0.18)',  label: 'Solid Profile'    },
+    { min: 0,  color: '#64748b', bg: 'rgba(100,116,139,0.06)', border: 'rgba(100,116,139,0.18)', label: 'Emerging Profile' },
+  ]
+  const tier = BADGE_TIERS.find(t => overall >= t.min) || BADGE_TIERS[3]
+
+  return (
+    <div
+      className="avoid-break"
+      style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: isPdfMode ? 10 : 14,
+        marginBottom: isPdfMode ? 16 : 28,
+        alignItems: 'stretch',
+      }}
+    >
+      <div style={{
+        flex: '1 1 220px',
+        background: tier.bg,
+        border: `1.5px solid ${tier.border}`,
+        borderRadius: isPdfMode ? 12 : 18,
+        padding: isPdfMode ? '14px 18px' : '20px 24px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: isPdfMode ? 12 : 16,
+      }}>
+        <div style={{
+          width: isPdfMode ? 44 : 56,
+          height: isPdfMode ? 44 : 56,
+          borderRadius: '50%',
+          background: tier.color,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          fontSize: isPdfMode ? 20 : 26,
+        }}>
+          🏅
+        </div>
+        <div>
+          <div style={{
+            fontSize: isPdfMode ? 9 : 10,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase',
+            color: tier.color,
+            marginBottom: 3,
+          }}>
+            {tier.label}
+          </div>
+          <div style={{
+            fontSize: isPdfMode ? 16 : 20,
+            fontWeight: 800,
+            color: '#0A2351',
+            lineHeight: 1.2,
+          }}>
+            Top {percentile}% {top1.label} Profile
+          </div>
+          <div style={{ fontSize: isPdfMode ? 11 : 13, color: '#64748b', marginTop: 3 }}>
+            Stronger than {100 - percentile}% of students assessed
+          </div>
+        </div>
+      </div>
+
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: isPdfMode ? 6 : 10,
+        flex: '0 1 auto',
+        minWidth: isPdfMode ? 140 : 160,
+      }}>
+        {[top1, top2, { label: 'Overall', score: overall, isOverall: true }].map((d, i) => (
+          <div key={i} style={{
+            background: '#ffffff',
+            border: '1px solid #e2e8f0',
+            borderRadius: isPdfMode ? 8 : 12,
+            padding: isPdfMode ? '8px 12px' : '10px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            gap: 12,
+          }}>
+            <span style={{ fontSize: isPdfMode ? 11 : 12, fontWeight: 600, color: '#334155' }}>
+              {d.label}
+            </span>
+            <span style={{
+              fontSize: isPdfMode ? 13 : 15,
+              fontWeight: 800,
+              color: i === 0 ? '#F57D14' : '#0A2351',
+            }}>
+              {d.score}
+              <span style={{ fontSize: isPdfMode ? 9 : 10, fontWeight: 500, color: '#94a3b8' }}>/100</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   <div className={`flex items-center gap-3 ${isPdfMode ? 'mb-3' : 'mb-6'}`}>
     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] shrink-0">
@@ -393,7 +527,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* 🚀 ADDED THE BADGE COMPONENT RIGHT HERE */}
+      {/* 🚀 ADDED: PROFILE BADGE CALL */}
       <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
 
       <section className={`avoid-break ${sp.section}`}>
