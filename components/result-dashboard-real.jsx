@@ -843,9 +843,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
-
-      {/* PDF branded footer */}
-      {isPdfMode && <PdfFooter />}
+      
+      {/* FIX: Removed the leftover <PdfFooter /> tag that was causing the crash */}
 
     </div>
   )
