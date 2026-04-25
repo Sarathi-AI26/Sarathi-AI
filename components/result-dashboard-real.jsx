@@ -43,7 +43,87 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// PDF HEADER — LARGER LOGO
+// COURSE LINKS — maps certification names to
+// official URLs so students can act immediately
+// Add more as needed; matching is case-insensitive
+// ─────────────────────────────────────────────
+const CERT_LINKS = {
+  // Product Management
+  'certified scrum product owner':       'https://www.scrumalliance.org/get-certified/product-owner-track/certified-scrum-product-owner',
+  'cspo':                                'https://www.scrumalliance.org/get-certified/product-owner-track/certified-scrum-product-owner',
+  'product school':                      'https://productschool.com/product-management-certification',
+  'aipmm':                               'https://aipmm.com/cpm/',
+  'pragmatic institute':                 'https://www.pragmaticinstitute.com/product/',
+  'google project management':           'https://grow.google/certificates/project-management/',
+
+  // Data Science & Analytics
+  'ibm data science':                    'https://www.coursera.org/professional-certificates/ibm-data-science',
+  'google professional data engineer':   'https://cloud.google.com/learn/certification/data-engineer',
+  'google data analytics':               'https://grow.google/certificates/data-analytics/',
+  'tableau':                             'https://www.tableau.com/learn/certification',
+  'microsoft power bi':                  'https://learn.microsoft.com/en-us/credentials/certifications/power-bi-data-analyst-associate/',
+
+  // Cloud & Engineering
+  'aws certified':                       'https://aws.amazon.com/certification/',
+  'aws solutions architect':             'https://aws.amazon.com/certification/certified-solutions-architect-associate/',
+  'aws certified developer':             'https://aws.amazon.com/certification/certified-developer-associate/',
+  'google cloud':                        'https://cloud.google.com/learn/certification',
+  'google cloud associate':              'https://cloud.google.com/learn/certification/cloud-engineer',
+  'google cloud professional':           'https://cloud.google.com/learn/certification/cloud-architect',
+  'azure':                               'https://learn.microsoft.com/en-us/certifications/',
+
+  // Management & Consulting
+  'pmp':                                 'https://www.pmi.org/certifications/project-management-pmp',
+  'project management professional':     'https://www.pmi.org/certifications/project-management-pmp',
+  'certified management consultant':     'https://www.imcusa.org/page/WhatisCMC',
+  'cmc':                                 'https://www.imcusa.org/page/WhatisCMC',
+  'shrm':                                'https://www.shrm.org/credentials',
+  'lean startup':                        'https://theleanstartup.com/',
+
+  // Finance
+  'cfa':                                 'https://www.cfainstitute.org/en/programs/cfa',
+  'ca':                                  'https://www.icai.org/',
+  'icai':                                'https://www.icai.org/',
+  'cpa':                                 'https://www.aicpa-cima.com/certifications/certified-public-accountant-cpa',
+  'frm':                                 'https://www.garp.org/frm',
+
+  // Marketing & Design
+  'google digital marketing':            'https://grow.google/certificates/digital-marketing-ecommerce/',
+  'hubspot':                             'https://academy.hubspot.com/certifications',
+  'meta certified':                      'https://www.facebook.com/business/learn/certification',
+  'ui/ux':                               'https://www.coursera.org/professional-certificates/google-ux-design',
+  'google ux':                           'https://grow.google/certificates/ux-design/',
+
+  // Legal / UPSC
+  'upsc':                                'https://upsc.gov.in/',
+  'clat':                                'https://consortiumofnlus.ac.in/',
+  'bar council':                         'https://www.barcouncilofindia.org/',
+
+  // Healthcare
+  'usmle':                               'https://www.usmle.org/',
+  'neet':                                'https://nta.ac.in/neet',
+  'fmge':                                'https://natboard.edu.in/',
+
+  // General / MBA
+  'cat':                                 'https://iimcat.ac.in/',
+  'gmat':                                'https://www.mba.com/exams/gmat-exam',
+  'gre':                                 'https://www.ets.org/gre',
+  'ielts':                               'https://www.ielts.org/',
+  'toefl':                               'https://www.ets.org/toefl',
+  'coursera':                            'https://www.coursera.org/',
+  'linkedin learning':                   'https://www.linkedin.com/learning/',
+  'udemy':                               'https://www.udemy.com/',
+}
+
+// Finds a URL for a cert name using fuzzy case-insensitive matching
+const getCertUrl = (certName) => {
+  const lower = certName.toLowerCase()
+  const match = Object.keys(CERT_LINKS).find(key => lower.includes(key))
+  return match ? CERT_LINKS[match] : null
+}
+
+// ─────────────────────────────────────────────
+// PDF HEADER — uses your actual logo image
 // ─────────────────────────────────────────────
 const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   <div style={{
@@ -55,33 +135,49 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
     marginBottom: '24px',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-      
-      <img 
-        src="/logo-horizontal.png" 
-        alt="SARATHI" 
-        style={{ height: '80px', width: 'auto', objectFit: 'contain' }} 
+      <img
+        src="/logo-horizontal.png"
+        alt="SARATHI"
+        style={{ height: '80px', width: 'auto', objectFit: 'contain' }}
       />
-
-      <div style={{ height: '48px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
-
+      <div style={{ height: '48px', width: '2px', backgroundColor: '#e2e8f0' }} />
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
       </div>
-
     </div>
     <div style={{ textAlign: 'right' }}>
       <div style={{ fontSize: '15px', fontWeight: '700', color: '#0A2351' }}>{studentName}</div>
       <div style={{ fontSize: '12px', color: '#F57D14', fontWeight: '700', marginTop: '4px' }}>{archetype}</div>
-      <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px' }}>
-        Generated {generatedDate}
-      </div>
+      <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px' }}>Generated {generatedDate}</div>
     </div>
   </div>
 )
 
 // ─────────────────────────────────────────────
-// 🚀 ADDED: PROFILE BADGE DEFINITION
+// PDF FOOTER — branding at bottom of last page
+// ─────────────────────────────────────────────
+const PdfFooter = () => (
+  <div style={{
+    marginTop: '32px',
+    paddingTop: '12px',
+    borderTop: '1px solid #e2e8f0',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }}>
+    <div style={{ fontSize: '9px', color: '#94a3b8' }}>
+      © {new Date().getFullYear()} SARATHI · sarathi-ai.in · Empowering Student Clarity
+    </div>
+    <div style={{ fontSize: '9px', color: '#cbd5e1' }}>
+      This report is personalised and confidential.
+    </div>
+  </div>
+)
+
+// ─────────────────────────────────────────────
+// PROFILE BADGE — percentile ranking visual
+// Pure inline styles — renders perfectly in PDF
 // ─────────────────────────────────────────────
 const ProfileBadge = ({ radarScores, isPdfMode }) => {
   if (!radarScores) return null
@@ -130,6 +226,7 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
         alignItems: 'stretch',
       }}
     >
+      {/* Main badge */}
       <div style={{
         flex: '1 1 220px',
         background: tier.bg,
@@ -178,6 +275,7 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
         </div>
       </div>
 
+      {/* Score pills */}
       <div style={{
         display: 'flex',
         flexDirection: 'column',
@@ -214,6 +312,9 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
   )
 }
 
+// ─────────────────────────────────────────────
+// SECTION HEADING
+// ─────────────────────────────────────────────
 const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   <div className={`flex items-center gap-3 ${isPdfMode ? 'mb-3' : 'mb-6'}`}>
     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] shrink-0">
@@ -226,7 +327,9 @@ const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   </div>
 )
 
-// 🚀 NEW: Timer-aware Loading View
+// ─────────────────────────────────────────────
+// LOADING VIEW — timer-aware with retry warning
+// ─────────────────────────────────────────────
 const LoadingView = ({ analyzing, elapsed }) => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center">
     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-[#F57D14]/10">
@@ -240,8 +343,6 @@ const LoadingView = ({ analyzing, elapsed }) => (
         ? 'Our AI is reading all 60 of your answers. This takes about 30 seconds — please do not refresh.'
         : 'Fetching your results...'}
     </p>
-
-    {/* 🚀 NEW: Dynamic Retry Warning if taking longer than 20 seconds */}
     {analyzing && elapsed > 20 && (
       <div className="mt-6 max-w-md rounded-xl bg-amber-50 border border-amber-200 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
         <div className="flex items-start gap-3">
@@ -249,19 +350,22 @@ const LoadingView = ({ analyzing, elapsed }) => (
           <div>
             <p className="text-sm font-bold text-amber-800">Still working — retrying automatically...</p>
             <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-              Gemini AI is currently experiencing peak traffic. We are actively retrying your request. This can take up to 60 seconds. Please do not close the page.
+              Gemini AI is currently experiencing peak traffic. We are actively retrying. This can take up to 60 seconds. Please do not close the page.
             </p>
           </div>
         </div>
       </div>
     )}
-
     <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
-      <Loader2 className="h-4 w-4 animate-spin" /> {analyzing && elapsed > 0 ? `Processing... (${elapsed}s)` : 'Processing...'}
+      <Loader2 className="h-4 w-4 animate-spin" />
+      {analyzing && elapsed > 0 ? `Processing... (${elapsed}s)` : 'Processing...'}
     </div>
   </div>
 )
 
+// ─────────────────────────────────────────────
+// IDENTITY STATEMENT
+// ─────────────────────────────────────────────
 const IdentityStatement = ({ statement, isPdfMode }) => (
   <div className={`avoid-break relative overflow-hidden rounded-2xl bg-[#0A2351] ${isPdfMode ? 'p-5 mb-4' : 'p-8 mb-8'}`}>
     <div className="absolute top-4 left-6 opacity-10">
@@ -279,6 +383,9 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
   </div>
 )
 
+// ─────────────────────────────────────────────
+// STRENGTH SIGNALS
+// ─────────────────────────────────────────────
 const StrengthSignals = ({ signals, isPdfMode }) => {
   if (!signals?.length) return null
   return (
@@ -290,7 +397,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
           return (
             <div
               key={i}
-              className={`rounded-2xl border border-slate-100 bg-white p-4 flex gap-3 items-start ${isPdfMode ? '' : 'shadow-sm hover:shadow-md transition-all'}`}
+              className={`avoid-break rounded-2xl border border-slate-100 bg-white p-4 flex gap-3 items-start ${isPdfMode ? '' : 'shadow-sm hover:shadow-md transition-all'}`}
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F57D14]/10">
                 <Icon className="h-4 w-4 text-[#F57D14]" />
@@ -307,13 +414,17 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
   )
 }
 
+// ─────────────────────────────────────────────
+// CAREER COMPATIBILITY CHART — pure CSS bars
+// Always renders in PDF (no Recharts SVG dependency)
+// ─────────────────────────────────────────────
 const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
-  
+
   const data = careers.map((c, i) => ({
     name: c.career_title?.split(',')[0] || c.career_title,
-    score: c.compatibility_score || 85,
-    color: i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'
+    score: Math.min(100, Math.max(0, Number(c.compatibility_score) || 85)),
+    color: i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8',
   }))
 
   return (
@@ -329,7 +440,7 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
                 </div>
                 <div className="flex-1 flex items-center h-7 bg-white rounded-r-md overflow-hidden border border-slate-100">
                   <div
-                    className="h-full flex items-center justify-end pr-2 transition-all duration-700"
+                    className="h-full flex items-center justify-end pr-2"
                     style={{ width: `${item.score}%`, backgroundColor: item.color }}
                   >
                     <span className="text-[10px] font-bold text-white">{item.score}%</span>
@@ -338,10 +449,10 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex gap-4 text-xs text-slate-400 flex-wrap">
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#F57D14]"/>Best match</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#0A2351]"/>Strong match</span>
-            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-300"/>Good match</span>
+          <div className="mt-4 flex gap-4 text-xs text-slate-400 flex-wrap border-t border-slate-100 pt-3">
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#F57D14]" />Best match</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#0A2351]" />Strong match</span>
+            <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-300" />Good match</span>
           </div>
         </CardContent>
       </Card>
@@ -349,6 +460,9 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   )
 }
 
+// ─────────────────────────────────────────────
+// WHAT TO AVOID
+// ─────────────────────────────────────────────
 const WhatToAvoid = ({ items, isPdfMode }) => {
   if (!items?.length) return null
   return (
@@ -358,7 +472,7 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
         {items.map((item, i) => (
           <div
             key={i}
-            className={`rounded-2xl border border-red-100 bg-red-50/60 p-4 ${isPdfMode ? 'mb-2' : ''}`}
+            className={`avoid-break rounded-2xl border border-red-100 bg-red-50/60 p-4 ${isPdfMode ? 'mb-2' : ''}`}
           >
             <div className="flex items-start gap-3">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-100 mt-0.5">
@@ -379,6 +493,9 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
   )
 }
 
+// ─────────────────────────────────────────────
+// ROADMAP TIMELINE
+// ─────────────────────────────────────────────
 const RoadmapTimeline = ({ steps, isPdfMode }) => {
   const colors = ['#3b82f6', '#6366f1', '#F57D14', '#f59e0b', '#0A2351']
   return (
@@ -392,7 +509,7 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
           <div
             key={i}
             className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-2' : 'mb-6'}`}
-            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            style={{ pageBreakInside: 'avoid', breakInside: 'avoid', orphans: 3, widows: 3 }}
           >
             {!isPdfMode && (
               <div className="relative flex-shrink-0">
@@ -415,16 +532,15 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
                   </div>
                 )}
                 <div>
-                  <span
-                    className="text-xs font-bold uppercase tracking-wider"
-                    style={{ color: colors[i] }}
-                  >
+                  <span className="text-xs font-bold uppercase tracking-wider" style={{ color: colors[i] }}>
                     {step.label}
                   </span>
                   <p className="font-bold text-[#0A2351] text-base leading-tight">{step.title}</p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-slate-600">{step.data}</p>
+              <p className="text-sm leading-relaxed text-slate-600" style={{ orphans: 3, widows: 3 }}>
+                {step.data}
+              </p>
             </div>
           </div>
         )
@@ -433,14 +549,17 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
   )
 }
 
+// ─────────────────────────────────────────────
+// FULL REPORT VIEW
+// ─────────────────────────────────────────────
 const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const sp = isPdfMode
     ? { section: 'mb-4', text: 'text-sm' }
     : { section: 'mb-8', text: 'text-lg' }
 
-  const profile = analysis?.psychometric_profile || {}
-  const roadmap = analysis?.five_year_roadmap || {}
-  const immediateAction = analysis?.immediate_action_plan || {}
+  const profile          = analysis?.psychometric_profile || {}
+  const roadmap          = analysis?.five_year_roadmap || {}
+  const immediateAction  = analysis?.immediate_action_plan || {}
   const executiveSummaryParagraphs = parseExecutiveSummary(analysis?.executive_summary)
 
   const rawScores = analysis?.radar_chart_scores || {}
@@ -472,6 +591,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
+      {/* PDF global styles */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
@@ -480,6 +600,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         `}} />
       )}
 
+      {/* PDF branded header */}
       {isPdfMode && (
         <PdfHeader
           studentName={studentName}
@@ -488,18 +609,17 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
       )}
 
+      {/* Web hero */}
       {!isPdfMode && (
         <section className="avoid-break rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
               <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
             </div>
-            
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
               {studentName}, you are a{' '}
               <span className="text-[#F57D14]">{analysis.user_archetype}</span>
             </h1>
-            
             <p className="mt-4 text-lg text-white/70 max-w-2xl">
               This roadmap was built from your 60 answers — every word of it is specific to you.
             </p>
@@ -508,6 +628,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* PDF hero compact */}
       {isPdfMode && (
         <section className="avoid-break rounded-xl bg-[#0A2351] p-5 mb-4 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-2">
@@ -523,13 +644,15 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* Identity Statement */}
       {analysis.identity_statement && (
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* 🚀 ADDED: PROFILE BADGE CALL */}
+      {/* Profile Badge — sits right after identity, fills page 1 */}
       <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
 
+      {/* Executive Summary */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={BrainCircuit}
@@ -546,14 +669,25 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </Card>
       </section>
 
+      {/* Strength Signals */}
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'}>
-        <section className={`avoid-break ${sp.section}`}>
+      {/* Radar + DNA — side-by-side in PDF using CSS grid */}
+      <div
+        style={isPdfMode ? {
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '12px',
+          marginBottom: '16px',
+        } : undefined}
+        className={isPdfMode ? '' : 'grid gap-6 lg:grid-cols-2 mb-8'}
+      >
+        {/* Psychometric Dimensions */}
+        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none">
             <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
-              <div className={isPdfMode ? 'h-[190px]' : 'h-[250px]'}>
+              <div style={{ height: isPdfMode ? 220 : 250 }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
                     <PolarGrid stroke="#cbd5e1" />
@@ -588,7 +722,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           </Card>
         </section>
 
-        <section className={`avoid-break ${sp.section}`}>
+        {/* Psychometric DNA */}
+        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Compass} title="Psychometric DNA" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none">
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
@@ -644,8 +779,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
+      {/* Career Compatibility Chart */}
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
+      {/* Career Match Detail Cards */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={Target}
@@ -657,13 +794,11 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           {(analysis.top_career_matches || []).map((match, i) => (
             <Card
               key={i}
-              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
             >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
-                    Prime Match
-                  </p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Prime Match</p>
                   {match.compatibility_score && (
                     <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
                       {match.compatibility_score}% match
@@ -673,7 +808,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                 <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
                   {match.career_title}
                 </h3>
-                <p className="text-sm text-slate-500 mb-2">
+                <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
                   {match.match_reason || match.why_it_fits}
                 </p>
                 {match.growth_path && (
@@ -701,8 +836,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       </section>
 
+      {/* What to Avoid */}
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
+      {/* Growth Warnings */}
       {blindSpots.length > 0 && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -721,7 +858,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                         ? <AlertTriangle className="h-4 w-4 text-red-500" />
                         : <span className="mt-1.5 block h-1.5 w-1.5 rounded-full bg-orange-400" />}
                     </span>
-                    <span className={`text-sm leading-relaxed ${spot.isSevere ? 'text-red-700 font-medium' : 'text-orange-900/80'}`}>
+                    <span
+                      className={`text-sm leading-relaxed ${spot.isSevere ? 'text-red-700 font-medium' : 'text-orange-900/80'}`}
+                      style={{ orphans: 3, widows: 3 }}
+                    >
                       {spot.text}
                     </span>
                   </li>
@@ -732,6 +872,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* Action Plan */}
       {immediateAction?.next_30_days && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -773,6 +914,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* India vs Abroad */}
       {analysis.india_vs_abroad_guidance && (
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading
@@ -791,6 +933,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* 5-Year Roadmap */}
       <section className={`avoid-break ${isPdfMode ? 'pt-2' : 'mt-4'}`}>
         <SectionHeading
           icon={TrendingUp}
@@ -801,6 +944,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
+      {/* PDF branded footer */}
+      {isPdfMode && <PdfFooter />}
+
     </div>
   )
 }
@@ -809,50 +955,43 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 const ResultDashboardReal = ({ assessmentId, onReady }) => {
-  const [loading, setLoading] = useState(true)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [assessment, setAssessment] = useState(null)
-  const [error, setError] = useState('')
-  const [isPdfMode, setIsPdfMode] = useState(false)
-  const [isDownloading, setIsDownloading] = useState(false)
-  
-  const [elapsed, setElapsed] = useState(0)
+  const [loading,      setLoading]      = useState(true)
+  const [analyzing,    setAnalyzing]    = useState(false)
+  const [assessment,   setAssessment]   = useState(null)
+  const [error,        setError]        = useState('')
+  const [isPdfMode,    setIsPdfMode]    = useState(false)
+  const [isDownloading,setIsDownloading]= useState(false)
+  const [elapsed,      setElapsed]      = useState(0)
   const [retryTrigger, setRetryTrigger] = useState(0)
 
+  // Elapsed timer while analyzing
   useEffect(() => {
-    let timer;
+    let timer
     if (analyzing) {
-      setElapsed(0);
-      timer = setInterval(() => {
-        setElapsed(prev => prev + 1);
-      }, 1000);
+      setElapsed(0)
+      timer = setInterval(() => setElapsed(prev => prev + 1), 1000)
     } else {
-      setElapsed(0);
+      setElapsed(0)
     }
-    return () => clearInterval(timer);
-  }, [analyzing]);
+    return () => clearInterval(timer)
+  }, [analyzing])
 
+  // Load / generate report
   useEffect(() => {
     const load = async () => {
-      if (!assessmentId) {
-        setError('No assessment ID found.')
-        setLoading(false)
-        return
-      }
-      
+      if (!assessmentId) { setError('No assessment ID found.'); setLoading(false); return }
+
       setError('')
 
       try {
-        const res = await fetch(`/api/results/${assessmentId}`)
+        const res  = await fetch(`/api/results/${assessmentId}`)
         const data = await res.json()
         if (!res.ok) throw new Error(data?.error || 'Failed to load')
 
         const current = data?.assessment
 
         if (current?.payment_status && hasFullAnalysis(current?.ai_analysis_result)) {
-          setAssessment(current)
-          setLoading(false)
-          return
+          setAssessment(current); setLoading(false); return
         }
 
         if (current?.payment_status) {
@@ -860,14 +999,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           const r = await fetch('/api/generate-roadmap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ assessmentId, mode: 'full' }),
+            body: JSON.stringify({ assessmentId }),
           })
           const d = await r.json()
           if (!r.ok) throw new Error(d?.error || 'Generation failed')
           setAssessment(d?.assessment)
-          setAnalyzing(false)
-          setLoading(false)
-          return
+          setAnalyzing(false); setLoading(false); return
         }
 
         window.location.href = `/checkout?assessmentId=${assessmentId}`
@@ -882,9 +1019,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   }, [assessmentId, retryTrigger])
 
   useEffect(() => {
-    if (!loading && !analyzing && !error && assessment) {
-      if (onReady) onReady()
-    }
+    if (!loading && !analyzing && !error && assessment && onReady) onReady()
   }, [loading, analyzing, error, assessment, onReady])
 
   const studentName = useMemo(
@@ -892,81 +1027,82 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
+  // PDF download with watermark + page numbers
   const handleDownloadPdf = async () => {
     setIsDownloading(true)
-    setIsPdfMode(true) 
+    setIsPdfMode(true)
 
-    await new Promise(resolve => setTimeout(resolve, 1500)) 
+    await new Promise(resolve => setTimeout(resolve, 1500))
 
     const html2pdf = (await import('html2pdf.js')).default
-    const element = document.getElementById('pdf-wrapper')
+    const element  = document.getElementById('pdf-wrapper')
 
-    const watermarkUrl = typeof window !== 'undefined' ? `${window.location.origin}/icon.png` : '/icon.png';
-    const watermarkImg = new Image();
-    watermarkImg.crossOrigin = "anonymous";
-    watermarkImg.src = watermarkUrl;
-    
-    await new Promise((resolve) => {
-      watermarkImg.onload = resolve;
-      watermarkImg.onerror = () => {
-        console.warn("Watermark image failed to load. Proceeding without it.");
-        resolve(); 
-      };
-    });
+    const watermarkUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/icon.png`
+      : '/icon.png'
+
+    const watermarkImg = new Image()
+    watermarkImg.crossOrigin = 'anonymous'
+    watermarkImg.src = watermarkUrl
+
+    await new Promise(resolve => {
+      watermarkImg.onload  = resolve
+      watermarkImg.onerror = () => { console.warn('Watermark image failed to load.'); resolve() }
+    })
 
     const opt = {
-      margin:       [15, 10, 15, 10], 
-      filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
-      image:        { type: 'jpeg', quality: 0.98 },
-      html2canvas:  { 
-        scale: 2, 
-        useCORS: true, 
-        scrollY: 0,
-        windowWidth: 780 
-      },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: 'css', before: '#nextpage1' } 
+      margin:      [15, 10, 15, 10],
+      filename:    `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
+      image:       { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true, scrollY: 0, windowWidth: 780 },
+      jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' },
+      pagebreak:   { mode: 'css', before: '#nextpage1' },
     }
 
-    html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
-      const totalPages = pdf.internal.getNumberOfPages();
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      
-      const wmSize = 100;
-      const wmX = (pageWidth - wmSize) / 2;
-      const wmY = (pageHeight - wmSize) / 2;
-      
-      for (let i = 1; i <= totalPages; i++) {
-        pdf.setPage(i);
-        
-        if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
-          pdf.setGState(new pdf.GState({ opacity: 0.05 }));
-          pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
-          pdf.setGState(new pdf.GState({ opacity: 1.0 }));
-        }
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .toPdf()
+      .get('pdf')
+      .then(pdf => {
+        const totalPages = pdf.internal.getNumberOfPages()
+        const pageWidth  = pdf.internal.pageSize.getWidth()
+        const pageHeight = pdf.internal.pageSize.getHeight()
+        const wmSize = 100
+        const wmX = (pageWidth  - wmSize) / 2
+        const wmY = (pageHeight - wmSize) / 2
 
-        pdf.setFontSize(8);
-        pdf.setTextColor(150);
-        const text = `SARATHI Career Roadmap Report | ${studentName} | Page ${i} of ${totalPages} | This report is personalised and confidential`; 
-        
-        pdf.text(text, pageWidth / 2, pageHeight - 8, {
-          align: 'center'
-        });
-      }
-    }).save().then(() => {
-        setIsPdfMode(false)
-        setIsDownloading(false)
-    });
+        for (let i = 1; i <= totalPages; i++) {
+          pdf.setPage(i)
+          if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
+            pdf.setGState(new pdf.GState({ opacity: 0.05 }))
+            pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize)
+            pdf.setGState(new pdf.GState({ opacity: 1.0 }))
+          }
+          pdf.setFontSize(8)
+          pdf.setTextColor(150)
+          pdf.text(
+            `SARATHI Career Roadmap | ${studentName} | Page ${i} of ${totalPages}`,
+            pageWidth / 2,
+            pageHeight - 8,
+            { align: 'center' }
+          )
+        }
+      })
+      .save()
+      .then(() => { setIsPdfMode(false); setIsDownloading(false) })
   }
 
   if (loading || analyzing) return <LoadingView analyzing={analyzing} elapsed={elapsed} />
 
   if (error) {
-    const isGenerationError = error.toLowerCase().includes('503') || 
-                              error.toLowerCase().includes('failed') || 
-                              error.toLowerCase().includes('ai') || 
-                              error.toLowerCase().includes('generation');
+    const isGenerationError =
+      error.toLowerCase().includes('503')        ||
+      error.toLowerCase().includes('failed')     ||
+      error.toLowerCase().includes('ai')         ||
+      error.toLowerCase().includes('generation') ||
+      error.toLowerCase().includes('demand')     ||
+      error.toLowerCase().includes('retrying')
 
     return (
       <div className="container mx-auto py-20 text-center">
@@ -974,10 +1110,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-4" />
           <p className="font-bold text-red-700 text-lg mb-2">Oops! Something went wrong.</p>
           <p className="text-sm text-red-600/80 mb-6">{error}</p>
-          
           {isGenerationError ? (
-            <Button onClick={() => setRetryTrigger(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
-              Try Again (Data is Saved)
+            <Button
+              onClick={() => { setLoading(true); setRetryTrigger(prev => prev + 1) }}
+              className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12"
+            >
+              Try Again (Your answers are saved)
             </Button>
           ) : (
             <Button asChild className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
@@ -993,18 +1131,19 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
+
+      {/* Download button — web only */}
       {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
-          <Button 
-            onClick={handleDownloadPdf} 
+          <Button
+            onClick={handleDownloadPdf}
             disabled={isDownloading}
             className="bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
           >
-            {isDownloading ? (
-              <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
-            ) : (
-              'Download Career Roadmap PDF'
-            )}
+            {isDownloading
+              ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
+              : 'Download Career Roadmap PDF'
+            }
           </Button>
         </div>
       )}
