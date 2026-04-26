@@ -43,7 +43,57 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// PDF HEADER — LARGER LOGO
+// 🚀 NEW: FEEDBACK BUTTONS COMPONENT
+// ─────────────────────────────────────────────
+const FeedbackButtons = ({ assessmentId, careerTitle }) => {
+  const [voted, setVoted] = useState(null) // 'up' | 'down' | null
+
+  const handleVote = async (rating) => {
+    if (voted) return // prevent double voting
+    setVoted(rating)
+    try {
+      await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assessmentId, careerTitle, rating }),
+      })
+    } catch {
+      // silent fail — don't disrupt the student experience
+    }
+  }
+
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-3">
+      <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+        Does this feel accurate?
+      </p>
+      <button
+        onClick={() => handleVote('up')}
+        disabled={!!voted}
+        className={`text-lg transition-all ${voted === 'up' ? 'opacity-100 scale-110' : voted ? 'opacity-30' : 'opacity-60 hover:opacity-100 hover:scale-110'}`}
+        title="Yes, this fits me"
+      >
+        👍
+      </button>
+      <button
+        onClick={() => handleVote('down')}
+        disabled={!!voted}
+        className={`text-lg transition-all ${voted === 'down' ? 'opacity-100 scale-110' : voted ? 'opacity-30' : 'opacity-60 hover:opacity-100 hover:scale-110'}`}
+        title="No, this doesn't fit me"
+      >
+        👎
+      </button>
+      {voted && (
+        <span className="text-[10px] text-slate-400 italic animate-in fade-in">
+          {voted === 'up' ? 'Thanks — helps us improve accuracy.' : 'Noted — your feedback trains the system.'}
+        </span>
+      )}
+    </div>
+  )
+}
+
+// ─────────────────────────────────────────────
+// PDF HEADER
 // ─────────────────────────────────────────────
 const PdfHeader = ({ studentName, archetype, generatedDate }) => (
   <div style={{
@@ -81,7 +131,7 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 )
 
 // ─────────────────────────────────────────────
-// 🚀 ADDED: PROFILE BADGE DEFINITION
+// PROFILE BADGE
 // ─────────────────────────────────────────────
 const ProfileBadge = ({ radarScores, isPdfMode }) => {
   if (!radarScores) return null
@@ -226,7 +276,6 @@ const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   </div>
 )
 
-// 🚀 NEW: Timer-aware Loading View
 const LoadingView = ({ analyzing, elapsed }) => (
   <div className="flex min-h-[70vh] flex-col items-center justify-center p-8 text-center">
     <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-[#F57D14]/10">
@@ -241,7 +290,6 @@ const LoadingView = ({ analyzing, elapsed }) => (
         : 'Fetching your results...'}
     </p>
 
-    {/* 🚀 NEW: Dynamic Retry Warning if taking longer than 20 seconds */}
     {analyzing && elapsed > 20 && (
       <div className="mt-6 max-w-md rounded-xl bg-amber-50 border border-amber-200 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
         <div className="flex items-start gap-3">
@@ -338,7 +386,7 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
               </div>
             ))}
           </div>
-          <div className="mt-4 flex gap-4 text-xs text-slate-400 flex-wrap">
+          <div className="mt-4 flex gap-4 text-xs text-slate-400 flex-wrap border-t border-slate-100 pt-3">
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#F57D14]"/>Best match</span>
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-[#0A2351]"/>Strong match</span>
             <span className="flex items-center gap-1.5"><span className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-300"/>Good match</span>
@@ -527,8 +575,32 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* 🚀 ADDED: PROFILE BADGE CALL */}
       <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
+
+      {/* 🚀 NEW: Methodology Footnote (Page 1 of PDF only) */}
+      {isPdfMode && (
+        <div style={{
+          background: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: 8,
+          padding: '10px 14px',
+          marginBottom: 16,
+          display: 'flex',
+          gap: 8,
+          alignItems: 'flex-start',
+        }}>
+          <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
+          <p style={{ fontSize: 10, color: '#64748b', margin: 0, lineHeight: 1.6 }}>
+            <strong style={{ color: '#0A2351' }}>How this report was generated:</strong>{' '}
+            Your match scores are computed from 60 psychometric responses across 5 dimensions —
+            Personality, Aptitude, Motivation, Career Interests, and Behavioural Tendencies.
+            Career compatibility percentages reflect the alignment between your response profile
+            and validated role requirement clusters. Salary ranges are indicative based on
+            Naukri and LinkedIn India data (2024). All inferences are directional — treat this
+            as a starting point for exploration, not a definitive prescription.
+          </p>
+        </div>
+      )}
 
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
@@ -695,6 +767,15 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     ))}
                   </div>
                 )}
+                
+                {/* 🚀 NEW: Feedback Buttons (Web Only) */}
+                {!isPdfMode && (
+                  <FeedbackButtons
+                    assessmentId={assessmentId}
+                    careerTitle={match.career_title}
+                  />
+                )}
+
               </CardContent>
             </Card>
           ))}
