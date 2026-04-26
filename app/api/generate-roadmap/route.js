@@ -174,6 +174,7 @@ CONTENT RULES (non-negotiable):
 9. IDENTITY STATEMENT: One sentence. Must make the student feel deeply seen — like someone finally understood who they really are. Grounded in their actual data. Specific, not generic.
 10. STRENGTH SIGNALS: Based on their actual high-scoring dimensions. Evidence must cite a specific question.
 11. WHAT TO AVOID: Must be specific to their data. Name real role types, environments, or habits — not generic advice.
+12. LANGUAGE PRECISION: Never use "you are X" as a definitive statement. Always use "your scores suggest", "your profile indicates", "based on your responses". Never say "this is your path" — say "this appears to be your strongest fit based on current data". The archetype label is emotional shorthand — always follow it with one grounded evidence sentence.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 
@@ -204,7 +205,7 @@ const OUTPUT_SCHEMA = `{
       "compatibility_score": 90,
       "match_reason": "2-3 sentences written directly to the student...",
       "growth_path": "Entry Level Role → Mid Level Role → Senior Role",
-      "starting_salary_inr": "₹X LPA - ₹Y LPA",
+      "starting_salary_inr": "₹X LPA - ₹Y LPA (Source: Naukri/LinkedIn India, 2024)",
       "key_certifications": ["Specific Cert Name"]
     }
   ],
