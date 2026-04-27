@@ -245,7 +245,7 @@ const ContactForm = () => {
       </div>
 
       {status === 'error' && (
-        <p className="text-sm text-red-500">Something went wrong. Please email us directly at partners@sarathi-ai.in</p>
+        <p className="text-sm text-red-500">Something went wrong. Please email us directly at admin@sarathiapp.in</p>
       )}
 
       <Button
@@ -733,8 +733,8 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-widest text-white/40">Partnerships</p>
-                      <a href="mailto:partners@sarathi-ai.in" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
-                        partners@sarathi-ai.in
+                      <a href="mailto:admin@sarathiapp.in" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
+                        admin@sarathiapp.in
                       </a>
                     </div>
                   </div>
