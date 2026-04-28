@@ -20,6 +20,7 @@ import {
   Lock,
   TrendingUp,
   Loader2,
+  CalendarDays // <-- Added for the Calendly button replacement
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -28,29 +29,29 @@ import { Button } from '@/components/ui/button'
 // ─────────────────────────────────────────────
 
 const STATS = [
-  { icon: Users,         value: '500+',  label: 'Assessments Completed' },
-  { icon: GraduationCap, value: '6+',    label: 'Partner Colleges'       },
-  { icon: CheckCircle2,  value: '60',    label: 'Psychometric Dimensions' },
+  { icon: CheckCircle2,  value: '60',       label: 'Psychometric Dimensions' }, // Updated
+  { icon: Zap,           value: '15',       label: 'Minutes to Clarity' },      // Updated
+  { icon: Target,        value: '10,000+',  label: 'Career Data Points' },      // Updated
 ]
 
 const TESTIMONIALS = [
   {
     name: 'Rahul S.',
-    college: 'SRM University, B.Tech CSE',
+    college: 'Engineering Student', // Updated to generic for beta
     avatar: 'RS',
     quote:
       'I was torn between an MBA and starting a venture. The 5-year roadmap broke it down quarter by quarter and told me exactly what to do in the next 30 days. The ₹99 I paid felt like a steal.',
   },
   {
     name: 'Priya M.',
-    college: 'Delhi University, B.Com Hons',
+    college: 'Commerce Student', // Updated to generic for beta
     avatar: 'PM',
     quote:
       'The psychometric radar was unsettlingly accurate. It flagged my tendency to overthink before committing and recommended roles with structured decision-making. I avoided a wrong job offer because of it.',
   },
   {
     name: 'Neha T.',
-    college: 'VIT Vellore, B.Tech ECE',
+    college: 'Engineering Student', // Updated to generic for beta
     avatar: 'NT',
     quote:
       'Within 15 minutes I had a clear Year 1 and Year 2 action plan. I had already landed two internship interviews at companies the report specifically recommended targeting.',
@@ -136,15 +137,6 @@ const INSTITUTION_FEATURES = [
   'TPO dashboard with exportable reports for industry partners',
 ]
 
-const COLLEGES = [
-  'SRM University',
-  'Delhi University',
-  'VIT Vellore',
-  'Amity University',
-  'KIIT',
-  'Manipal',
-]
-
 // ─────────────────────────────────────────────
 // CONTACT FORM COMPONENT
 // ─────────────────────────────────────────────
@@ -152,7 +144,7 @@ const ContactForm = () => {
   const [formData, setFormData] = useState({
     name: '', designation: '', institution: '', email: '', batchSize: '',
   })
-  const [status, setStatus] = useState('idle') // idle | loading | success | error
+  const [status, setStatus] = useState('idle')
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -332,7 +324,6 @@ export default function Home() {
                     </Link>
                   </Button>
                   
-                  {/* 🚀 FIX: Connected the Hero button to your real PDF */}
                   <a
                     href="/sample-report.pdf"
                     target="_blank"
@@ -441,7 +432,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── SOCIAL PROOF BAR ── */}
+        {/* ── SOCIAL PROOF BAR (Temporarily Hidden for Beta) ── */}
+        {/*
         <section className="border-b border-slate-100 bg-white py-14">
           <div className="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <p className="mb-10 text-center text-xs font-bold uppercase tracking-widest text-slate-400">
@@ -454,8 +446,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+        */}
 
-        {/* ── STATS ── */}
+        {/* ── STATS (Updated for Beta) ── */}
         <section className="bg-slate-50 py-14">
           <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 gap-8 text-center md:grid-cols-3 md:divide-x md:divide-slate-200">
@@ -532,7 +525,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ── */}
+        {/* ── TESTIMONIALS (Placeholder) ── */}
         <section id="about" className="scroll-mt-24 bg-[#0A2351] py-20 lg:py-28">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
@@ -621,7 +614,7 @@ export default function Home() {
                 </ul>
                 <Button asChild className="mt-10 h-12 w-full rounded-full bg-[#F57D14] font-bold text-white hover:bg-[#dd6f11] shadow-xl shadow-[#F57D14]/30 transition-all hover:scale-105">
                   <Link href="/assessment">
-                    Get My Roadmap <ArrowRight className="ml-2 h-4 w-4" />
+                    Get My Roadmap - ₹99 <ArrowRight className="ml-2 h-4 w-4" /> {/* Fixed Price Copy */}
                   </Link>
                 </Button>
               </div>
@@ -716,14 +709,15 @@ export default function Home() {
                   </p>
                 </div>
                 <div className="space-y-6 border-t border-white/10 pt-8">
+                   {/* 🚀 FIX: Replaced direct phone number with a Demo link */}
                   <div className="flex items-center gap-4 group">
                     <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white/5 group-hover:bg-[#F57D14] transition-colors">
-                      <PhoneCall className="h-5 w-5 text-[#F57D14] group-hover:text-white" />
+                      <CalendarDays className="h-5 w-5 text-[#F57D14] group-hover:text-white" />
                     </div>
                     <div>
                       <p className="text-xs font-bold uppercase tracking-widest text-white/40">Enterprise Sales</p>
-                      <a href="tel:+918920857008" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
-                        +91 89208 57008
+                      <a href="mailto:admin@sarathiapp.in" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
+                         Schedule a Demo
                       </a>
                     </div>
                   </div>
@@ -750,15 +744,14 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ── */}
+        {/* ── FINAL CTA (Updated Footer Text) ── */}
         <section className="bg-[#F57D14] py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">
               Your career clarity is 15 minutes away.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base text-white/80">
-              Hundreds of students have already mapped their future with SARATHI.
-              The assessment is free. Your roadmap is waiting.
+              Join the first wave of Indian students mapping their future with SARATHI. The assessment is currently free.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild className="h-14 rounded-full bg-white px-10 text-base font-extrabold text-[#F57D14] shadow-2xl transition-all hover:scale-105 hover:bg-slate-100">
@@ -767,7 +760,6 @@ export default function Home() {
                 </Link>
               </Button>
               
-              {/* 🚀 FIX: Connected the CTA button to your real PDF */}
               <a
                 href="/sample-report.pdf"
                 target="_blank"
