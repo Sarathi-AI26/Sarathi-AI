@@ -282,11 +282,10 @@ ${OUTPUT_SCHEMA}
   return JSON.parse(result.response.text())
 }
 
-// 🚀 WRAPPER WITH EXPONENTIAL BACKOFF
+// 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF (Max 49s)
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 5
-  // Delays: 3s, 8s, 15s, 25s (Total 51s max wait to stay under Vercel 60s timeout)
-  const delays = [3000, 8000, 15000, 25000] 
+  const maxRetries = 4 // Initial attempt + 3 retries
+  const delays = [2000, 5000, 10000] // 2s, 5s, 10s
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -295,7 +294,8 @@ async function generateRoadmapWithRetry(params) {
       console.error(`Gemini Attempt ${attempt + 1} failed:`, error.message)
 
       if (attempt === maxRetries - 1 || !isRetryableError(error)) {
-        throw error // Throw on final attempt or if error is not traffic-related
+        // Throw a clean, human-readable message for the frontend to display
+        throw new Error("Our AI is experiencing heavy traffic. Please try again.")
       }
 
       const waitTime = delays[attempt]
