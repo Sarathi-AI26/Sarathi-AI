@@ -175,6 +175,7 @@ CONTENT RULES (non-negotiable):
 10. STRENGTH SIGNALS: Based on their actual high-scoring dimensions. Evidence must cite a specific question.
 11. WHAT TO AVOID: Must be specific to their data. Name real role types, environments, or habits — not generic advice.
 12. LANGUAGE PRECISION: Never use "you are X" as a definitive statement. Always use "your scores suggest", "your profile indicates", "based on your responses". Never say "this is your path" — say "this appears to be your strongest fit based on current data". The archetype label is emotional shorthand — always follow it with one grounded evidence sentence.
+13. DREAM CAREER OVERRIDE (CRITICAL): Read the student's answer to Q56 (dream_career). If they explicitly name a specific non-corporate or unconventional career (e.g., Cricketer, Musician, Pilot, IAS Officer, Chef), AT LEAST ONE of your top_career_matches MUST be that exact career or a highly adjacent field in that industry. Do not force them into Analyst or Product Manager roles if their heart is clearly elsewhere. Tailor their entire 5-year roadmap to making that specific dream a reality.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 
