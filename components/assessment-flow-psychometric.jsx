@@ -172,8 +172,8 @@ const AssessmentFlowPsychometric = () => {
         throw new Error(data.error || 'Submission failed')
       }
 
-      if (data.assessmentId) {
-        router.push(`/result?id=${data.assessmentId}`)
+     if (data.assessmentId) {
+        router.push(`/checkout?assessmentId=${data.assessmentId}`) // <--- THE FIX
       } else {
         throw new Error('No assessment ID returned')
       }
