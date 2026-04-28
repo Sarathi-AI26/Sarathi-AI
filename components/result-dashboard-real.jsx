@@ -922,6 +922,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       }
       
       setError('')
+      setLoading(true) // <--- ADD THIS LINE HERE to reset the UI immediately
 
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
