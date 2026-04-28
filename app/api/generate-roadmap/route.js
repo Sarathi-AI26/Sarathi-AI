@@ -242,7 +242,7 @@ const OUTPUT_SCHEMA = `{
 }`
 
 // ─────────────────────────────────────────────
-// EXPONENTIAL BACKOFF RETRY LOGIC
+// EXPONENTIAL BACKOFF & TIMEOUT LOGIC
 // ─────────────────────────────────────────────
 function isRetryableError(error) {
   const msg = error?.message?.toLowerCase() || ''
@@ -255,7 +255,8 @@ function isRetryableError(error) {
     msg.includes('overloaded') ||
     msg.includes('json_parse_failed') ||
     msg.includes('timeout') ||
-    msg.includes('fetch failed')
+    msg.includes('fetch failed') ||
+    msg.includes('gemini_timeout') // <-- Added custom timeout flag
   )
 }
 
@@ -282,22 +283,34 @@ ${assessment_context}
 Generate the complete career roadmap. Return ONLY valid JSON matching this schema exactly:
 ${OUTPUT_SCHEMA}
 `
-  const result = await model.generateContent(userPrompt)
+  
+  // 🚀 THE FIX: Strict 15-second cutoff using Promise.race
+  // If Gemini takes 29 seconds, we kill it at 15s and force a retry.
+  const TIMEOUT_MS = 15000 
+  
+  const result = await Promise.race([
+    model.generateContent(userPrompt),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('GEMINI_TIMEOUT')), TIMEOUT_MS)
+    )
+  ])
+
   const text = result.response.text()
 
-  // 🚀 CRITICAL FIX: Safe JSON parsing
   try {
     return JSON.parse(text)
   } catch (err) {
-    // If Gemini hallucinates non-JSON text, throw a retryable error to trigger backoff
     throw new Error('JSON_PARSE_FAILED')
   }
 }
 
 // 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 3 // Max 3 total attempts to stay under 60s
-  const delays = [2000, 5000] 
+  const maxRetries = 3 
+  const delays = [1000, 2000] // Wait 1s, then 2s between retries
+
+  // Max Math: 15s (T1) + 1s (W1) + 15s (T2) + 2s (W2) + 15s (T3) = 48 seconds total.
+  // Safely under Vercel's 60-second death limit.
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -310,7 +323,7 @@ async function generateRoadmapWithRetry(params) {
       }
 
       const waitTime = delays[attempt]
-      console.log(`Gemini overloaded. Waiting ${waitTime}ms before retry...`)
+      console.log(`Gemini overloaded or timed out. Waiting ${waitTime}ms before retry...`)
       await new Promise(resolve => setTimeout(resolve, waitTime))
     }
   }
