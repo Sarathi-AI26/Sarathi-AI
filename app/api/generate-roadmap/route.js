@@ -171,10 +171,10 @@ CONTENT RULES (non-negotiable):
 6. ROLE MODEL MIRROR: Year 5 roadmap milestone must explicitly connect to Q58 role model. If they admire a founder — Year 5 = launching something. If a scientist — Year 5 = publishing or leading research.
 7. INDIA VS ABROAD: If Q60 mentions abroad — include at least one international milestone in the roadmap.
 8. SECTOR MATCH: Career matches must come from the student's highest-scoring interest dimensions. Never default to generic tech and consulting for everyone.
-9. IDENTITY STATEMENT: One sentence. Must make the student feel deeply seen — like someone finally understood who they really are. Grounded in their actual data. Specific, not generic.
+9. IDENTITY STATEMENT: One sentence. Must make the student feel deeply seen. Grounded in their actual data.
 10. STRENGTH SIGNALS: Based on their actual high-scoring dimensions. Evidence must cite a specific question.
-11. WHAT TO AVOID: Must be specific to their data. Name real role types, environments, or habits — not generic advice.
-12. LANGUAGE PRECISION: Never use "you are X" as a definitive statement. Always use "your scores suggest", "your profile indicates", "based on your responses". Never say "this is your path" — say "this appears to be your strongest fit based on current data". The archetype label is emotional shorthand — always follow it with one grounded evidence sentence.
+11. WHAT TO AVOID: Must be specific to their data. Name real role types, environments, or habits.
+12. LANGUAGE PRECISION: Never use "you are X" as a definitive statement. Always use "your scores suggest", "your profile indicates", "based on your responses".
 13. DREAM CAREER OVERRIDE (CRITICAL): Read the student's answer to Q56 (dream_career). If they explicitly name a specific non-corporate or unconventional career (e.g., Cricketer, Musician, Pilot, IAS Officer, Chef), AT LEAST ONE of your top_career_matches MUST be that exact career or a highly adjacent field in that industry. Do not force them into Analyst or Product Manager roles if their heart is clearly elsewhere. Tailor their entire 5-year roadmap to making that specific dream a reality.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
@@ -183,8 +183,8 @@ OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 // OUTPUT SCHEMA
 // ─────────────────────────────────────────────
 const OUTPUT_SCHEMA = `{
-  "user_archetype": "2-3 word label derived from their top scoring dimensions. Clinical but human. E.g. 'Pragmatic Social Founder', 'Analytical Deep Specialist'.",
-  "identity_statement": "THE most important field. One powerful, emotionally resonant sentence that captures who this student is at their core...",
+  "user_archetype": "2-3 word label derived from their top scoring dimensions. Clinical but human.",
+  "identity_statement": "One powerful, emotionally resonant sentence that captures who this student is at their core...",
   "executive_summary": {
     "paragraph_1": "Their core cognitive and behavioural wiring...",
     "paragraph_2": "Their risk profile and decisiveness pattern...",
@@ -242,7 +242,7 @@ const OUTPUT_SCHEMA = `{
 }`
 
 // ─────────────────────────────────────────────
-// 🚀 NEW: EXPONENTIAL BACKOFF RETRY LOGIC
+// EXPONENTIAL BACKOFF RETRY LOGIC
 // ─────────────────────────────────────────────
 function isRetryableError(error) {
   const msg = error?.message?.toLowerCase() || ''
@@ -252,7 +252,10 @@ function isRetryableError(error) {
     msg.includes('high demand') ||
     msg.includes('429') ||
     msg.includes('resource_exhausted') ||
-    msg.includes('overloaded')
+    msg.includes('overloaded') ||
+    msg.includes('json_parse_failed') ||
+    msg.includes('timeout') ||
+    msg.includes('fetch failed')
   )
 }
 
@@ -280,13 +283,21 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   const result = await model.generateContent(userPrompt)
-  return JSON.parse(result.response.text())
+  const text = result.response.text()
+
+  // 🚀 CRITICAL FIX: Safe JSON parsing
+  try {
+    return JSON.parse(text)
+  } catch (err) {
+    // If Gemini hallucinates non-JSON text, throw a retryable error to trigger backoff
+    throw new Error('JSON_PARSE_FAILED')
+  }
 }
 
-// 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF (Max 49s)
+// 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 4 // Initial attempt + 3 retries
-  const delays = [2000, 5000, 10000] // 2s, 5s, 10s
+  const maxRetries = 3 // Max 3 total attempts to stay under 60s
+  const delays = [2000, 5000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -295,8 +306,7 @@ async function generateRoadmapWithRetry(params) {
       console.error(`Gemini Attempt ${attempt + 1} failed:`, error.message)
 
       if (attempt === maxRetries - 1 || !isRetryableError(error)) {
-        // Throw a clean, human-readable message for the frontend to display
-        throw new Error("Our AI is experiencing heavy traffic. Please try again.")
+        throw new Error('Our AI is experiencing heavy traffic. Please try again.')
       }
 
       const waitTime = delays[attempt]
@@ -339,7 +349,6 @@ export async function POST(request) {
       return jsonResponse({ ok: true, assessment: normalizeAssessment(assessment) })
     }
 
-    // 🚀 NEW: Call the Retry Wrapper instead of the direct core
     const aiAnalysis = await generateRoadmapWithRetry({
       student_profile: {
         name: assessment?.users?.name || 'Student',
@@ -364,6 +373,7 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Roadmap generation failed:', error)
-    return jsonResponse({ error: error?.message || 'AI Generation Failed' }, 500)
+    // 🚀 CRITICAL FIX: Never send raw Javascript engine errors back to the frontend
+    return jsonResponse({ error: 'Our AI is experiencing heavy traffic. Please try again.' }, 500)
   }
 }
