@@ -284,9 +284,8 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   
-  // 🚀 THE FIX: Strict 15-second cutoff using Promise.race
-  // If Gemini takes 29 seconds, we kill it at 15s and force a retry.
-  const TIMEOUT_MS = 15000 
+  // 🚀 THE FIX: Increased to 30 seconds to allow Gemini to finish writing the roadmap
+  const TIMEOUT_MS = 30000 
   
   const result = await Promise.race([
     model.generateContent(userPrompt),
@@ -298,7 +297,9 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    return JSON.parse(text)
+    // 🚀 THE FIX: Strip markdown formatting in case Gemini hallucinates backticks
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
+    return JSON.parse(cleanText)
   } catch (err) {
     throw new Error('JSON_PARSE_FAILED')
   }
@@ -306,11 +307,8 @@ ${OUTPUT_SCHEMA}
 
 // 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 3 
-  const delays = [1000, 2000] // Wait 1s, then 2s between retries
-
-  // Max Math: 15s (T1) + 1s (W1) + 15s (T2) + 2s (W2) + 15s (T3) = 48 seconds total.
-  // Safely under Vercel's 60-second death limit.
+  const maxRetries = 2 // 🚀 Reduced to 2 retries to stay under Vercel's 60s limit
+  const delays = [1000] // Wait 1s between try 1 and try 2
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -386,7 +384,6 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Roadmap generation failed:', error)
-    // 🚀 CRITICAL FIX: Never send raw Javascript engine errors back to the frontend
     return jsonResponse({ error: 'Our AI is experiencing heavy traffic. Please try again.' }, 500)
   }
 }
