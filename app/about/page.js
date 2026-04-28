@@ -62,17 +62,15 @@ export default function AboutPage() {
                   </p>
                 </div>
                 
-                {/* ── STATS — synced with homepage ── */}
+                {/* ── STATS (Updated for Beta) ── */}
                 <div className="grid grid-cols-2 gap-8 border-t border-slate-100 pt-8">
                   <div>
-                    {/* FIX: was 15k+ — changed to match homepage stat */}
-                    <h4 className="text-4xl font-extrabold text-[#F57D14]">500+</h4>
+                    <h4 className="text-4xl font-extrabold text-[#F57D14]">15</h4>
                     <p className="mt-2 text-sm font-bold uppercase tracking-wider text-slate-500">
-                      Assessments Completed
+                      Minutes to Clarity
                     </p>
                   </div>
                   <div>
-                    {/* FIX: was 99% AI Match Accuracy — removed unverifiable claim */}
                     <h4 className="text-4xl font-extrabold text-[#F57D14]">60</h4>
                     <p className="mt-2 text-sm font-bold uppercase tracking-wider text-slate-500">
                       Psychometric Dimensions
@@ -140,7 +138,7 @@ export default function AboutPage() {
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: Target,      title: 'Absolute Clarity',   desc: 'Cutting through the noise to help students find their true north.',                                      color: 'bg-blue-600'    },
+                { icon: Target,      title: 'Absolute Clarity',   desc: 'Cutting through the noise to help students find their true north.',                                     color: 'bg-blue-600'    },
                 { icon: Sparkles,    title: 'AI Innovation',      desc: 'Leveraging Gemini 2.5 Flash to process complex psychometric data in real-time.',                         color: 'bg-[#F57D14]'  },
                 { icon: BrainCircuit,title: 'Scientific Rigor',   desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and Self-Determination Theory.', color: 'bg-indigo-600' },
                 { icon: Award,       title: 'Student First',      desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',                      color: 'bg-emerald-600' },
