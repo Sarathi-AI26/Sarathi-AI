@@ -3,7 +3,7 @@ import { getSupabaseAdmin } from '../../../lib/supabase'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
-export const maxDuration = 60
+export const maxDuration = 300
 
 // ─────────────────────────────────────────────
 // QUESTION BANK
