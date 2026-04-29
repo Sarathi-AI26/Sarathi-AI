@@ -3,6 +3,7 @@ import { getSupabaseAdmin } from '../../../lib/supabase'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 export const runtime = 'nodejs'
+// 🚀 VERCEL PRO UPGRADE: Allows the server to run for 300 seconds (5 minutes)
 export const maxDuration = 300
 
 // ─────────────────────────────────────────────
@@ -284,7 +285,8 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   
-  const TIMEOUT_MS = 54000 
+  // 🚀 VERCEL PRO UPGRADE: Gives Gemini 280 seconds (4.6 minutes) to write the JSON
+  const TIMEOUT_MS = 280000 
   
   const result = await Promise.race([
     model.generateContent(userPrompt),
@@ -305,7 +307,8 @@ ${OUTPUT_SCHEMA}
 
 // 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 1 
+  // We can afford 2 retries now because we have 5 full minutes to use
+  const maxRetries = 2 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
