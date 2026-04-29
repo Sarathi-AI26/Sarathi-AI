@@ -261,13 +261,13 @@ function isRetryableError(error) {
   )
 }
 
-// 🚀 ADDED 'modelName' PARAMETER TO ALLOW DYNAMIC FALLBACKS
-async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-2.5-flash' }) {
+// 🚀 ADDED 'modelName' PARAMETER WITH 1.5 PRO AS THE HARD DEFAULT
+async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-1.5-pro' }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   const model = genAI.getGenerativeModel({
-    model: modelName, // Uses the model passed in by the retry wrapper
+    model: modelName, 
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: 'application/json',
@@ -306,32 +306,19 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 WRAPPER WITH 1.5 PRO VIP FALLBACK
+// 🚀 SMART ROUTING: Force 1.5 Pro EXCLUSIVELY to bypass the 2.5 Flash outage
 async function generateRoadmapWithRetry(params) {
-  // We can afford 2 retries now because we have 5 full minutes to use
   const maxRetries = 2 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      // First, try the high-quality 2.5 Flash model
-      return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-flash' })
+      console.log(`Bypassing traffic: Routing directly to VIP gemini-1.5-pro (Attempt ${attempt + 1})...`)
+      return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-pro' })
     } catch (error) {
-      console.error(`Gemini 2.5 Attempt ${attempt + 1} failed:`, error.message)
+      console.error(`Attempt ${attempt + 1} failed:`, error.message)
 
-      // If we are on our last retry and it STILL failed, trigger the fallback
-      if (attempt === maxRetries - 1) {
-        console.log("Google 2.5 servers are overloaded. Activating VIP Gemini 1.5 Pro Fallback...")
-        try {
-          // The Ultimate Safety Net: Try one last time using the highly-available VIP 1.5 Pro
-          return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-pro' })
-        } catch (fallbackError) {
-          console.error("Gemini 1.5 Pro Fallback also failed:", fallbackError.message)
-          throw new Error('Our AI is experiencing heavy traffic. Please try again.')
-        }
-      }
-
-      if (!isRetryableError(error)) {
+      if (attempt === maxRetries - 1 || !isRetryableError(error)) {
         throw new Error('Our AI is experiencing heavy traffic. Please try again.')
       }
 
