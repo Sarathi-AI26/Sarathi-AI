@@ -261,8 +261,8 @@ function isRetryableError(error) {
   )
 }
 
-// 🚀 ADDED 'modelName' PARAMETER WITH 1.5 PRO AS THE HARD DEFAULT
-async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-1.5-pro' }) {
+// 🚀 ADDED 'modelName' PARAMETER WITH 1.5 FLASH AS THE HARD DEFAULT
+async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-1.5-flash' }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
@@ -306,15 +306,15 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 SMART ROUTING: Force 1.5 Pro EXCLUSIVELY to bypass the 2.5 Flash outage
+// 🚀 SMART ROUTING: Force 1.5 Flash EXCLUSIVELY to bypass the 2.5 Flash outage and the 1.5 Pro 404 error
 async function generateRoadmapWithRetry(params) {
   const maxRetries = 2 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`Bypassing traffic: Routing directly to VIP gemini-1.5-pro (Attempt ${attempt + 1})...`)
-      return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-pro' })
+      console.log(`Bypassing traffic: Routing directly to gemini-1.5-flash (Attempt ${attempt + 1})...`)
+      return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash' })
     } catch (error) {
       console.error(`Attempt ${attempt + 1} failed:`, error.message)
 
