@@ -531,25 +531,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     day: 'numeric', month: 'long', year: 'numeric',
   })
 
-// ... rest of the component
-
-  const blindSpots = (analysis?.potential_blind_spots || []).map(spot => ({
-    text: safeText(spot),
-    isSevere: safeText(spot)?.toUpperCase().includes('SEVERE'),
-  }))
-
-  const roadmapSteps = [
-    { label: 'Year 1', title: 'Foundation & Skill Launch',     key: 'year_1', icon: Target     },
-    { label: 'Year 2', title: 'Skill Application & Execution', key: 'year_2', icon: BookOpen   },
-    { label: 'Year 3', title: 'Market Acceleration',           key: 'year_3', icon: Sparkles   },
-    { label: 'Year 4', title: 'Strategic Positioning',         key: 'year_4', icon: TrendingUp },
-    { label: 'Year 5', title: 'Leadership & Mastery',          key: 'year_5', icon: Network    },
-  ].map(s => ({ ...s, data: roadmap?.[s.key] })).filter(s => s.data)
-
-  const generatedDate = new Date().toLocaleDateString('en-IN', {
-    day: 'numeric', month: 'long', year: 'numeric',
-  })
-
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
@@ -801,7 +782,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   </div>
                 )}
                 
-                {/* 🚀 NEW: Feedback Buttons (Web Only) */}
                 {!isPdfMode && (
                   <FeedbackButtons
                     assessmentId={assessmentId}
@@ -955,7 +935,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       }
       
       setError('')
-      setLoading(true) // <--- ADD THIS LINE HERE to reset the UI immediately
+      setLoading(true) 
 
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
