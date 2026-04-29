@@ -256,7 +256,7 @@ function isRetryableError(error) {
     msg.includes('json_parse_failed') ||
     msg.includes('timeout') ||
     msg.includes('fetch failed') ||
-    msg.includes('gemini_timeout') // <-- Added custom timeout flag
+    msg.includes('gemini_timeout') 
   )
 }
 
@@ -284,7 +284,6 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   
-  // 🚀 THE FIX: Increased to 30 seconds to allow Gemini to finish writing the roadmap
   const TIMEOUT_MS = 30000 
   
   const result = await Promise.race([
@@ -297,7 +296,6 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    // 🚀 THE FIX: Strip markdown formatting in case Gemini hallucinates backticks
     const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
@@ -307,8 +305,8 @@ ${OUTPUT_SCHEMA}
 
 // 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 2 // 🚀 Reduced to 2 retries to stay under Vercel's 60s limit
-  const delays = [1000] // Wait 1s between try 1 and try 2
+  const maxRetries = 2 
+  const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -369,7 +367,6 @@ export async function POST(request) {
     })
 
     // 🚀 THE FIX: Forcibly inject the mathematically perfect scores
-    // This guarantees we never rely on the AI's hallucinated 0s again.
     if (assessment.raw_answers) {
       const exactScores = computeSectionScores(assessment.raw_answers)
       aiAnalysis.radar_chart_scores = {
@@ -380,10 +377,6 @@ export async function POST(request) {
         "Behavioural Tendencies": exactScores["Behavioural"] || 0
       }
     }
-
-    const { data: updated, error: updateError } = await supabase
-      .from('assessments')
-// ... rest of the code remains the same
 
     const { data: updated, error: updateError } = await supabase
       .from('assessments')
