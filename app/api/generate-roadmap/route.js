@@ -368,6 +368,23 @@ export async function POST(request) {
       assessment_context: buildAssessmentContext(assessment),
     })
 
+    // 🚀 THE FIX: Forcibly inject the mathematically perfect scores
+    // This guarantees we never rely on the AI's hallucinated 0s again.
+    if (assessment.raw_answers) {
+      const exactScores = computeSectionScores(assessment.raw_answers)
+      aiAnalysis.radar_chart_scores = {
+        "Personality": exactScores["Personality"] || 0,
+        "Aptitude": exactScores["Aptitude"] || 0,
+        "Motivation": exactScores["Motivation"] || 0,
+        "Career Interests": exactScores["Career Interests"] || 0,
+        "Behavioural Tendencies": exactScores["Behavioural"] || 0
+      }
+    }
+
+    const { data: updated, error: updateError } = await supabase
+      .from('assessments')
+// ... rest of the code remains the same
+
     const { data: updated, error: updateError } = await supabase
       .from('assessments')
       .update({ ai_analysis_result: aiAnalysis })
