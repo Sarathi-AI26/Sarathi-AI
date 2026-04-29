@@ -7,7 +7,7 @@ import {
   LockKeyhole, Network, Sparkles, Target, Loader2,
   BookOpen, TrendingUp, Timer, Activity, Globe,
   AlertTriangle, Lock, ArrowRight, CheckCircle2,
-  Zap, Users, Shield, Brain, XCircle, Quote,
+  Zap, Users, Shield, Brain, XCircle, Quote, Share2 // 🚀 ADDED Share2 HERE
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -919,6 +919,9 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [isPdfMode, setIsPdfMode] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   
+  // 🚀 NEW: State for Share Button
+  const [isCopied, setIsCopied] = useState(false) 
+  
   const [elapsed, setElapsed] = useState(0)
   const [retryTrigger, setRetryTrigger] = useState(0)
 
@@ -996,6 +999,18 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
+  // 🚀 NEW: Share Button Functionality
+  const handleShare = async () => {
+    try {
+      const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+      await navigator.clipboard.writeText(shareUrl);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2500); // Changes button back after 2.5s
+    } catch (err) {
+      console.error("Failed to copy link:", err);
+    }
+  }
+
   const handleDownloadPdf = async () => {
     setIsDownloading(true)
     setIsPdfMode(true) 
@@ -1061,6 +1076,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     }).save().then(() => {
         setIsPdfMode(false)
         setIsDownloading(false)
+    }).catch((err) => {
+        // 🚀 NEW: Safety Fallback for Safari/Mobile users
+        console.error("PDF Generation Failed:", err);
+        setIsPdfMode(false)
+        setIsDownloading(false)
+        alert("PDF download failed on this browser. Please try again on Chrome or open this link on a Desktop/Laptop.")
     });
   }
 
@@ -1098,7 +1119,19 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
       {!isPdfMode && (
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex justify-end">
+        // 🚀 NEW: Added flex-wrap and gap-3 so buttons sit nicely side-by-side on mobile
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-wrap justify-end gap-3">
+          
+          {/* 🚀 NEW: The Share Button */}
+          <Button 
+            onClick={handleShare} 
+            variant="outline"
+            className={`font-bold transition-all ${isCopied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
+          >
+            {isCopied ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
+            {isCopied ? 'Link Copied!' : 'Share Result'}
+          </Button>
+
           <Button 
             onClick={handleDownloadPdf} 
             disabled={isDownloading}
