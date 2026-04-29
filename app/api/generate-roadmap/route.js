@@ -263,7 +263,8 @@ function isRetryableError(error) {
   )
 }
 
-async function generateRoadmapCore({ student_profile, assessment_context, modelName }) {
+// 🚀 DEFAULTING TO 2.5 PRO
+async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-2.5-pro' }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
@@ -306,20 +307,15 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 SMART ROUTING: Explicit Latest Tag, with Global Fallback
+// 🚀 SMART ROUTING: Skip 2.5-Flash traffic entirely and route straight to 2.5-Pro
 async function generateRoadmapWithRetry(params) {
   const maxRetries = 2 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      if (attempt === 0) {
-        console.log(`Routing to exact model string: gemini-1.5-flash-latest...`)
-        return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash-latest' })
-      } else {
-        console.log(`404 or Overload hit. Triggering ultimate failsafe: gemini-pro...`)
-        return await generateRoadmapCore({ ...params, modelName: 'gemini-pro' })
-      }
+      console.log(`Bypassing 2.5-flash traffic: Routing directly to VIP gemini-2.5-pro (Attempt ${attempt + 1})...`)
+      return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-pro' })
     } catch (error) {
       console.error(`Attempt ${attempt + 1} failed:`, error.message)
 
