@@ -17,23 +17,36 @@ import {
 } from 'recharts'
 
 // ─────────────────────────────────────────────
-// HELPERS
+// 🛡️ THE TANK: INDESTRUCTIBLE DATA PARSERS
 // ─────────────────────────────────────────────
 const hasFullAnalysis = (analysis) =>
   Boolean(analysis?.executive_summary && Array.isArray(analysis?.top_career_matches))
 
+// This function intercepts ANY rogue objects before they hit React
+const safeText = (val) => {
+  if (val === null || val === undefined) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'number' || typeof val === 'boolean') return String(val);
+  if (Array.isArray(val)) return val.map(safeText).join(', ');
+  if (typeof val === 'object') {
+    try {
+      // If Gemini accidentally passes an object (Error #31), flatten it quietly
+      return Object.values(val)
+        .map(v => (typeof v === 'object' && v !== null) ? '' : String(v))
+        .filter(Boolean).join(' ');
+    } catch (e) {
+      return '';
+    }
+  }
+  return String(val);
+}
+
 const parseExecutiveSummary = (raw) => {
   if (!raw) return []
   if (typeof raw === 'string') return raw.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
-  if (typeof raw === 'object') return Object.values(raw).filter(Boolean)
+  if (Array.isArray(raw)) return raw.map(safeText).filter(Boolean)
+  if (typeof raw === 'object') return Object.values(raw).map(safeText).filter(Boolean)
   return []
-}
-
-const safeText = (val) => {
-  if (!val) return null
-  if (typeof val === 'string') return val
-  if (typeof val === 'object') return Object.values(val).filter(Boolean).join(' — ')
-  return String(val)
 }
 
 const ICON_MAP = {
@@ -43,13 +56,13 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
-// 🚀 NEW: FEEDBACK BUTTONS COMPONENT
+// FEEDBACK BUTTONS COMPONENT
 // ─────────────────────────────────────────────
 const FeedbackButtons = ({ assessmentId, careerTitle }) => {
-  const [voted, setVoted] = useState(null) // 'up' | 'down' | null
+  const [voted, setVoted] = useState(null) 
 
   const handleVote = async (rating) => {
-    if (voted) return // prevent double voting
+    if (voted) return 
     setVoted(rating)
     try {
       await fetch('/api/feedback', {
@@ -58,7 +71,7 @@ const FeedbackButtons = ({ assessmentId, careerTitle }) => {
         body: JSON.stringify({ assessmentId, careerTitle, rating }),
       })
     } catch {
-      // silent fail — don't disrupt the student experience
+      // silent fail 
     }
   }
 
@@ -121,10 +134,10 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 
     </div>
     <div style={{ textAlign: 'right' }}>
-      <div style={{ fontSize: '15px', fontWeight: '700', color: '#0A2351' }}>{studentName}</div>
-      <div style={{ fontSize: '12px', color: '#F57D14', fontWeight: '700', marginTop: '4px' }}>{archetype}</div>
+      <div style={{ fontSize: '15px', fontWeight: '700', color: '#0A2351' }}>{safeText(studentName)}</div>
+      <div style={{ fontSize: '12px', color: '#F57D14', fontWeight: '700', marginTop: '4px' }}>{safeText(archetype)}</div>
       <div style={{ fontSize: '10px', color: '#aaa', marginTop: '4px' }}>
-        Generated {generatedDate}
+        Generated {safeText(generatedDate)}
       </div>
     </div>
   </div>
@@ -134,7 +147,7 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 // PROFILE BADGE
 // ─────────────────────────────────────────────
 const ProfileBadge = ({ radarScores, isPdfMode }) => {
-  if (!radarScores) return null
+  if (!radarScores || typeof radarScores !== 'object') return null
 
   const dims = [
     { key: 'Personality',            label: 'Personality'  },
@@ -146,9 +159,9 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
     .map(d => ({ ...d, score: Number(radarScores[d.key]) || 0 }))
     .sort((a, b) => b.score - a.score)
 
-  const top1    = dims[0]
-  const top2    = dims[1]
-  const overall = Math.round(dims.reduce((s, d) => s + d.score, 0) / dims.length)
+  const top1    = dims[0] || { label: 'Overall', score: 0 }
+  const top2    = dims[1] || { label: 'Focus', score: 0 }
+  const overall = Math.round(dims.reduce((s, d) => s + d.score, 0) / (dims.length || 1))
 
   const toPercentile = (score) => {
     if (score >= 90) return 10
@@ -212,7 +225,7 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
             color: tier.color,
             marginBottom: 3,
           }}>
-            {tier.label}
+            {safeText(tier.label)}
           </div>
           <div style={{
             fontSize: isPdfMode ? 16 : 20,
@@ -220,7 +233,7 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
             color: '#0A2351',
             lineHeight: 1.2,
           }}>
-            Top {percentile}% {top1.label} Profile
+            Top {percentile}% {safeText(top1.label)} Profile
           </div>
           <div style={{ fontSize: isPdfMode ? 11 : 13, color: '#64748b', marginTop: 3 }}>
             Stronger than {100 - percentile}% of students assessed
@@ -247,14 +260,14 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
             gap: 12,
           }}>
             <span style={{ fontSize: isPdfMode ? 11 : 12, fontWeight: 600, color: '#334155' }}>
-              {d.label}
+              {safeText(d.label)}
             </span>
             <span style={{
               fontSize: isPdfMode ? 13 : 15,
               fontWeight: 800,
               color: i === 0 ? '#F57D14' : '#0A2351',
             }}>
-              {d.score}
+              {Number(d.score) || 0}
               <span style={{ fontSize: isPdfMode ? 9 : 10, fontWeight: 500, color: '#94a3b8' }}>/100</span>
             </span>
           </div>
@@ -270,8 +283,8 @@ const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
       <Icon className="h-5 w-5" />
     </div>
     <div>
-      <h2 className={`font-bold text-[#0A2351] ${isPdfMode ? 'text-lg' : 'text-xl'}`}>{title}</h2>
-      {subtitle && <p className="text-sm text-slate-500">{subtitle}</p>}
+      <h2 className={`font-bold text-[#0A2351] ${isPdfMode ? 'text-lg' : 'text-xl'}`}>{safeText(title)}</h2>
+      {subtitle && <p className="text-sm text-slate-500">{safeText(subtitle)}</p>}
     </div>
   </div>
 )
@@ -320,7 +333,7 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
         Your Identity
       </p>
       <p className={`font-bold text-white leading-relaxed ${isPdfMode ? 'text-lg' : 'text-2xl sm:text-3xl'}`}>
-        {statement}
+        {safeText(statement)}
       </p>
     </div>
     <div className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-[#F57D14]/10" />
@@ -344,8 +357,8 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
                 <Icon className="h-4 w-4 text-[#F57D14]" />
               </div>
               <div>
-                <p className="text-sm font-bold text-[#0A2351]">{signal.label}</p>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{signal.evidence}</p>
+                <p className="text-sm font-bold text-[#0A2351]">{safeText(signal.label)}</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{safeText(signal.evidence)}</p>
               </div>
             </div>
           )
@@ -359,8 +372,8 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   if (!careers?.length) return null
   
   const data = careers.map((c, i) => ({
-    name: c.career_title?.split(',')[0] || c.career_title,
-    score: c.compatibility_score || 85,
+    name: safeText(c.career_title)?.split(',')[0] || safeText(c.career_title),
+    score: Number(c.compatibility_score) || 85,
     color: i === 0 ? '#F57D14' : i === 1 ? '#0A2351' : '#94a3b8'
   }))
 
@@ -414,10 +427,10 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
               </div>
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-wider text-red-400 mb-0.5">
-                  {item.category}
+                  {safeText(item.category)}
                 </p>
-                <p className="text-sm font-bold text-red-800 mb-1">{item.warning}</p>
-                <p className="text-xs text-red-600/80 leading-relaxed">{item.reason}</p>
+                <p className="text-sm font-bold text-red-800 mb-1">{safeText(item.warning)}</p>
+                <p className="text-xs text-red-600/80 leading-relaxed">{safeText(item.reason)}</p>
               </div>
             </div>
           </div>
@@ -467,12 +480,12 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
                     className="text-xs font-bold uppercase tracking-wider"
                     style={{ color: colors[i] }}
                   >
-                    {step.label}
+                    {safeText(step.label)}
                   </span>
-                  <p className="font-bold text-[#0A2351] text-base leading-tight">{step.title}</p>
+                  <p className="font-bold text-[#0A2351] text-base leading-tight">{safeText(step.title)}</p>
                 </div>
               </div>
-              <p className="text-sm leading-relaxed text-slate-600">{step.data}</p>
+              <p className="text-sm leading-relaxed text-slate-600">{safeText(step.data)}</p>
             </div>
           </div>
         )
@@ -492,10 +505,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const immediateAction = analysis?.immediate_action_plan || {}
   const executiveSummaryParagraphs = parseExecutiveSummary(analysis?.executive_summary)
 
-  // 🛡️ Safely parse Radar Scores. Gemini sometimes uses underscores or different casing.
   const rawScores = analysis?.radar_chart_scores || {}
   
-  // Helper to safely find a score regardless of exact string formatting
   const getScore = (keyMatches) => {
       const foundKey = Object.keys(rawScores).find(k => 
           keyMatches.some(match => k.toLowerCase().includes(match.toLowerCase()))
@@ -511,7 +522,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     { subject: 'Behaviour',   score: getScore(['Behaviour', 'Behavior']), fullMark: 100 },
   ]
 
-  // 🛡️ Ensure blindSpots only ever outputs arrays of objects with string text
   const blindSpots = Array.isArray(analysis?.potential_blind_spots) 
     ? analysis.potential_blind_spots.map(spot => ({
         text: safeText(spot) || "No critical blind spots identified.",
@@ -525,7 +535,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     { label: 'Year 3', title: 'Market Acceleration',           key: 'year_3', icon: Sparkles   },
     { label: 'Year 4', title: 'Strategic Positioning',         key: 'year_4', icon: TrendingUp },
     { label: 'Year 5', title: 'Leadership & Mastery',          key: 'year_5', icon: Network    },
-  ].map(s => ({ ...s, data: safeText(roadmap?.[s.key]) })).filter(s => s.data) // Added safeText here
+  ].map(s => ({ ...s, data: safeText(roadmap?.[s.key]) })).filter(s => s.data)
 
   const generatedDate = new Date().toLocaleDateString('en-IN', {
     day: 'numeric', month: 'long', year: 'numeric',
@@ -558,8 +568,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             </div>
             
             <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
-              {studentName}, you are a{' '}
-              <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+              {safeText(studentName)}, you are a{' '}
+              <span className="text-[#F57D14]">{safeText(analysis.user_archetype)}</span>
             </h1>
             
             <p className="mt-4 text-lg text-white/70 max-w-2xl">
@@ -576,8 +586,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
           </div>
           <h1 className="text-2xl font-extrabold text-white">
-            {studentName}, you are a{' '}
-            <span className="text-[#F57D14]">{analysis.user_archetype}</span>
+            {safeText(studentName)}, you are a{' '}
+            <span className="text-[#F57D14]">{safeText(analysis.user_archetype)}</span>
           </h1>
           <p className="mt-2 text-sm text-white/70">
             This roadmap was built from your 60 answers — every word is specific to you.
@@ -591,7 +601,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
       <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
 
-      {/* 🚀 NEW: Methodology Footnote (Page 1 of PDF only) */}
       {isPdfMode && (
         <div style={{
           background: '#f8fafc',
@@ -626,7 +635,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <Card className="border-0 shadow-sm avoid-break">
           <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
             {executiveSummaryParagraphs.map((para, i) => (
-              <p key={i} style={{ orphans: 3, widows: 3 }}>{para}</p>
+              <p key={i} style={{ orphans: 3, widows: 3 }}>{safeText(para)}</p>
             ))}
           </CardContent>
         </Card>
@@ -665,8 +674,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     key={d.subject}
                     className="flex items-center gap-1.5 rounded-full bg-white border border-slate-100 px-3 py-1"
                   >
-                    <span className="text-xs font-bold text-[#0A2351]">{d.subject}</span>
-                    <span className="text-xs font-bold text-[#F57D14]">{d.score}</span>
+                    <span className="text-xs font-bold text-[#0A2351]">{safeText(d.subject)}</span>
+                    <span className="text-xs font-bold text-[#F57D14]">{Number(d.score) || 0}</span>
                   </div>
                 ))}
               </div>
@@ -686,10 +695,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   <div className="mt-2 flex flex-wrap gap-2">
                     {profile.dominant_personality_traits.map(trait => (
                       <span
-                        key={trait}
+                        key={safeText(trait)}
                         className="rounded-lg bg-white px-3 py-1.5 text-xs font-bold text-[#0A2351] shadow-sm border border-slate-100"
                       >
-                        {trait}
+                        {safeText(trait)}
                       </span>
                     ))}
                   </div>
@@ -701,7 +710,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     How You Learn Best
                   </label>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600 italic" style={{ orphans: 3, widows: 3 }}>
-                    {profile.learning_style}
+                    {safeText(profile.learning_style)}
                   </p>
                 </div>
               )}
@@ -711,7 +720,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     Where You'll Thrive
                   </label>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600" style={{ orphans: 3, widows: 3 }}>
-                    {profile.work_environment_fit}
+                    {safeText(profile.work_environment_fit)}
                   </p>
                 </div>
               )}
@@ -721,7 +730,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     How You Work With Others
                   </label>
                   <p className="mt-1 text-sm leading-relaxed text-slate-600" style={{ orphans: 3, widows: 3 }}>
-                    {profile.collaboration_style}
+                    {safeText(profile.collaboration_style)}
                   </p>
                 </div>
               )}
@@ -752,31 +761,31 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   </p>
                   {match.compatibility_score && (
                     <span className="text-xs font-extrabold text-[#F57D14] bg-[#F57D14]/10 px-2 py-0.5 rounded-full">
-                      {match.compatibility_score}% match
+                      {Number(match.compatibility_score)}% match
                     </span>
                   )}
                 </div>
                 <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
-                  {match.career_title}
+                  {safeText(match.career_title)}
                 </h3>
                 <p className="text-sm text-slate-500 mb-2">
-                  {match.match_reason || match.why_it_fits}
+                  {safeText(match.match_reason || match.why_it_fits)}
                 </p>
                 {match.growth_path && (
-                  <p className="text-xs text-slate-400 mb-2 italic">{match.growth_path}</p>
+                  <p className="text-xs text-slate-400 mb-2 italic">{safeText(match.growth_path)}</p>
                 )}
                 <div className="flex items-center gap-2 font-bold text-[#0A2351] text-sm mb-2">
                   <BadgeIndianRupee className="h-4 w-4 text-[#F57D14]" />
-                  {match.starting_salary_inr}
+                  {safeText(match.starting_salary_inr)}
                 </div>
                 {match.key_certifications?.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {match.key_certifications.map(cert => (
                       <span
-                        key={cert}
+                        key={safeText(cert)}
                         className="rounded-md bg-[#0A2351]/5 px-2 py-0.5 text-[10px] font-bold text-[#0A2351]"
                       >
-                        {cert}
+                        {safeText(cert)}
                       </span>
                     ))}
                   </div>
@@ -785,7 +794,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                 {!isPdfMode && (
                   <FeedbackButtons
                     assessmentId={assessmentId}
-                    careerTitle={match.career_title}
+                    careerTitle={safeText(match.career_title)}
                   />
                 )}
 
@@ -816,7 +825,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                         : <span className="mt-1.5 block h-1.5 w-1.5 rounded-full bg-orange-400" />}
                     </span>
                     <span className={`text-sm leading-relaxed ${spot.isSevere ? 'text-red-700 font-medium' : 'text-orange-900/80'}`}>
-                      {spot.text}
+                      {safeText(spot.text)}
                     </span>
                   </li>
                 ))}
@@ -842,7 +851,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     This month — next 30 days
                   </p>
                   <p className={`font-bold text-white ${isPdfMode ? 'text-base' : 'text-lg'}`}>
-                    {immediateAction.next_30_days}
+                    {safeText(immediateAction.next_30_days)}
                   </p>
                 </div>
                 {immediateAction.next_90_days && (
@@ -851,14 +860,14 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                       This quarter — next 90 days
                     </p>
                     <p className="text-sm font-medium text-white/90">
-                      {immediateAction.next_90_days}
+                      {safeText(immediateAction.next_90_days)}
                     </p>
                   </div>
                 )}
                 <div className="border-t border-white/20 pt-3">
                   <p className="text-sm text-white">
                     <span className="font-bold text-white">How you'll know it's done: </span>
-                    {immediateAction.success_metric}
+                    {safeText(immediateAction.success_metric)}
                   </p>
                 </div>
               </div>
@@ -878,7 +887,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           <Card className="border-0 bg-blue-50/60 border border-blue-100">
             <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
               <p className="text-sm leading-relaxed text-slate-700" style={{ orphans: 3, widows: 3 }}>
-                {analysis.india_vs_abroad_guidance}
+                {safeText(analysis.india_vs_abroad_guidance)}
               </p>
             </CardContent>
           </Card>
@@ -1011,7 +1020,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
     const opt = {
       margin:       [15, 10, 15, 10], 
-      filename:     `SARATHI_Roadmap_${studentName.replace(/\s+/g, '_')}.pdf`,
+      filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
@@ -1043,7 +1052,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
         pdf.setFontSize(8);
         pdf.setTextColor(150);
-        const text = `SARATHI Career Roadmap Report | ${studentName} | Page ${i} of ${totalPages} | This report is personalised and confidential`; 
+        const text = `SARATHI Career Roadmap Report | ${safeText(studentName)} | Page ${i} of ${totalPages} | This report is personalised and confidential`; 
         
         pdf.text(text, pageWidth / 2, pageHeight - 8, {
           align: 'center'
