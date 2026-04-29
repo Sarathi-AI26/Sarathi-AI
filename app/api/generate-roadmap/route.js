@@ -284,7 +284,7 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   
-  const TIMEOUT_MS = 30000 
+  const TIMEOUT_MS = 54000 
   
   const result = await Promise.race([
     model.generateContent(userPrompt),
@@ -305,7 +305,7 @@ ${OUTPUT_SCHEMA}
 
 // 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 2 
+  const maxRetries = 1 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
