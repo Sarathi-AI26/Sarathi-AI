@@ -261,12 +261,13 @@ function isRetryableError(error) {
   )
 }
 
-async function generateRoadmapCore({ student_profile, assessment_context }) {
+// 🚀 ADDED 'modelName' PARAMETER TO ALLOW DYNAMIC FALLBACKS
+async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-2.5-flash' }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   const model = genAI.getGenerativeModel({
-    model: 'gemini-2.5-flash',
+    model: modelName, // Uses the model passed in by the retry wrapper
     systemInstruction: SYSTEM_PROMPT,
     generationConfig: {
       responseMimeType: 'application/json',
@@ -305,7 +306,7 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 WRAPPER WITH STRICT EXPONENTIAL BACKOFF
+// 🚀 WRAPPER WITH 1.5 FLASH FALLBACK (AS SUGGESTED BY REVIEWER)
 async function generateRoadmapWithRetry(params) {
   // We can afford 2 retries now because we have 5 full minutes to use
   const maxRetries = 2 
@@ -313,11 +314,24 @@ async function generateRoadmapWithRetry(params) {
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      return await generateRoadmapCore(params)
+      // First, try the high-quality 2.5 Flash model
+      return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-flash' })
     } catch (error) {
-      console.error(`Gemini Attempt ${attempt + 1} failed:`, error.message)
+      console.error(`Gemini 2.5 Attempt ${attempt + 1} failed:`, error.message)
 
-      if (attempt === maxRetries - 1 || !isRetryableError(error)) {
+      // If we are on our last retry and it STILL failed, trigger the fallback
+      if (attempt === maxRetries - 1) {
+        console.log("Google 2.5 servers are overloaded. Activating Gemini 1.5 Flash Fallback...")
+        try {
+          // The Ultimate Safety Net: Try one last time using the highly-available 1.5 Flash
+          return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash' })
+        } catch (fallbackError) {
+          console.error("Gemini 1.5 Flash Fallback also failed:", fallbackError.message)
+          throw new Error('Our AI is experiencing heavy traffic. Please try again.')
+        }
+      }
+
+      if (!isRetryableError(error)) {
         throw new Error('Our AI is experiencing heavy traffic. Please try again.')
       }
 
