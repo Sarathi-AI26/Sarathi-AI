@@ -249,6 +249,8 @@ function isRetryableError(error) {
   const msg = error?.message?.toLowerCase() || ''
   return (
     msg.includes('503') ||
+    msg.includes('404') ||
+    msg.includes('not found') ||
     msg.includes('service unavailable') ||
     msg.includes('high demand') ||
     msg.includes('429') ||
@@ -261,8 +263,7 @@ function isRetryableError(error) {
   )
 }
 
-// 🚀 ADDED 'modelName' PARAMETER WITH 1.5 FLASH AS THE HARD DEFAULT
-async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-1.5-flash' }) {
+async function generateRoadmapCore({ student_profile, assessment_context, modelName }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
@@ -286,7 +287,6 @@ Generate the complete career roadmap. Return ONLY valid JSON matching this schem
 ${OUTPUT_SCHEMA}
 `
   
-  // 🚀 VERCEL PRO UPGRADE: Gives Gemini 280 seconds (4.6 minutes) to write the JSON
   const TIMEOUT_MS = 280000 
   
   const result = await Promise.race([
@@ -306,15 +306,20 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 SMART ROUTING: Force 1.5 Flash EXCLUSIVELY to bypass the 2.5 Flash outage and the 1.5 Pro 404 error
+// 🚀 SMART ROUTING: Explicit Latest Tag, with Global Fallback
 async function generateRoadmapWithRetry(params) {
   const maxRetries = 2 
   const delays = [1000] 
 
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`Bypassing traffic: Routing directly to gemini-1.5-flash (Attempt ${attempt + 1})...`)
-      return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash' })
+      if (attempt === 0) {
+        console.log(`Routing to exact model string: gemini-1.5-flash-latest...`)
+        return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash-latest' })
+      } else {
+        console.log(`404 or Overload hit. Triggering ultimate failsafe: gemini-pro...`)
+        return await generateRoadmapCore({ ...params, modelName: 'gemini-pro' })
+      }
     } catch (error) {
       console.error(`Attempt ${attempt + 1} failed:`, error.message)
 
@@ -323,7 +328,7 @@ async function generateRoadmapWithRetry(params) {
       }
 
       const waitTime = delays[attempt]
-      console.log(`Gemini overloaded or timed out. Waiting ${waitTime}ms before retry...`)
+      console.log(`Waiting ${waitTime}ms before switching models...`)
       await new Promise(resolve => setTimeout(resolve, waitTime))
     }
   }
