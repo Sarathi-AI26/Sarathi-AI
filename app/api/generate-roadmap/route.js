@@ -306,7 +306,7 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 WRAPPER WITH 1.5 FLASH FALLBACK (AS SUGGESTED BY REVIEWER)
+// 🚀 WRAPPER WITH 1.5 PRO VIP FALLBACK
 async function generateRoadmapWithRetry(params) {
   // We can afford 2 retries now because we have 5 full minutes to use
   const maxRetries = 2 
@@ -321,12 +321,12 @@ async function generateRoadmapWithRetry(params) {
 
       // If we are on our last retry and it STILL failed, trigger the fallback
       if (attempt === maxRetries - 1) {
-        console.log("Google 2.5 servers are overloaded. Activating Gemini 1.5 Flash Fallback...")
+        console.log("Google 2.5 servers are overloaded. Activating VIP Gemini 1.5 Pro Fallback...")
         try {
-          // The Ultimate Safety Net: Try one last time using the highly-available 1.5 Flash
-          return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-flash' })
+          // The Ultimate Safety Net: Try one last time using the highly-available VIP 1.5 Pro
+          return await generateRoadmapCore({ ...params, modelName: 'gemini-1.5-pro' })
         } catch (fallbackError) {
-          console.error("Gemini 1.5 Flash Fallback also failed:", fallbackError.message)
+          console.error("Gemini 1.5 Pro Fallback also failed:", fallbackError.message)
           throw new Error('Our AI is experiencing heavy traffic. Please try again.')
         }
       }
