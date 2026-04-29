@@ -9,7 +9,6 @@ import { Card, CardContent } from '@/components/ui/card'
 import { toast } from 'sonner'
 
 import { clearAssessmentSession } from '@/lib/assessment-session'
-import SarathiLogo from '@/components/sarathi-logo'
 
 const CheckoutClient = ({ assessmentId }) => {
   const router = useRouter()
@@ -71,10 +70,6 @@ const CheckoutClient = ({ assessmentId }) => {
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4 py-12">
-      <div className="mb-8">
-        <SarathiLogo href="/" imageClassName="h-16 w-auto sm:h-20" />
-      </div>
-
       <Card className="max-w-md w-full border-0 shadow-2xl rounded-3xl overflow-hidden relative">
         {/* Decorative Background */}
         <div className="absolute top-0 left-0 w-full h-32 bg-[#0A2351]">
