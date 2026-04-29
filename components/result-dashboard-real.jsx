@@ -486,19 +486,52 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     ? { section: 'mb-4', text: 'text-sm' }
     : { section: 'mb-8', text: 'text-lg' }
 
+  // 🛡️ Ensure all objects are safely defaulted to prevent undefined access
   const profile = analysis?.psychometric_profile || {}
   const roadmap = analysis?.five_year_roadmap || {}
   const immediateAction = analysis?.immediate_action_plan || {}
   const executiveSummaryParagraphs = parseExecutiveSummary(analysis?.executive_summary)
 
+  // 🛡️ Safely parse Radar Scores. Gemini sometimes uses underscores or different casing.
   const rawScores = analysis?.radar_chart_scores || {}
+  
+  // Helper to safely find a score regardless of exact string formatting
+  const getScore = (keyMatches) => {
+      const foundKey = Object.keys(rawScores).find(k => 
+          keyMatches.some(match => k.toLowerCase().includes(match.toLowerCase()))
+      );
+      return foundKey ? Number(rawScores[foundKey]) || 0 : 0;
+  }
+
   const chartData = [
-    { subject: 'Personality', score: Number(rawScores['Personality'])            || 0, fullMark: 100 },
-    { subject: 'Aptitude',    score: Number(rawScores['Aptitude'])               || 0, fullMark: 100 },
-    { subject: 'Motivation',  score: Number(rawScores['Motivation'])             || 0, fullMark: 100 },
-    { subject: 'Interests',   score: Number(rawScores['Career Interests'])       || 0, fullMark: 100 },
-    { subject: 'Behaviour',   score: Number(rawScores['Behavioural Tendencies']) || 0, fullMark: 100 },
+    { subject: 'Personality', score: getScore(['Personality']), fullMark: 100 },
+    { subject: 'Aptitude',    score: getScore(['Aptitude']), fullMark: 100 },
+    { subject: 'Motivation',  score: getScore(['Motivation']), fullMark: 100 },
+    { subject: 'Interests',   score: getScore(['Career', 'Interest']), fullMark: 100 },
+    { subject: 'Behaviour',   score: getScore(['Behaviour', 'Behavior']), fullMark: 100 },
   ]
+
+  // 🛡️ Ensure blindSpots only ever outputs arrays of objects with string text
+  const blindSpots = Array.isArray(analysis?.potential_blind_spots) 
+    ? analysis.potential_blind_spots.map(spot => ({
+        text: safeText(spot) || "No critical blind spots identified.",
+        isSevere: String(spot).toUpperCase().includes('SEVERE'),
+      }))
+    : []
+
+  const roadmapSteps = [
+    { label: 'Year 1', title: 'Foundation & Skill Launch',     key: 'year_1', icon: Target     },
+    { label: 'Year 2', title: 'Skill Application & Execution', key: 'year_2', icon: BookOpen   },
+    { label: 'Year 3', title: 'Market Acceleration',           key: 'year_3', icon: Sparkles   },
+    { label: 'Year 4', title: 'Strategic Positioning',         key: 'year_4', icon: TrendingUp },
+    { label: 'Year 5', title: 'Leadership & Mastery',          key: 'year_5', icon: Network    },
+  ].map(s => ({ ...s, data: safeText(roadmap?.[s.key]) })).filter(s => s.data) // Added safeText here
+
+  const generatedDate = new Date().toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'long', year: 'numeric',
+  })
+
+// ... rest of the component
 
   const blindSpots = (analysis?.potential_blind_spots || []).map(spot => ({
     text: safeText(spot),
