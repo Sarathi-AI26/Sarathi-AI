@@ -1118,24 +1118,25 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
 
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-      {!isPdfMode && (
-        // 🚀 NEW: Added flex-wrap and gap-3 so buttons sit nicely side-by-side on mobile
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-wrap justify-end gap-3">
+    {!isPdfMode && (
+        // 🚀 CHANGED: Swapped flex-wrap for flex-col on mobile so the download button is full-width and easy to tap
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-col sm:flex-row justify-end gap-3">
           
-          {/* 🚀 NEW: The Share Button */}
+          {/* 🚀 CHANGED: Added 'hidden sm:inline-flex' so this button hides on phones (letting the orange one take over) but shows on laptops */}
           <Button 
             onClick={handleShare} 
             variant="outline"
-            className={`font-bold transition-all ${isCopied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
+            className={`hidden sm:inline-flex font-bold transition-all ${isCopied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
           >
             {isCopied ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
             {isCopied ? 'Link Copied!' : 'Share Result'}
           </Button>
 
+          {/* 🚀 CHANGED: Added 'w-full sm:w-auto' to make it stretch nicely on mobile */}
           <Button 
             onClick={handleDownloadPdf} 
             disabled={isDownloading}
-            className="bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
+            className="w-full sm:w-auto bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
           >
             {isDownloading ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
