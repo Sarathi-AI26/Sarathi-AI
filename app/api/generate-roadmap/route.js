@@ -1,3 +1,4 @@
+// app/api/generate-roadmap/route.js
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../lib/supabase'
 import { GoogleGenerativeAI } from '@google/generative-ai'
@@ -153,15 +154,29 @@ function buildAssessmentContext(assessment) {
 }
 
 // ─────────────────────────────────────────────
-// SYSTEM PROMPT
+// DYNAMIC SYSTEM PROMPT BUILDER
 // ─────────────────────────────────────────────
-const SYSTEM_PROMPT = `You are a warm, deeply insightful career mentor writing directly to a real Indian college student who is confused about their future and needs clarity, courage, and a concrete plan.
+function buildSystemPrompt(averageScore) {
+  const isExploratory = averageScore < 75;
 
-TONE (this changes everything):
+  return `You are a warm, deeply insightful career mentor writing directly to a real Indian college student who is confused about their future and needs clarity, courage, and a concrete plan.
+
+TONE CALIBRATION (NON-NEGOTIABLE):
 - Write using "you" and "your" throughout. Never say "the subject" or "the candidate".
 - Use plain, warm English. Write like a trusted elder sibling who happens to be a career expert.
 - Be honest but kind. If there is a risk, name it with care — not as a verdict, but as a heads-up from someone who genuinely wants them to succeed.
 - Short sentences. Active voice. Every paragraph must feel like it was written for this one specific person.
+- NEVER use absolute, fortune-teller statements like "You are a leader" or "This is your path."
+- Always use probabilistic language: "Your responses strongly indicate..." or "Profiles with these scores often thrive in..."
+
+${isExploratory ? `
+LOW CONFIDENCE OVERRIDE (CRITICAL):
+- This student's average score (${averageScore.toFixed(1)}/100) lacks strong directional signals.
+- Pivot the tone to exploration and experimentation.
+- Replace the confident 5-year mastery plan with a 1-to-2 year discovery plan. Focus on trying different roles, taking short internships, and building foundational flexibility rather than committing to a single deep domain.
+` : `
+- Provide a confident, clear 5-year execution plan focused on skill mastery and direct career progression.
+`}
 
 CONTENT RULES (non-negotiable):
 1. ZERO GENERIC PHRASES: Never use "highly motivated", "thrives in dynamic environments", "natural leader", "passionate learner". Every sentence must apply only to this student — it must be falsifiable.
@@ -179,12 +194,14 @@ CONTENT RULES (non-negotiable):
 13. DREAM CAREER OVERRIDE (CRITICAL): Read the student's answer to Q56 (dream_career). If they explicitly name a specific non-corporate or unconventional career (e.g., Cricketer, Musician, Pilot, IAS Officer, Chef), AT LEAST ONE of your top_career_matches MUST be that exact career or a highly adjacent field in that industry. Do not force them into Analyst or Product Manager roles if their heart is clearly elsewhere. Tailor their entire 5-year roadmap to making that specific dream a reality.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
+}
 
 // ─────────────────────────────────────────────
 // OUTPUT SCHEMA
 // ─────────────────────────────────────────────
 const OUTPUT_SCHEMA = `{
   "user_archetype": "2-3 word label derived from their top scoring dimensions. Clinical but human.",
+  "archetype_translation": "Explain the archetype in plain English. e.g., -> Best suited for: Cybersecurity, Policy, Risk Analysis",
   "identity_statement": "One powerful, emotionally resonant sentence that captures who this student is at their core...",
   "executive_summary": {
     "paragraph_1": "Their core cognitive and behavioural wiring...",
@@ -207,7 +224,7 @@ const OUTPUT_SCHEMA = `{
       "compatibility_score": 90,
       "match_reason": "2-3 sentences written directly to the student...",
       "growth_path": "Entry Level Role → Mid Level Role → Senior Role",
-      "starting_salary_inr": "₹X LPA - ₹Y LPA (Source: Naukri/LinkedIn India, 2024)",
+      "starting_salary_inr": "₹X LPA - ₹Y LPA (Source: Naukri/LinkedIn India, 2026)",
       "key_certifications": ["Specific Cert Name"]
     }
   ],
@@ -263,14 +280,14 @@ function isRetryableError(error) {
   )
 }
 
-// 🚀 DEFAULTING TO 2.5 PRO
-async function generateRoadmapCore({ student_profile, assessment_context, modelName = 'gemini-2.5-pro' }) {
+// 🚀 CORE GENERATOR
+async function generateRoadmapCore({ student_profile, assessment_context, systemPrompt, modelName = 'gemini-2.5-pro' }) {
   if (!process.env.GEMINI_API_KEY) throw new Error('Missing GEMINI_API_KEY')
 
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
   const model = genAI.getGenerativeModel({
     model: modelName, 
-    systemInstruction: SYSTEM_PROMPT,
+    systemInstruction: systemPrompt,
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.3,
@@ -307,25 +324,27 @@ ${OUTPUT_SCHEMA}
   }
 }
 
-// 🚀 SMART ROUTING: Skip 2.5-Flash traffic entirely and route straight to 2.5-Pro
+// 🚀 SMART ROUTING: Flash First, Pro Fallback
 async function generateRoadmapWithRetry(params) {
-  const maxRetries = 2 
-  const delays = [1000] 
+  try {
+    console.log(`🚀 ATTEMPT 1: Routing to lightning-fast gemini-2.5-flash...`);
+    return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-flash' });
+  } catch (error) {
+    console.warn(`⚠️ Attempt 1 (Flash) failed:`, error.message);
+    
+    if (!isRetryableError(error)) {
+        throw new Error('Our AI is experiencing a fatal error. Please try again.');
+    }
+    
+    console.log(`⏸️ Initiating 3-second server breathe before fallback...`);
+    await new Promise(resolve => setTimeout(resolve, 3000));
 
-  for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
-      console.log(`Bypassing 2.5-flash traffic: Routing directly to VIP gemini-2.5-pro (Attempt ${attempt + 1})...`)
-      return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-pro' })
-    } catch (error) {
-      console.error(`Attempt ${attempt + 1} failed:`, error.message)
-
-      if (attempt === maxRetries - 1 || !isRetryableError(error)) {
-        throw new Error('Our AI is experiencing heavy traffic. Please try again.')
-      }
-
-      const waitTime = delays[attempt]
-      console.log(`Waiting ${waitTime}ms before switching models...`)
-      await new Promise(resolve => setTimeout(resolve, waitTime))
+      console.log(`🛡️ ATTEMPT 2: Routing to heavy-duty gemini-2.5-pro fallback...`);
+      return await generateRoadmapCore({ ...params, modelName: 'gemini-2.5-pro' });
+    } catch (fallbackError) {
+      console.error(`❌ Attempt 2 (Pro) failed:`, fallbackError.message);
+      throw new Error('Our AI is experiencing heavy traffic. Please try again.');
     }
   }
 }
@@ -363,17 +382,31 @@ export async function POST(request) {
       return jsonResponse({ ok: true, assessment: normalizeAssessment(assessment) })
     }
 
+    // 🚀 CALCULATE AVERAGE SCORE FOR UNCERTAINTY LAYER
+    let averageScore = 80;
+    let exactScores = null;
+    
+    if (assessment.raw_answers) {
+      exactScores = computeSectionScores(assessment.raw_answers);
+      const scoreValues = Object.values(exactScores);
+      if (scoreValues.length > 0) {
+        averageScore = scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length;
+      }
+    }
+
+    const dynamicSystemPrompt = buildSystemPrompt(averageScore);
+
     const aiAnalysis = await generateRoadmapWithRetry({
       student_profile: {
         name: assessment?.users?.name || 'Student',
         college: assessment?.users?.college || '',
       },
       assessment_context: buildAssessmentContext(assessment),
+      systemPrompt: dynamicSystemPrompt,
     })
 
     // 🚀 THE FIX: Forcibly inject the mathematically perfect scores
-    if (assessment.raw_answers) {
-      const exactScores = computeSectionScores(assessment.raw_answers)
+    if (exactScores) {
       aiAnalysis.radar_chart_scores = {
         "Personality": exactScores["Personality"] || 0,
         "Aptitude": exactScores["Aptitude"] || 0,
