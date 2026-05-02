@@ -4,13 +4,13 @@ import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import {
   BadgeIndianRupee, BrainCircuit, Compass, Lightbulb,
-  LockKeyhole, Network, Sparkles, Target, Loader2,
+  Network, Sparkles, Target, Loader2,
   BookOpen, TrendingUp, Timer, Activity, Globe,
-  AlertTriangle, Lock, ArrowRight, CheckCircle2,
-  Zap, Users, Shield, Brain, XCircle, Quote, Share2 // 🚀 ADDED Share2 HERE
+  AlertTriangle, ArrowRight, CheckCircle2,
+  Zap, Users, Shield, Brain, XCircle, Quote, Share2, Flame, Scale
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   Radar, RadarChart, PolarGrid, PolarAngleAxis,
   ResponsiveContainer, Tooltip,
@@ -22,7 +22,6 @@ import {
 const hasFullAnalysis = (analysis) =>
   Boolean(analysis?.executive_summary && Array.isArray(analysis?.top_career_matches))
 
-// This function intercepts ANY rogue objects before they hit React
 const safeText = (val) => {
   if (val === null || val === undefined) return '';
   if (typeof val === 'string') return val;
@@ -30,7 +29,6 @@ const safeText = (val) => {
   if (Array.isArray(val)) return val.map(safeText).join(', ');
   if (typeof val === 'object') {
     try {
-      // If Gemini accidentally passes an object (Error #31), flatten it quietly
       return Object.values(val)
         .map(v => (typeof v === 'object' && v !== null) ? '' : String(v))
         .filter(Boolean).join(' ');
@@ -41,12 +39,27 @@ const safeText = (val) => {
   return String(val);
 }
 
+// 🚀 UPGRADED: Handles the new V2 JSON bullet object while keeping V1 backwards compatible
 const parseExecutiveSummary = (raw) => {
-  if (!raw) return []
-  if (typeof raw === 'string') return raw.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean)
-  if (Array.isArray(raw)) return raw.map(safeText).filter(Boolean)
-  if (typeof raw === 'object') return Object.values(raw).map(safeText).filter(Boolean)
-  return []
+  if (!raw) return { core_wiring: [], risk_profile: [], motivation: [] }
+  
+  // Legacy V1 Fallback (Strings/Arrays)
+  if (typeof raw === 'string') {
+    return { core_wiring: raw.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean), risk_profile: [], motivation: [] }
+  }
+  if (Array.isArray(raw)) {
+    return { core_wiring: raw.map(safeText).filter(Boolean), risk_profile: [], motivation: [] }
+  }
+  
+  // V2 Bullet Object
+  if (typeof raw === 'object') {
+    return {
+      core_wiring: Array.isArray(raw.core_wiring) ? raw.core_wiring.map(safeText).filter(Boolean) : [],
+      risk_profile: Array.isArray(raw.risk_profile) ? raw.risk_profile.map(safeText).filter(Boolean) : [],
+      motivation: Array.isArray(raw.motivation) ? raw.motivation.map(safeText).filter(Boolean) : [],
+    }
+  }
+  return { core_wiring: [], risk_profile: [], motivation: [] }
 }
 
 const ICON_MAP = {
@@ -142,6 +155,90 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
     </div>
   </div>
 )
+
+// ─────────────────────────────────────────────
+// NEW: TRUTH BOMB COMPONENT
+// ─────────────────────────────────────────────
+const TruthBomb = ({ data, isPdfMode }) => {
+  if (!data || !data.headline) return null;
+  return (
+    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+      <div className={`rounded-[2rem] border-l-8 border-l-red-500 bg-gradient-to-r from-red-50 to-white p-6 sm:p-10 relative overflow-hidden shadow-sm`}>
+        <div className="absolute -right-10 -top-10 opacity-5">
+          <Flame className="h-48 w-48 text-red-500" />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Flame className="h-5 w-5 text-red-500" />
+            <h3 className={`font-black text-red-700 uppercase tracking-widest ${isPdfMode ? 'text-xs' : 'text-sm'}`}>
+              The Brutal Truth: {safeText(data.headline)}
+            </h3>
+          </div>
+          <p className={`font-bold text-[#0A2351] leading-relaxed ${isPdfMode ? 'text-base' : 'text-xl sm:text-2xl'} max-w-4xl`}>
+            "{safeText(data.insight)}"
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─────────────────────────────────────────────
+// NEW: COMPARISON TABLE COMPONENT
+// ─────────────────────────────────────────────
+const ComparisonTable = ({ isPdfMode }) => (
+  <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <SectionHeading icon={Scale} title="Why This Matters" subtitle="Generic Advice vs. Your DNA Blueprint" isPdfMode={isPdfMode} />
+    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <table className="w-full text-left text-sm">
+        <thead className="bg-[#0A2351] text-white">
+          <tr>
+            <th className="p-4 sm:p-5 font-bold w-1/2">The Old Way (Generic)</th>
+            <th className="p-4 sm:p-5 font-bold w-1/2 bg-[#F57D14]">SARATHI Way (Your Data)</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-slate-100">
+          <tr>
+            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Follow your passion."</td>
+            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Align passion strictly with your proven aptitude scores.</td>
+          </tr>
+          <tr>
+            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Get a safe, stable corporate job."</td>
+            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Leverage your specific risk-tolerance and decisiveness profile.</td>
+          </tr>
+          <tr>
+            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Figure it out as you go."</td>
+            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Execute a 5-year mapped timeline built for your traits.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+)
+
+// ─────────────────────────────────────────────
+// NEW: FINAL CTA COMPONENT
+// ─────────────────────────────────────────────
+const FinalCTA = ({ isPdfMode }) => {
+  return (
+    <section className={`avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden`}>
+      <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
+      <div className="relative z-10">
+        <h2 className={`font-extrabold mb-4 ${isPdfMode ? 'text-2xl' : 'text-3xl sm:text-4xl'}`}>
+          Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
+        </h2>
+        <p className="text-white/80 mb-8 max-w-xl mx-auto text-sm sm:text-base">
+          You now have the exact roadmap based on your psychological DNA. The guesswork is over. The next step is execution.
+        </p>
+        {!isPdfMode && (
+          <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
+            <Link href="/dashboard">Return to Dashboard <ArrowRight className="ml-2 h-5 w-5" /></Link>
+          </Button>
+        )}
+      </div>
+    </section>
+  )
+}
 
 // ─────────────────────────────────────────────
 // PROFILE BADGE
@@ -503,7 +600,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const profile = analysis?.psychometric_profile || {}
   const roadmap = analysis?.five_year_roadmap || {}
   const immediateAction = analysis?.immediate_action_plan || {}
-  const executiveSummaryParagraphs = parseExecutiveSummary(analysis?.executive_summary)
+  const summaryBullets = parseExecutiveSummary(analysis?.executive_summary)
 
   const rawScores = analysis?.radar_chart_scores || {}
   
@@ -540,6 +637,26 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const generatedDate = new Date().toLocaleDateString('en-IN', {
     day: 'numeric', month: 'long', year: 'numeric',
   })
+
+  // Helper for rendering bullet lists
+  const renderList = (title, items, icon) => {
+    if (!items || items.length === 0) return null;
+    return (
+      <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+        <div className="flex items-center gap-2 font-bold text-[#0A2351] mb-3 border-b border-slate-100 pb-2">
+           {icon} {title}
+        </div>
+        <ul className="space-y-3">
+           {items.map((item, idx) => (
+             <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-600">
+               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57D14]" />
+               <span className="leading-relaxed">{item}</span>
+             </li>
+           ))}
+        </ul>
+      </div>
+    )
+  }
 
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
@@ -615,35 +732,46 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           <span style={{ fontSize: 16, flexShrink: 0 }}>ℹ️</span>
           <p style={{ fontSize: 10, color: '#64748b', margin: 0, lineHeight: 1.6 }}>
             <strong style={{ color: '#0A2351' }}>How this report was generated:</strong>{' '}
-            Your match scores are computed from 60 psychometric responses across 5 dimensions —
-            Personality, Aptitude, Motivation, Career Interests, and Behavioural Tendencies.
-            Career compatibility percentages reflect the alignment between your response profile
-            and validated role requirement clusters. Salary ranges are indicative based on
-            Naukri and LinkedIn India data (2026). All inferences are directional — treat this
-            as a starting point for exploration, not a definitive prescription.
+            Your match scores are computed from 60 psychometric responses across 5 dimensions.
+            Career compatibility percentages reflect alignment between your profile and validated role requirements.
+            Salary ranges are indicative based on Naukri/LinkedIn India data (2026).
+            All inferences are directional — treat this as a starting point, not a definitive prescription.
           </p>
         </div>
       )}
 
+      {/* 🚀 NEW: TRUTH BOMB */}
+      <TruthBomb data={analysis.truth_bomb} isPdfMode={isPdfMode} />
+
+      {/* 🚀 UPGRADED: CAREER DNA SNAPSHOT (Bullets instead of paragraphs) */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={BrainCircuit}
-          title="Your Psychometric Summary"
-          subtitle="What your 60 answers actually say about you."
+          title="Career DNA Snapshot"
+          subtitle="The core wiring dictating your path."
           isPdfMode={isPdfMode}
         />
-        <Card className="border-0 shadow-sm avoid-break">
-          <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
-            {executiveSummaryParagraphs.map((para, i) => (
-              <p key={i} style={{ orphans: 3, widows: 3 }}>{safeText(para)}</p>
-            ))}
-          </CardContent>
-        </Card>
+        {/* Render legacy paragraphs if old data format, otherwise render new card grid */}
+        {summaryBullets.core_wiring?.length > 0 && typeof summaryBullets.core_wiring[0] === 'string' && !summaryBullets.risk_profile?.length ? (
+           <Card className="border-0 shadow-sm avoid-break">
+            <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
+              {summaryBullets.core_wiring.map((para, i) => (
+                <p key={i} style={{ orphans: 3, widows: 3 }}>{safeText(para)}</p>
+              ))}
+            </CardContent>
+          </Card>
+        ) : (
+          <div className={`grid gap-4 ${isPdfMode ? 'grid-cols-3' : 'sm:grid-cols-3'}`}>
+            {renderList("Core Wiring", summaryBullets.core_wiring, <Zap className="h-4 w-4 text-[#F57D14]"/>)}
+            {renderList("Risk Profile", summaryBullets.risk_profile, <Shield className="h-4 w-4 text-[#F57D14]"/>)}
+            {renderList("Motivation", summaryBullets.motivation, <Target className="h-4 w-4 text-[#F57D14]"/>)}
+          </div>
+        )}
       </section>
 
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'}>
+      <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'} id="nextpage1">
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none">
@@ -684,7 +812,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
 
         <section className={`avoid-break ${sp.section}`}>
-          <SectionHeading icon={Compass} title="Psychometric DNA" isPdfMode={isPdfMode} />
+          <SectionHeading icon={Compass} title="Psychometric Traits" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none">
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
               {profile.dominant_personality_traits?.length > 0 && (
@@ -894,6 +1022,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* 🚀 NEW: COMPARISON TABLE */}
+      <ComparisonTable isPdfMode={isPdfMode} />
+
       <section className={`avoid-break ${isPdfMode ? 'pt-2' : 'mt-4'}`}>
         <SectionHeading
           icon={TrendingUp}
@@ -903,6 +1034,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         />
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
+
+      {/* 🚀 NEW: FINAL CTA */}
+      <FinalCTA isPdfMode={isPdfMode} />
 
     </div>
   )
@@ -919,7 +1053,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   const [isPdfMode, setIsPdfMode] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   
-  // 🚀 NEW: State for Share Button
   const [isCopied, setIsCopied] = useState(false) 
   
   const [elapsed, setElapsed] = useState(0)
@@ -999,13 +1132,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     [assessment]
   )
 
-  // 🚀 NEW: Share Button Functionality
   const handleShare = async () => {
     try {
       const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
       await navigator.clipboard.writeText(shareUrl);
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2500); // Changes button back after 2.5s
+      setTimeout(() => setIsCopied(false), 2500);
     } catch (err) {
       console.error("Failed to copy link:", err);
     }
@@ -1077,7 +1209,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         setIsPdfMode(false)
         setIsDownloading(false)
     }).catch((err) => {
-        // 🚀 NEW: Safety Fallback for Safari/Mobile users
         console.error("PDF Generation Failed:", err);
         setIsPdfMode(false)
         setIsDownloading(false)
@@ -1119,10 +1250,8 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   return (
     <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
     {!isPdfMode && (
-        // 🚀 CHANGED: Swapped flex-wrap for flex-col on mobile so the download button is full-width and easy to tap
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-col sm:flex-row justify-end gap-3">
           
-          {/* 🚀 CHANGED: Added 'hidden sm:inline-flex' so this button hides on phones (letting the orange one take over) but shows on laptops */}
           <Button 
             onClick={handleShare} 
             variant="outline"
@@ -1132,7 +1261,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
             {isCopied ? 'Link Copied!' : 'Share Result'}
           </Button>
 
-          {/* 🚀 CHANGED: Added 'w-full sm:w-auto' to make it stretch nicely on mobile */}
           <Button 
             onClick={handleDownloadPdf} 
             disabled={isDownloading}
