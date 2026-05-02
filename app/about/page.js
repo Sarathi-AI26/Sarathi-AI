@@ -166,7 +166,7 @@ export default function AboutPage() {
         </section>
 
         {/* ── MID-PAGE CTA ── */}
-        <section className="bg-slate-50 py-16">
+        <section className="bg-slate-50 py-16 lg:py-20">
           <div className="container mx-auto px-4 text-center">
              <h2 className="text-3xl font-extrabold text-[#0A2351] sm:text-4xl">Confused about your career path?</h2>
              <p className="mt-4 text-lg text-slate-600">Stop guessing. Get clarity in 15 minutes.</p>
