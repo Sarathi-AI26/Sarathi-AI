@@ -430,7 +430,7 @@ export default function Home() {
         </section>
 
         {/* ── METHODOLOGY (Layered Approach) ── */}
-        <section id="methodology" className="scroll-mt-24 bg-white py-20 lg:py-28">
+        <section id="methodology" className="bg-white py-20 lg:py-28">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-12">
               <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">Methodology</p>
@@ -472,7 +472,7 @@ export default function Home() {
         </section>
 
         {/* ── TESTIMONIALS ── */}
-        <section id="about" className="scroll-mt-24 bg-[#0A2351] py-20 lg:py-28">
+        <section id="about" className="bg-[#0A2351] py-20 lg:py-28">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">Student Stories</p>
@@ -563,7 +563,7 @@ export default function Home() {
         </section>
 
         {/* ── FOR INSTITUTIONS ── */}
-        <section id="institutions" className="scroll-mt-24 bg-white py-20 lg:py-28 border-t border-slate-100">
+        <section id="institutions" className="bg-white py-20 lg:py-28 border-t border-slate-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="order-2 lg:order-1">
@@ -623,7 +623,7 @@ export default function Home() {
         </section>
 
         {/* ── CONTACT ── */}
-        <section id="contact" className="scroll-mt-24 bg-[#0A2351] py-20 lg:py-28">
+        <section id="contact" className="bg-[#0A2351] py-20 lg:py-28">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-center">
               <div className="space-y-10">
