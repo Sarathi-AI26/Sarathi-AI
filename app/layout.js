@@ -1,3 +1,4 @@
+// app/layout.js
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
@@ -19,7 +20,8 @@ export const metadata = {
 
 const App = ({ children }) => {
   return (
-    <html lang="en" className={inter.variable}>
+    // 🚀 THE FIX: Template literals allow the font variable and the scroll padding to coexist
+    <html lang="en" className={`${inter.variable} scroll-pt-20 sm:scroll-pt-28`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -41,4 +43,3 @@ const App = ({ children }) => {
 }
 
 export default App
-
