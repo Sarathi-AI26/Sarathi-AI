@@ -36,20 +36,7 @@ const ResultPage = () => {
             <p className="text-sm text-slate-500 hidden sm:block">
               Your personalised career roadmap is ready.
             </p>
-            <div className="flex items-center gap-3 ml-auto">
-              <Button
-                variant="outline"
-                onClick={handleCopyLink}
-                className="h-12 rounded-2xl px-5 font-medium border-slate-200 text-slate-600 hover:border-[#0A2351] transition-all"
-              >
-                {copied ? (
-                  <><CheckCircle2 className="mr-2 h-4 w-4 text-green-500" /> Link Copied</>
-                ) : (
-                  <><Share2 className="mr-2 h-4 w-4" /> Share</>
-                )}
-              </Button>
-              {/* The Orange Download Button and its logic have been successfully removed from here */}
-            </div>
+           
           </div>
         )}
 
