@@ -3,8 +3,7 @@
 import React, { useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import ResultDashboardReal from '@/components/result-dashboard-real'
-import { Loader2, Share2, CheckCircle2 } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Loader2 } from 'lucide-react'
 
 // ─────────────────────────────────────────────
 // RESULT PAGE
@@ -14,17 +13,6 @@ const ResultPage = () => {
   const assessmentId = searchParams.get('id') || ''
 
   const [isReportReady, setIsReportReady] = useState(false)
-  const [copied, setCopied] = useState(false)
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2500)
-    } catch {
-      console.warn('Clipboard copy failed')
-    }
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 py-4 sm:py-8">
@@ -36,7 +24,6 @@ const ResultPage = () => {
             <p className="text-sm text-slate-500 hidden sm:block">
               Your personalised career roadmap is ready.
             </p>
-           
           </div>
         )}
 
