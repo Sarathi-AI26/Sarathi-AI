@@ -178,7 +178,7 @@ LOW CONFIDENCE OVERRIDE (CRITICAL):
 
 CONTENT RULES (non-negotiable):
 1. ZERO GENERIC PHRASES: Every sentence must be specific and falsifiable.
-2. BULLET POINTS ONLY: In the executive_summary, provide short, punchy bullet points. NO PARAGRAPHS.
+2. EMPATHETIC PROSE (CRITICAL): For the executive_summary, provide beautifully written, highly empathetic paragraphs. Use warm, resonant prose to connect with the student's psychological profile. Do NOT use bullet points here.
 3. THE TRUTH BOMB: You must generate a 'truth_bomb' section. This is a bold, highly emotional, slightly provocative insight about their specific personality and what is holding them back or what their true superpower is. Make it hit hard.
 4. CITE DATA: Reference a specific question number and score in your insights. 
 5. PROCRASTINATION: If Q48 is Strongly Agree or Agree — flag it first in what_to_avoid as a self-management risk.
@@ -201,11 +201,11 @@ const OUTPUT_SCHEMA = `{
     "headline": "A bold, 3-5 word attention-grabbing headline (e.g., 'The Perfectionism Trap', 'Your Hidden Superpower')",
     "insight": "2-3 sentences of deep, slightly provocative emotional insight about their profile. Tell them the hard truth about what they need to leverage or overcome to succeed."
   },
-  "executive_summary": {
-    "core_wiring": ["Bullet 1 citing Q score", "Bullet 2 citing Q score"],
-    "risk_profile": ["Bullet 1 citing Q score", "Bullet 2 citing Q score"],
-    "motivation": ["Bullet 1 connecting Q58 and Q59"]
-  },
+  "executive_summary": [
+    "Paragraph 1: Their core cognitive and behavioural wiring...",
+    "Paragraph 2: Their risk profile and decisiveness pattern...",
+    "Paragraph 3: Connect their role model (Q58) to their intrinsic motivation (Q59)..."
+  ],
   "radar_chart_scores": {
     "Personality": 0, "Aptitude": 0, "Motivation": 0, "Career Interests": 0, "Behavioural Tendencies": 0
   },
