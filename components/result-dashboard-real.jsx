@@ -670,6 +670,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
+          .html2pdf__page-break { height: 0 !important; margin: 0 !important; padding: 0 !important; page-break-before: always !important; clear: both !important; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           section { margin-bottom: 16px !important; }
         `}} />
@@ -777,6 +778,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
+      {/* 🚀 HARD PAGE BREAK 1: Before Psychometric Dimensions */}
+      {isPdfMode && <div className="html2pdf__page-break" />}
+
       <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'} id="nextpage1">
         <section className={`avoid-break ${sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
@@ -873,20 +877,25 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
+      {/* 🚀 HARD PAGE BREAK 2: Before Career Matches */}
+      {isPdfMode && <div className="html2pdf__page-break" />}
+
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
-      <section className={`avoid-break ${sp.section}`}>
-        <SectionHeading
-          icon={Target}
-          title="Your Career Matches — In Detail"
-          subtitle="Each matched to your specific scores."
-          isPdfMode={isPdfMode}
-        />
+      <section className={`${sp.section}`}>
+        <div className="avoid-break">
+          <SectionHeading
+            icon={Target}
+            title="Your Career Matches — In Detail"
+            subtitle="Each matched to your specific scores."
+            isPdfMode={isPdfMode}
+          />
+        </div>
         <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
           {(analysis.top_career_matches || []).map((match, i) => (
             <Card
               key={i}
-              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
             >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
@@ -937,6 +946,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           ))}
         </div>
       </section>
+
+      {/* 🚀 HARD PAGE BREAK 3: Before What To Avoid */}
+      {isPdfMode && <div className="html2pdf__page-break" />}
 
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
@@ -1031,6 +1043,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* 🚀 NEW: COMPARISON TABLE */}
       <ComparisonTable isPdfMode={isPdfMode} />
 
+      {/* 🚀 HARD PAGE BREAK 4: Before 5-Year Roadmap */}
+      {isPdfMode && <div className="html2pdf__page-break" />}
+      
       {/* 🚀 THE FIX: Removed 'avoid-break' from the <section> below */}
       <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
         <div className="avoid-break">
@@ -1044,8 +1059,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
-      {/* 🚀 NEW: FINAL CTA */}
-      <FinalCTA isPdfMode={isPdfMode} />
+      {/* 🚀 COMPLETELY HIDDEN ON PDF: Final CTA is only for website users now */}
+      {!isPdfMode && <FinalCTA isPdfMode={isPdfMode} />}
 
     </div>
   )
@@ -1185,8 +1200,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         windowWidth: 780 
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      // 🚀 UPDATED PAGEBREAK RULE BELOW
-      pagebreak:    { mode: ['css', 'legacy'], before: ['#nextpage1', '#final-cta'] } 
+      pagebreak:    { mode: ['css', 'legacy'] } 
     }
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
