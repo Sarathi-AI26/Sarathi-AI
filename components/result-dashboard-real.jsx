@@ -619,7 +619,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
             Personality, Aptitude, Motivation, Career Interests, and Behavioural Tendencies.
             Career compatibility percentages reflect the alignment between your response profile
             and validated role requirement clusters. Salary ranges are indicative based on
-            Naukri and LinkedIn India data (2024). All inferences are directional — treat this
+            Naukri and LinkedIn India data (2026). All inferences are directional — treat this
             as a starting point for exploration, not a definitive prescription.
           </p>
         </div>
