@@ -221,7 +221,11 @@ const ComparisonTable = ({ isPdfMode }) => (
 // ─────────────────────────────────────────────
 const FinalCTA = ({ isPdfMode }) => {
   return (
-    <section className={`avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden`}>
+    <section 
+      id="final-cta" 
+      className={`avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden`}
+      style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+    >
       <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
       <div className="relative z-10">
         <h2 className={`font-extrabold mb-4 ${isPdfMode ? 'text-2xl' : 'text-3xl sm:text-4xl'}`}>
@@ -231,9 +235,11 @@ const FinalCTA = ({ isPdfMode }) => {
           You now have the exact roadmap based on your psychological DNA. The guesswork is over. The next step is execution.
         </p>
         {!isPdfMode && (
-          <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
-            <Link href="/dashboard">Return to Dashboard <ArrowRight className="ml-2 h-5 w-5" /></Link>
-          </Button>
+          <div data-html2canvas-ignore="true">
+            <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
+              <Link href="/">Return to Home <ArrowRight className="ml-2 h-5 w-5" /></Link>
+            </Button>
+          </div>
         )}
       </div>
     </section>
@@ -1025,13 +1031,16 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* 🚀 NEW: COMPARISON TABLE */}
       <ComparisonTable isPdfMode={isPdfMode} />
 
-      <section className={`avoid-break ${isPdfMode ? 'pt-2' : 'mt-4'}`}>
-        <SectionHeading
-          icon={TrendingUp}
-          title="Your 5-Year Roadmap"
-          subtitle="Year by year — from where you are to where you want to be."
-          isPdfMode={isPdfMode}
-        />
+      {/* 🚀 THE FIX: Removed 'avoid-break' from the <section> below */}
+      <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
+        <div className="avoid-break">
+          <SectionHeading
+            icon={TrendingUp}
+            title="Your 5-Year Roadmap"
+            subtitle="Year by year — from where you are to where you want to be."
+            isPdfMode={isPdfMode}
+          />
+        </div>
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
@@ -1176,7 +1185,8 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         windowWidth: 780 
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: 'css', before: '#nextpage1' } 
+      // 🚀 UPDATED PAGEBREAK RULE BELOW
+      pagebreak:    { mode: ['css', 'legacy'], before: ['#nextpage1', '#final-cta'] } 
     }
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
