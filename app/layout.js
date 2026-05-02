@@ -21,7 +21,7 @@ export const metadata = {
 const App = ({ children }) => {
   return (
     // 🚀 THE FIX: Template literals allow the font variable and the scroll padding to coexist
-    <html lang="en" className={`${inter.variable} scroll-pt-20 sm:scroll-pt-28`}>
+    <html lang="en" className={`${inter.variable} scroll-pt-16 sm:scroll-pt-24`}>
       <head>
         <script
           dangerouslySetInnerHTML={{
