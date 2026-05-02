@@ -312,7 +312,7 @@ export default function Home() {
                       <div className="h-3 w-3 rounded-full bg-red-400/70" />
                       <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
                       <div className="h-3 w-3 rounded-full bg-green-400/70" />
-                      <p className="ml-3 text-xs font-semibold text-white/40">sarathipp.in · Career Report</p>
+                      <p className="ml-3 text-xs font-semibold text-white/40">sarathiapp.in · Career Report</p>
                     </div>
                   </div>
 
