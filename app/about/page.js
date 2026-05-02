@@ -9,7 +9,8 @@ import {
   Users,
   ArrowRight,
   Rocket,
-  Award
+  Award,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -23,7 +24,7 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white">
       <main>
         
-        {/* HERO */}
+        {/* ── HERO ── */}
         <section className="relative overflow-hidden bg-[#0A2351] pt-12 pb-20 lg:pt-20 lg:pb-24">
           <div className="absolute inset-0">
             <div className="absolute -top-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#F57D14]/20 blur-[100px]" />
@@ -33,18 +34,30 @@ export default function AboutPage() {
             <div className="mb-6 inline-flex items-center rounded-full bg-white/10 px-4 py-2 text-sm font-bold uppercase tracking-widest text-[#F57D14] border border-white/10 backdrop-blur-sm">
               Our Story
             </div>
-            <h1 className="mx-auto max-w-4xl text-5xl font-extrabold tracking-tight text-white sm:text-6xl xl:text-7xl">
-              Bridging the gap between{' '}
-              <span className="text-[#F57D14]">potential</span> and{' '}
-              <span className="text-[#F57D14]">placement.</span>
+            <h1 className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-white sm:text-5xl xl:text-7xl">
+              Most students don’t fail because they lack talent.<br className="hidden sm:block" />
+              <span className="text-[#F57D14]">They fail because they choose the wrong path.</span>
             </h1>
-            <p className="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-white/80">
-              We are on a mission to eliminate career confusion for millions of Indian college students by combining deep psychological science with cutting-edge AI.
+            <p className="mx-auto mt-8 max-w-2xl text-lg font-medium leading-relaxed text-white/80">
+              Bridging the gap between potential and placement.
             </p>
+            
+            {/* Hero CTA */}
+            <div className="mt-10 flex flex-col items-center justify-center">
+              <Button
+                asChild
+                className="h-14 rounded-full bg-[#F57D14] px-10 text-lg font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/20 transition-transform hover:scale-105"
+              >
+                <Link href="/assessment">
+                  Start Career Test <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+              <p className="mt-4 text-sm font-medium text-white/70">Takes 15 minutes • No signup required</p>
+            </div>
           </div>
         </section>
 
-        {/* THE PROBLEM & SOLUTION */}
+        {/* ── THE PROBLEM & SOLUTION ── */}
         <section className="py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
@@ -52,31 +65,55 @@ export default function AboutPage() {
               <div className="space-y-8">
                 <div>
                   <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">
-                    The old way of career counseling is broken.
+                    The current career system is broken.
                   </h2>
+                  <ul className="mt-6 space-y-4 text-lg text-slate-600">
+                    <li className="flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57D14]" /> 
+                      Students choose careers based on guesswork
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57D14]" /> 
+                      Outdated tests don’t match real jobs
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57D14]" /> 
+                      Advice is generic, not personalized
+                    </li>
+                  </ul>
+                  
+                  <div className="mt-8 rounded-2xl bg-red-50 p-5 border border-red-100">
+                    <p className="flex items-start gap-3 text-lg font-bold leading-relaxed text-[#0A2351]">
+                      <AlertTriangle className="h-6 w-6 shrink-0 text-red-500" />
+                      This leads to years of confusion, wrong choices, and wasted potential.
+                    </p>
+                  </div>
+
                   <p className="mt-6 text-lg leading-relaxed text-slate-600">
-                    Every year, millions of Indian students graduate with degrees, but without direction. Traditional career counseling relies on outdated personality tests, subjective human opinions, and generic advice that does not account for the rapidly changing job market.
-                  </p>
-                  <p className="mt-4 text-lg leading-relaxed text-slate-600">
                     We knew there had to be a better, more scientific way.{' '}
-                    <strong className="text-[#0A2351]">SARATHI</strong> (Student Assessment Roadmap Application for Transformation & Holistic Improvement) was born from a simple idea: what if we could map a student's intrinsic traits directly to high-growth career trajectories with pinpoint accuracy?
+                    <strong className="text-[#0A2351]">SARATHI</strong> (Student Assessment Roadmap Application for Transformation & Holistic Improvement) was born to map your intrinsic traits directly to high-growth career trajectories with pinpoint accuracy.
                   </p>
                 </div>
                 
                 {/* ── STATS ── */}
-                <div className="grid grid-cols-2 gap-8 border-t border-slate-100 pt-8">
-                  <div>
-                    <h4 className="text-4xl font-extrabold text-[#F57D14]">15</h4>
-                    <p className="mt-2 text-sm font-bold uppercase tracking-wider text-slate-500">
-                      Minutes to Clarity
-                    </p>
+                <div className="border-t border-slate-100 pt-8">
+                  <div className="grid grid-cols-3 gap-4 sm:gap-8">
+                    <div>
+                      <h4 className="text-3xl sm:text-4xl font-extrabold text-[#F57D14]">15</h4>
+                      <p className="mt-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">Minutes to Clarity</p>
+                    </div>
+                    <div>
+                      <h4 className="text-3xl sm:text-4xl font-extrabold text-[#F57D14]">60</h4>
+                      <p className="mt-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">Psychometric Dimensions</p>
+                    </div>
+                    <div>
+                      <h4 className="text-3xl sm:text-4xl font-extrabold text-[#F57D14]">10k+</h4>
+                      <p className="mt-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500">Career Data Points</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-4xl font-extrabold text-[#F57D14]">60</h4>
-                    <p className="mt-2 text-sm font-bold uppercase tracking-wider text-slate-500">
-                      Psychometric Dimensions
-                    </p>
-                  </div>
+                  <p className="mt-6 text-sm font-medium italic text-slate-500 text-center sm:text-left">
+                    Backed by real career data, not assumptions
+                  </p>
                 </div>
               </div>
 
@@ -95,7 +132,7 @@ export default function AboutPage() {
                       <div>
                         <h4 className="font-bold text-[#0A2351]">Bias-Free Analysis</h4>
                         <p className="mt-1 text-sm text-slate-600">
-                          AI does not judge. It purely analyses 60 psychological data points to find your true fit.
+                          No opinions. Pure data-driven career fit.
                         </p>
                       </div>
                     </li>
@@ -106,7 +143,7 @@ export default function AboutPage() {
                       <div>
                         <h4 className="font-bold text-[#0A2351]">Actionable Roadmaps</h4>
                         <p className="mt-1 text-sm text-slate-600">
-                          We do not just give you a label. We give you a specific year-by-year execution plan.
+                          Not suggestions. A step-by-step execution plan.
                         </p>
                       </div>
                     </li>
@@ -117,7 +154,7 @@ export default function AboutPage() {
                       <div>
                         <h4 className="font-bold text-[#0A2351]">Built for India</h4>
                         <p className="mt-1 text-sm text-slate-600">
-                          Our engine is specifically trained on the nuances of the Indian tech and corporate job market.
+                          Mapped to real Indian job market demands.
                         </p>
                       </div>
                     </li>
@@ -128,8 +165,27 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* CORE VALUES GRID */}
-        <section className="bg-slate-50 py-16 lg:py-20">
+        {/* ── MID-PAGE CTA ── */}
+        <section className="bg-slate-50 py-16">
+          <div className="container mx-auto px-4 text-center">
+             <h2 className="text-3xl font-extrabold text-[#0A2351] sm:text-4xl">Confused about your career path?</h2>
+             <p className="mt-4 text-lg text-slate-600">Stop guessing. Get clarity in 15 minutes.</p>
+             <div className="mt-8 flex flex-col items-center justify-center">
+                <Button
+                  asChild
+                  className="h-14 rounded-full bg-[#F57D14] px-10 text-lg font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/20 transition-transform hover:scale-105"
+                >
+                  <Link href="/assessment">
+                    Start Career Test <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <p className="mt-4 text-sm font-medium text-slate-500">Takes 15 minutes • No signup required</p>
+             </div>
+          </div>
+        </section>
+
+        {/* ── CORE VALUES GRID ── */}
+        <section className="bg-white py-16 lg:py-20 border-t border-slate-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mb-12 text-center">
               <h2 className="text-3xl font-bold tracking-tight text-[#0A2351] sm:text-4xl">Our Core DNA</h2>
@@ -139,12 +195,12 @@ export default function AboutPage() {
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: Target,      title: 'Absolute Clarity',   desc: 'Cutting through the noise to help students find their true north.',                                   color: 'bg-blue-600'    },
-                { icon: Sparkles,    title: 'AI Innovation',      desc: 'Leveraging Gemini to process complex psychometric data in real-time.',                          color: 'bg-[#F57D14]'  },
-                { icon: BrainCircuit,title: 'Scientific Rigor',   desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and SDT.', color: 'bg-indigo-600' },
-                { icon: Award,       title: 'Student First',      desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',                      color: 'bg-emerald-600' },
+                { icon: Target,      title: 'No More Confusion',   desc: 'Cutting through the noise to help students find their true north.',                                   color: 'bg-blue-600'    },
+                { icon: Sparkles,    title: 'AI That Understands You', desc: 'Leveraging Gemini to process complex psychometric data in real-time.',                          color: 'bg-[#F57D14]'  },
+                { icon: BrainCircuit,title: 'Backed by Real Science',  desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and SDT.', color: 'bg-indigo-600' },
+                { icon: Award,       title: 'Built for Your Future',   desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',                      color: 'bg-emerald-600' },
               ].map((value, i) => (
-                <div key={i} className="rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:shadow-xl hover:-translate-y-1">
+                <div key={i} className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all hover:shadow-xl hover:-translate-y-1">
                   <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md ${value.color}`}>
                     <value.icon className="h-6 w-6" />
                   </div>
@@ -156,7 +212,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* CTA */}
+        {/* ── FINAL CTA ── */}
         <section className="py-16 lg:py-20 relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="mx-auto max-w-4xl rounded-[3rem] bg-[#0A2351] p-10 text-center shadow-2xl sm:p-16 relative overflow-hidden">
@@ -176,7 +232,10 @@ export default function AboutPage() {
                     Start Career Test <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <p className="mt-4 text-sm font-medium text-white/70">Takes 15 minutes • No signup required</p>
+                <div className="mt-4 flex flex-col items-center gap-1 text-sm font-medium text-white/70">
+                   <span>Takes 15 minutes • No signup required</span>
+                   <span>Free to start • Full roadmap ₹99</span>
+                </div>
               </div>
             </div>
           </div>
