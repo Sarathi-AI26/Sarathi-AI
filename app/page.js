@@ -39,21 +39,21 @@ const STATS = [
 const TESTIMONIALS = [
   {
     name: 'Rahul S.',
-    college: 'Engineering Student',
+    college: 'Final Year Engineering Student',
     avatar: 'RS',
     quote:
       'I was torn between an MBA and starting a venture. The 5-year roadmap broke it down quarter by quarter and told me exactly what to do in the next 30 days. This level of clarity is unmatched.',
   },
   {
     name: 'Priya M.',
-    college: 'Commerce Student',
+    college: '2nd Year B.Com Student',
     avatar: 'PM',
     quote:
       'The psychometric radar was unsettlingly accurate. It flagged my tendency to overthink before committing and recommended roles with structured decision-making. I avoided a wrong job offer because of it.',
   },
   {
     name: 'Neha T.',
-    college: 'Engineering Student',
+    college: 'Tier-2 Engineering College',
     avatar: 'NT',
     quote:
       'Within 15 minutes I had a clear Year 1 and Year 2 action plan. I had already landed two internship interviews at companies the report specifically recommended targeting.',
@@ -64,22 +64,22 @@ const OUTCOMES = [
   {
     icon: Compass,
     title: 'A Clear Career Direction',
-    desc: 'Matched precisely to your unique personality and cognitive style, not just your degree.',
+    desc: 'Know exactly which career fits you (and which doesn’t).',
   },
   {
     icon: Target,
     title: 'Specific Skills to Build',
-    desc: 'Exactly what tools, languages, or certifications you need to land your first role.',
+    desc: 'Know exactly what to learn (no more random courses).',
   },
   {
     icon: AlertTriangle,
     title: 'What to Avoid & Why',
-    desc: 'Identify the roles, environments, and habits that will lead to burnout for your specific profile.',
+    desc: 'Avoid wrong career paths before it is too late.',
   },
   {
     icon: Map,
     title: 'Year-by-Year Action Plan',
-    desc: 'A concrete 5-year timeline from learning foundations to market mastery.',
+    desc: 'Get a clear 5-year execution plan.',
   },
 ]
 
@@ -237,7 +237,7 @@ export default function Home() {
                 {/* Hidden on mobile to save vertical space */}
                 <div className="hidden md:inline-flex mb-8 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-blue-200 backdrop-blur-sm">
                   <Sparkles className="h-4 w-4 text-[#F57D14]" />
-                  Gemini AI · 60 Psychometric Dimensions
+                  Built using real student feedback
                 </div>
 
                 <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl xl:text-7xl">
@@ -253,34 +253,40 @@ export default function Home() {
                 <p className="mt-6 text-base leading-relaxed text-white/70 sm:mt-8 sm:max-w-lg md:text-lg">
                   Get a clear career roadmap matched to your personality in just 15 minutes.
                 </p>
+                <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 text-sm font-medium text-white/80 border border-white/10">
+                  <Zap className="h-4 w-4 text-[#F57D14]" /> Takes 15 minutes • No signup required
+                </div>
 
-                <div className="mt-8 flex flex-col items-start gap-4 sm:mt-10 sm:flex-row sm:items-center">
-                  <Button
-                    asChild
-                    className="h-14 w-full sm:w-auto rounded-full bg-[#F57D14] px-8 text-base font-bold text-white shadow-2xl shadow-[#F57D14]/30 transition-all hover:scale-105 hover:bg-[#dd6f11]"
-                  >
-                    <Link href="/assessment">
-                      Start the Assessment
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </Button>
-                  
-                  <a
-                    href="/sample-report.pdf"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0 text-sm font-semibold text-white/60 transition-colors hover:text-white"
-                  >
-                    <span className="underline underline-offset-4">View sample report</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </a>
+                <div className="mt-8 flex flex-col items-start gap-3 sm:mt-10">
+                  <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center w-full sm:w-auto">
+                    <Button
+                      asChild
+                      className="h-14 w-full sm:w-auto rounded-full bg-[#F57D14] px-8 text-base font-bold text-white shadow-2xl shadow-[#F57D14]/30 transition-all hover:scale-105 hover:bg-[#dd6f11]"
+                    >
+                      <Link href="/assessment">
+                        Start Career Test
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Link>
+                    </Button>
+                    
+                    <a
+                      href="/sample-report.pdf"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0 text-sm font-semibold text-white/60 transition-colors hover:text-white"
+                    >
+                      <span className="underline underline-offset-4">View sample report</span>
+                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </div>
+                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99</p>
                 </div>
 
                 <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
                   {[
-                    { icon: Lock,  text: 'Data Encrypted'     },
-                    { icon: Zap,   text: '15-Minute Test'      },
-                    { icon: Award, text: 'AI-Powered Insights' },
+                    { icon: Lock,  text: 'Private & Secure' },
+                    { icon: Zap,   text: '15 Min to Clarity' },
+                    { icon: Award, text: '60 Scientific Dimensions' },
                   ].map(({ icon: Icon, text }) => (
                     <div key={text} className="flex items-center gap-2 text-xs sm:text-sm font-medium text-white/50">
                       <Icon className="h-4 w-4 text-[#F57D14]" />
@@ -397,7 +403,7 @@ export default function Home() {
             {/* Scroll Catcher CTA */}
             <div className="mt-16 text-center">
                <Button asChild variant="outline" className="h-12 rounded-full border-slate-300 font-bold text-[#0A2351] hover:bg-slate-100 px-8 transition-all hover:scale-105">
-                 <Link href="/assessment">Start your roadmap <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                 <Link href="/assessment">Start Career Test <ArrowRight className="ml-2 h-4 w-4" /></Link>
                </Button>
             </div>
           </div>
@@ -507,7 +513,7 @@ export default function Home() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">Simple, Honest Pricing</h2>
-              <p className="mt-4 text-base text-slate-500">Take the assessment and generate your profile for free.</p>
+              <p className="mt-4 text-base font-semibold text-[#F57D14]">Most students upgrade to unlock their full roadmap.</p>
             </div>
 
             <div className="mx-auto mt-16 grid max-w-4xl gap-8 md:grid-cols-2">
@@ -517,10 +523,9 @@ export default function Home() {
                 <p className="mt-2 text-sm text-slate-500">No credit card required</p>
                 <ul className="mt-8 space-y-3">
                   {[
-                    'Full 60-question psychometric assessment',
-                    'Personality and interest breakdown',
-                    'Top 3 career match preview',
-                    'Basic strengths summary',
+                    '60-question psychometric test',
+                    'Basic personality insights',
+                    'Top 3 career matches (preview only)',
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-400" />
@@ -554,7 +559,7 @@ export default function Home() {
                 </ul>
                 <Button asChild className="mt-10 h-12 w-full rounded-full bg-[#F57D14] font-bold text-white hover:bg-[#dd6f11] shadow-xl shadow-[#F57D14]/30 transition-all hover:scale-105">
                   <Link href="/assessment">
-                    Start the Assessment <ArrowRight className="ml-2 h-4 w-4" />
+                    Unlock Full Roadmap – ₹99 <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
               </div>
@@ -569,6 +574,7 @@ export default function Home() {
               <div className="order-2 lg:order-1">
                 <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">For Institutions</p>
                 <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">Modernise Your Placement Cell</h2>
+                <p className="mt-3 text-sm font-bold text-[#F57D14]">Trusted by forward-thinking institutions</p>
                 <p className="mt-4 text-base leading-relaxed text-slate-600">
                   SARATHI partners with forward-thinking universities to replace guesswork with data. Our bulk-assessment
                   platform gives TPOs real-time cohort intelligence to bridge the gap between student potential and
@@ -664,12 +670,15 @@ export default function Home() {
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">
               Stop guessing your career.<br />Get clarity in 15 minutes.
             </h2>
-            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button asChild className="h-14 rounded-full bg-white px-10 text-base font-extrabold text-[#F57D14] shadow-2xl transition-all hover:scale-105 hover:bg-slate-100">
-                <Link href="/assessment">
-                  Start the Assessment <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
+            <div className="mt-10 flex flex-col items-center justify-center gap-2 sm:flex-row">
+              <div className="flex flex-col items-center">
+                <Button asChild className="h-14 rounded-full bg-white px-10 text-base font-extrabold text-[#F57D14] shadow-2xl transition-all hover:scale-105 hover:bg-slate-100">
+                  <Link href="/assessment">
+                    Start Your Career Test Now <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <p className="mt-4 text-sm font-medium text-white/70">Takes 15 minutes • Get your roadmap today</p>
+              </div>
             </div>
           </div>
         </section>
