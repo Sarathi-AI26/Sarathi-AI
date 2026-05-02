@@ -220,7 +220,7 @@ export default function Home() {
       <main>
 
         {/* ── HERO (Mobile Optimised) ── */}
-        <section id="home" className="relative overflow-hidden bg-[#0A2351] pt-12 pb-20 lg:py-32">
+        <section id="home" className="relative overflow-hidden bg-[#0A2351] pt-12 pb-20 lg:pt-20 lg:pb-28">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.04]"
             style={{
@@ -371,7 +371,7 @@ export default function Home() {
         </section>
 
         {/* ── WHAT YOU'LL WALK AWAY WITH (New Outcomes Section) ── */}
-        <section className="bg-white py-20 lg:py-28 border-b border-slate-100">
+        <section className="bg-white py-16 lg:py-20 border-b border-slate-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center mb-16">
               <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">
@@ -404,7 +404,7 @@ export default function Home() {
         </section>
 
         {/* ── HOW IT WORKS ── */}
-        <section className="bg-slate-50 py-20 lg:py-28">
+        <section className="bg-slate-50 py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">How It Works</p>
@@ -430,7 +430,7 @@ export default function Home() {
         </section>
 
         {/* ── METHODOLOGY (Layered Approach) ── */}
-        <section id="methodology" className="bg-white py-20 lg:py-28">
+        <section id="methodology" className="bg-white py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
             <div className="text-center mb-12">
               <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">Methodology</p>
@@ -472,7 +472,7 @@ export default function Home() {
         </section>
 
         {/* ── TESTIMONIALS ── */}
-        <section id="about" className="bg-[#0A2351] py-20 lg:py-28">
+        <section id="about" className="bg-[#0A2351] py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <p className="mb-3 text-sm font-bold uppercase tracking-widest text-[#F57D14]">Student Stories</p>
@@ -503,7 +503,7 @@ export default function Home() {
         </section>
 
         {/* ── PRICING (Beta Mode) ── */}
-        <section className="bg-slate-50 py-20 lg:py-28">
+        <section className="bg-slate-50 py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center">
               <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">Simple, Honest Pricing</h2>
@@ -563,7 +563,7 @@ export default function Home() {
         </section>
 
         {/* ── FOR INSTITUTIONS ── */}
-        <section id="institutions" className="bg-white py-20 lg:py-28 border-t border-slate-100">
+        <section id="institutions" className="bg-white py-16 lg:py-20 border-t border-slate-100">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div className="order-2 lg:order-1">
@@ -603,7 +603,7 @@ export default function Home() {
         </section>
 
         {/* ── FAQ ── */}
-        <section className="bg-slate-50 py-20 lg:py-28">
+        <section className="bg-slate-50 py-16 lg:py-20">
           <div className="container mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-2xl text-center mb-16">
               <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">Frequently Asked Questions</h2>
@@ -623,7 +623,7 @@ export default function Home() {
         </section>
 
         {/* ── CONTACT ── */}
-        <section id="contact" className="bg-[#0A2351] py-20 lg:py-28">
+        <section id="contact" className="bg-[#0A2351] py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid gap-12 lg:grid-cols-2 lg:gap-24 items-center">
               <div className="space-y-10">
@@ -659,7 +659,7 @@ export default function Home() {
         </section>
 
         {/* ── FINAL CTA ── */}
-        <section className="bg-[#F57D14] py-20">
+        <section className="bg-[#F57D14] py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">
               Stop guessing your career.<br />Get clarity in 15 minutes.
