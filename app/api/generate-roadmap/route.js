@@ -156,8 +156,8 @@ function buildAssessmentContext(assessment) {
 // ─────────────────────────────────────────────
 // DYNAMIC SYSTEM PROMPT BUILDER
 // ─────────────────────────────────────────────
-function buildSystemPrompt(averageScore) {
-  const isExploratory = averageScore < 75;
+function buildSystemPrompt(averageScore, hasDreamCareer) {
+  const isExploratory = averageScore < 60 && !hasDreamCareer;
 
   return `You are a warm, deeply insightful career mentor writing directly to a real Indian college student who is confused about their future and needs clarity, courage, and a concrete plan.
 
@@ -266,8 +266,6 @@ function isRetryableError(error) {
   const msg = error?.message?.toLowerCase() || ''
   return (
     msg.includes('503') ||
-    msg.includes('404') ||
-    msg.includes('not found') ||
     msg.includes('service unavailable') ||
     msg.includes('high demand') ||
     msg.includes('429') ||
@@ -385,6 +383,7 @@ export async function POST(request) {
     // 🚀 CALCULATE AVERAGE SCORE FOR UNCERTAINTY LAYER
     let averageScore = 80;
     let exactScores = null;
+    let hasDreamCareer = false;
     
     if (assessment.raw_answers) {
       exactScores = computeSectionScores(assessment.raw_answers);
@@ -392,9 +391,15 @@ export async function POST(request) {
       if (scoreValues.length > 0) {
         averageScore = scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length;
       }
+      
+      // Check Q56 (index 55) for dream career presence
+      const q56Answer = assessment.raw_answers[55];
+      if (q56Answer && typeof q56Answer === 'string' && q56Answer.trim().length > 3 && !['none', 'n/a', 'na'].includes(q56Answer.trim().toLowerCase())) {
+         hasDreamCareer = true;
+      }
     }
 
-    const dynamicSystemPrompt = buildSystemPrompt(averageScore);
+    const dynamicSystemPrompt = buildSystemPrompt(averageScore, hasDreamCareer);
 
     const aiAnalysis = await generateRoadmapWithRetry({
       student_profile: {
