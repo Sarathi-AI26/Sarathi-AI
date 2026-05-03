@@ -406,7 +406,7 @@ const LoadingView = ({ analyzing, elapsed }) => (
     </h1>
     <p className="mt-2 text-slate-500 max-w-md">
       {analyzing
-        ? 'Our AI is reading all 60 of your answers. This takes about 30 seconds — please do not refresh.'
+        ? 'Our AI is reading all 60 of your answers. This takes about 30-60 seconds — please do not refresh.'
         : 'Fetching your results...'}
     </p>
 
