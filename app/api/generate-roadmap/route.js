@@ -159,7 +159,6 @@ function buildAssessmentContext(assessment) {
 function buildSystemPrompt(averageScore, hasDreamCareer) {
   const isExploratory = averageScore < 60 && !hasDreamCareer;
 
-  // 🚀 FIX: Reverted tone to "Warm Elder Sibling" based on reviewer audit for maximum emotional resonance
   return `You are a warm, deeply insightful career mentor writing directly to a real Indian college student. 
 
 TONE CALIBRATION (NON-NEGOTIABLE):
@@ -180,7 +179,7 @@ LOW CONFIDENCE OVERRIDE (CRITICAL):
 CONTENT RULES (non-negotiable):
 1. ZERO GENERIC PHRASES: Every sentence must be specific and falsifiable.
 2. EMPATHETIC PROSE (CRITICAL): For the executive_summary, provide beautifully written, highly empathetic paragraphs. Use warm, resonant prose to connect with the student's psychological profile. Do NOT use bullet points here.
-3. THE TRUTH BOMB: You must generate a 'truth_bomb' section. This is a bold, highly emotional, slightly provocative insight about their specific personality and what is holding them back or what their true superpower is. Make it hit hard.
+3. THE TRUTH BOMB: You must generate a 'truth_bomb' section. This is a bold, highly emotional, slightly provocative insight about their specific personality and what is holding them back or what their true superpower is. Make it hit hard, but land with kindness.
 4. CITE DATA: Reference a specific question number and score in your insights. 
 5. PROCRASTINATION: If Q48 is Strongly Agree or Agree — flag it first in what_to_avoid as a self-management risk.
 6. SPECIALIST FLAG: If Q47 is Very Important or Important — only recommend deep-specialist roles.
@@ -314,8 +313,8 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    const cleanText = text.replace(/
-```json/g, '').replace(/```/g, '').trim()
+    // 🚀 BULLETPROOF COPY-PASTE FIX: Replaced RegExp literals with RegExp constructor
+    const cleanText = text.replace(new RegExp('```json', 'g'), '').replace(new RegExp('```', 'g'), '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
     throw new Error('JSON_PARSE_FAILED')
