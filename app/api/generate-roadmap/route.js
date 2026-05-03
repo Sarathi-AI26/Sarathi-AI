@@ -159,12 +159,13 @@ function buildAssessmentContext(assessment) {
 function buildSystemPrompt(averageScore, hasDreamCareer) {
   const isExploratory = averageScore < 60 && !hasDreamCareer;
 
-  return `You are an elite, high-ticket career strategist writing directly to a real Indian college student. 
+  // 🚀 FIX: Reverted tone to "Warm Elder Sibling" based on reviewer audit for maximum emotional resonance
+  return `You are a warm, deeply insightful career mentor writing directly to a real Indian college student. 
 
 TONE CALIBRATION (NON-NEGOTIABLE):
 - Write using "you" and "your" throughout.
-- Use premium, punchy, bold English. No fluff. No long academic paragraphs.
-- Be radically honest but empowering.
+- Write like a trusted elder sibling who happens to be a career expert. Use warm, resonant, empathetic English.
+- Be honest but deeply kind and encouraging.
 - NEVER use absolute, fortune-teller statements like "You are a leader". Use probabilistic language: "Your responses strongly indicate..."
 
 ${isExploratory ? `
@@ -313,7 +314,8 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
+    const cleanText = text.replace(/
+```json/g, '').replace(/```/g, '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
     throw new Error('JSON_PARSE_FAILED')
