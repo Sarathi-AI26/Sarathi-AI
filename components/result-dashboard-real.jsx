@@ -39,19 +39,14 @@ const safeText = (val) => {
   return String(val);
 }
 
-// 🚀 UPGRADED: Handles the new V2 JSON bullet object while keeping V1 backwards compatible
 const parseExecutiveSummary = (raw) => {
   if (!raw) return { core_wiring: [], risk_profile: [], motivation: [] }
-  
-  // Legacy V1 Fallback (Strings/Arrays)
   if (typeof raw === 'string') {
     return { core_wiring: raw.split(/\n\s*\n/).map(p => p.trim()).filter(Boolean), risk_profile: [], motivation: [] }
   }
   if (Array.isArray(raw)) {
     return { core_wiring: raw.map(safeText).filter(Boolean), risk_profile: [], motivation: [] }
   }
-  
-  // V2 Bullet Object
   if (typeof raw === 'object') {
     return {
       core_wiring: Array.isArray(raw.core_wiring) ? raw.core_wiring.map(safeText).filter(Boolean) : [],
@@ -131,20 +126,16 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
     marginBottom: '24px',
   }}>
     <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-      
       <img 
         src="/logo-horizontal.png" 
         alt="SARATHI" 
         style={{ height: '80px', width: 'auto', objectFit: 'contain' }} 
       />
-
       <div style={{ height: '48px', width: '2px', backgroundColor: '#e2e8f0' }}></div>
-
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Empowering</span>
         <span style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.15em', color: '#94a3b8', lineHeight: '1.2' }}>Student Clarity</span>
       </div>
-
     </div>
     <div style={{ textAlign: 'right' }}>
       <div style={{ fontSize: '15px', fontWeight: '700', color: '#0A2351' }}>{safeText(studentName)}</div>
@@ -157,13 +148,25 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 )
 
 // ─────────────────────────────────────────────
-// NEW: TRUTH BOMB COMPONENT
+// TRUTH BOMB
 // ─────────────────────────────────────────────
 const TruthBomb = ({ data, isPdfMode }) => {
   if (!data || !data.headline) return null;
   return (
     <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
-      <div className={`rounded-[2rem] border-l-8 border-l-red-500 bg-gradient-to-r from-red-50 to-white p-6 sm:p-10 relative overflow-hidden shadow-sm`}>
+      <div 
+        className={isPdfMode ? '' : `bg-gradient-to-r from-red-50 to-white`}
+        style={{
+          borderRadius: isPdfMode ? 24 : 32,
+          borderLeft: '8px solid #ef4444',
+          // 🚀 FIX: Solid background for PDF so it doesn't render white
+          backgroundColor: isPdfMode ? '#fff5f5' : undefined,
+          padding: isPdfMode ? '24px 32px' : '40px',
+          position: 'relative',
+          overflow: 'hidden',
+          boxShadow: isPdfMode ? 'none' : '0 1px 2px 0 rgb(0 0 0 / 0.05)'
+        }}
+      >
         <div className="absolute -right-10 -top-10 opacity-5">
           <Flame className="h-48 w-48 text-red-500" />
         </div>
@@ -184,63 +187,63 @@ const TruthBomb = ({ data, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// NEW: COMPARISON TABLE COMPONENT
+// COMPARISON TABLE
 // ─────────────────────────────────────────────
-const ComparisonTable = ({ isPdfMode }) => (
-  <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
-    <SectionHeading icon={Scale} title="Why This Matters" subtitle="Generic Advice vs. Your DNA Blueprint" isPdfMode={isPdfMode} />
-    <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <table className="w-full text-left text-sm">
-        <thead className="bg-[#0A2351] text-white">
-          <tr>
-            <th className="p-4 sm:p-5 font-bold w-1/2">The Old Way (Generic)</th>
-            <th className="p-4 sm:p-5 font-bold w-1/2 bg-[#F57D14]">SARATHI Way (Your Data)</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          <tr>
-            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Follow your passion."</td>
-            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Align passion strictly with your proven aptitude scores.</td>
-          </tr>
-          <tr>
-            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Get a safe, stable corporate job."</td>
-            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Leverage your specific risk-tolerance and decisiveness profile.</td>
-          </tr>
-          <tr>
-            <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Figure it out as you go."</td>
-            <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Execute a 5-year mapped timeline built for your traits.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-)
+const ComparisonTable = ({ isPdfMode }) => {
+  // 🚀 FIX: Completely remove from PDF via React logic
+  if (isPdfMode) return null;
+
+  return (
+    <section className="avoid-break mb-8">
+      <SectionHeading icon={Scale} title="Why This Matters" subtitle="Generic Advice vs. Your DNA Blueprint" isPdfMode={false} />
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table className="w-full text-left text-sm">
+          <thead className="bg-[#0A2351] text-white">
+            <tr>
+              <th className="p-4 sm:p-5 font-bold w-1/2">The Old Way (Generic)</th>
+              <th className="p-4 sm:p-5 font-bold w-1/2 bg-[#F57D14]">SARATHI Way (Your Data)</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            <tr>
+              <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Follow your passion."</td>
+              <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Align passion strictly with your proven aptitude scores.</td>
+            </tr>
+            <tr>
+              <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Get a safe, stable corporate job."</td>
+              <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Leverage your specific risk-tolerance and decisiveness profile.</td>
+            </tr>
+            <tr>
+              <td className="p-4 sm:p-5 text-slate-500 line-through italic">"Figure it out as you go."</td>
+              <td className="p-4 sm:p-5 text-[#0A2351] font-bold bg-[#F57D14]/5">Execute a 5-year mapped timeline built for your traits.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  )
+}
 
 // ─────────────────────────────────────────────
-// NEW: FINAL CTA COMPONENT
+// FINAL CTA
 // ─────────────────────────────────────────────
 const FinalCTA = ({ isPdfMode }) => {
+  // 🚀 FIX: Completely remove from PDF via React logic
+  if (isPdfMode) return null;
+
   return (
-    <section 
-      id="final-cta" 
-      className={`avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden`}
-      style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
-    >
+    <section className="avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
       <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
       <div className="relative z-10">
-        <h2 className={`font-extrabold mb-4 ${isPdfMode ? 'text-2xl' : 'text-3xl sm:text-4xl'}`}>
+        <h2 className="font-extrabold mb-4 text-3xl sm:text-4xl">
           Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
         </h2>
         <p className="text-white/80 mb-8 max-w-xl mx-auto text-sm sm:text-base">
           You now have the exact roadmap based on your psychological DNA. The guesswork is over. The next step is execution.
         </p>
-        {!isPdfMode && (
-          <div data-html2canvas-ignore="true">
-            <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
-              <Link href="/">Return to Home <ArrowRight className="ml-2 h-5 w-5" /></Link>
-            </Button>
-          </div>
-        )}
+        <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
+          <Link href="/">Return to Home <ArrowRight className="ml-2 h-5 w-5" /></Link>
+        </Button>
       </div>
     </section>
   )
@@ -667,12 +670,14 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
+      {/* 🚀 FIX: Updated CSS for perfect page breaks, orphans, and avoiding clipping */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
           .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
-          .html2pdf__page-break { height: 0 !important; margin: 0 !important; padding: 0 !important; page-break-before: always !important; clear: both !important; }
+          .pdf-page-break { page-break-before: always !important; break-before: always !important; display: block; height: 0; margin: 0; padding: 0; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          section { margin-bottom: 16px !important; }
+          section { margin-bottom: 14px !important; }
+          p, li, span { orphans: 3 !important; widows: 3 !important; }
         `}} />
       )}
 
@@ -750,7 +755,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {/* 🚀 NEW: TRUTH BOMB */}
       <TruthBomb data={analysis.truth_bomb} isPdfMode={isPdfMode} />
 
-      {/* 🚀 UPGRADED: CAREER DNA SNAPSHOT (Bullets instead of paragraphs) */}
+      {/* 🚀 UPGRADED: CAREER DNA SNAPSHOT */}
       <section className={`avoid-break ${sp.section}`}>
         <SectionHeading
           icon={BrainCircuit}
@@ -758,7 +763,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           subtitle="The core wiring dictating your path."
           isPdfMode={isPdfMode}
         />
-        {/* Render legacy paragraphs if old data format, otherwise render new card grid */}
         {summaryBullets.core_wiring?.length > 0 && typeof summaryBullets.core_wiring[0] === 'string' && !summaryBullets.risk_profile?.length ? (
            <Card className="border-0 shadow-sm avoid-break">
             <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
@@ -778,13 +782,17 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      {/* 🚀 HARD PAGE BREAK 1: Before Psychometric Dimensions */}
-      {isPdfMode && <div className="html2pdf__page-break" />}
+      {/* 🚀 HARD PAGE BREAK 1 */}
+      {isPdfMode && <div className="pdf-page-break" />}
 
-      <div className={isPdfMode ? 'block' : 'grid gap-6 lg:grid-cols-2'} id="nextpage1">
-        <section className={`avoid-break ${sp.section}`}>
+      {/* 🚀 FIX: Hardcoded CSS Grid to force Radar & Traits side-by-side in PDF */}
+      <div 
+        style={isPdfMode ? { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' } : undefined} 
+        className={isPdfMode ? '' : 'grid gap-6 lg:grid-cols-2'}
+      >
+        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
-          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+          <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
               <div className={isPdfMode ? 'h-[190px]' : 'h-[250px]'}>
                 <ResponsiveContainer width="100%" height="100%">
@@ -821,9 +829,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           </Card>
         </section>
 
-        <section className={`avoid-break ${sp.section}`}>
+        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Compass} title="Psychometric Traits" isPdfMode={isPdfMode} />
-          <Card className="border-0 bg-[#0A2351]/5 shadow-none">
+          <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
               {profile.dominant_personality_traits?.length > 0 && (
                 <div>
@@ -877,8 +885,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
-      {/* 🚀 HARD PAGE BREAK 2: Before Career Matches */}
-      {isPdfMode && <div className="html2pdf__page-break" />}
+      {/* 🚀 HARD PAGE BREAK 2 */}
+      {isPdfMode && <div className="pdf-page-break" />}
 
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
@@ -947,8 +955,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       </section>
 
-      {/* 🚀 HARD PAGE BREAK 3: Before What To Avoid */}
-      {isPdfMode && <div className="html2pdf__page-break" />}
+      {/* 🚀 HARD PAGE BREAK 3 */}
+      {isPdfMode && <div className="pdf-page-break" />}
 
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
@@ -1040,13 +1048,12 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* 🚀 NEW: COMPARISON TABLE */}
+      {/* 🚀 FIX: Returns null via React if isPdfMode is true */}
       <ComparisonTable isPdfMode={isPdfMode} />
 
-      {/* 🚀 HARD PAGE BREAK 4: Before 5-Year Roadmap */}
-      {isPdfMode && <div className="html2pdf__page-break" />}
+      {/* 🚀 HARD PAGE BREAK 4 */}
+      {isPdfMode && <div className="pdf-page-break" />}
       
-      {/* 🚀 THE FIX: Removed 'avoid-break' from the <section> below */}
       <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
         <div className="avoid-break">
           <SectionHeading
@@ -1059,8 +1066,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
-      {/* 🚀 COMPLETELY HIDDEN ON PDF: Final CTA is only for website users now */}
-      {!isPdfMode && <FinalCTA isPdfMode={isPdfMode} />}
+      {/* 🚀 FIX: Returns null via React if isPdfMode is true */}
+      <FinalCTA isPdfMode={isPdfMode} />
 
     </div>
   )
@@ -1070,41 +1077,45 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 const ResultDashboardReal = ({ assessmentId, onReady }) => {
-  const [loading, setLoading] = useState(true)
-  const [analyzing, setAnalyzing] = useState(false)
-  const [assessment, setAssessment] = useState(null)
-  const [error, setError] = useState('')
-  const [isPdfMode, setIsPdfMode] = useState(false)
-  const [isDownloading, setIsDownloading] = useState(false)
+  const [loading, setAnalyzing, assessment, setAssessment, error, setError, isPdfMode, setIsPdfMode, isDownloading, setIsDownloading, isCopied, setIsCopied, elapsed, setElapsed, retryTrigger, setRetryTrigger] = [
+    useState(true)[0], useState(false)[1], useState(null)[0], useState(null)[1], useState('')[0], useState('')[1], useState(false)[0], useState(false)[1], useState(false)[0], useState(false)[1], useState(false)[0], useState(false)[1], useState(0)[0], useState(0)[1], useState(0)[0], useState(0)[1]
+  ];
+  // Redeclare states properly
+  const [loading_val, setLoading_val] = useState(true)
+  const [analyzing_val, setAnalyzing_val] = useState(false)
+  const [assessment_val, setAssessment_val] = useState(null)
+  const [error_val, setError_val] = useState('')
+  const [isPdfMode_val, setIsPdfMode_val] = useState(false)
+  const [isDownloading_val, setIsDownloading_val] = useState(false)
   
-  const [isCopied, setIsCopied] = useState(false) 
+  const [isCopied_val, setIsCopied_val] = useState(false) 
   
-  const [elapsed, setElapsed] = useState(0)
-  const [retryTrigger, setRetryTrigger] = useState(0)
+  const [elapsed_val, setElapsed_val] = useState(0)
+  const [retryTrigger_val, setRetryTrigger_val] = useState(0)
 
   useEffect(() => {
     let timer;
-    if (analyzing) {
-      setElapsed(0);
+    if (analyzing_val) {
+      setElapsed_val(0);
       timer = setInterval(() => {
-        setElapsed(prev => prev + 1);
+        setElapsed_val(prev => prev + 1);
       }, 1000);
     } else {
-      setElapsed(0);
+      setElapsed_val(0);
     }
     return () => clearInterval(timer);
-  }, [analyzing]);
+  }, [analyzing_val]);
 
   useEffect(() => {
     const load = async () => {
       if (!assessmentId) {
-        setError('No assessment ID found.')
-        setLoading(false)
+        setError_val('No assessment ID found.')
+        setLoading_val(false)
         return
       }
       
-      setError('')
-      setLoading(true) 
+      setError_val('')
+      setLoading_val(true) 
 
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
@@ -1114,13 +1125,13 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         const current = data?.assessment
 
         if (current?.payment_status && hasFullAnalysis(current?.ai_analysis_result)) {
-          setAssessment(current)
-          setLoading(false)
+          setAssessment_val(current)
+          setLoading_val(false)
           return
         }
 
         if (current?.payment_status) {
-          setAnalyzing(true)
+          setAnalyzing_val(true)
           const r = await fetch('/api/generate-roadmap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1128,48 +1139,48 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           })
           const d = await r.json()
           if (!r.ok) throw new Error(d?.error || 'Generation failed')
-          setAssessment(d?.assessment)
-          setAnalyzing(false)
-          setLoading(false)
+          setAssessment_val(d?.assessment)
+          setAnalyzing_val(false)
+          setLoading_val(false)
           return
         }
 
         window.location.href = `/checkout?assessmentId=${assessmentId}`
 
       } catch (err) {
-        setError(err.message)
-        setLoading(false)
-        setAnalyzing(false)
+        setError_val(err.message)
+        setLoading_val(false)
+        setAnalyzing_val(false)
       }
     }
     load()
-  }, [assessmentId, retryTrigger])
+  }, [assessmentId, retryTrigger_val])
 
   useEffect(() => {
-    if (!loading && !analyzing && !error && assessment) {
+    if (!loading_val && !analyzing_val && !error_val && assessment_val) {
       if (onReady) onReady()
     }
-  }, [loading, analyzing, error, assessment, onReady])
+  }, [loading_val, analyzing_val, error_val, assessment_val, onReady])
 
   const studentName = useMemo(
-    () => assessment?.users?.name || assessment?.user?.name || 'Student',
-    [assessment]
+    () => assessment_val?.users?.name || assessment_val?.user?.name || 'Student',
+    [assessment_val]
   )
 
   const handleShare = async () => {
     try {
       const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
       await navigator.clipboard.writeText(shareUrl);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2500);
+      setIsCopied_val(true);
+      setTimeout(() => setIsCopied_val(false), 2500);
     } catch (err) {
       console.error("Failed to copy link:", err);
     }
   }
 
   const handleDownloadPdf = async () => {
-    setIsDownloading(true)
-    setIsPdfMode(true) 
+    setIsDownloading_val(true)
+    setIsPdfMode_val(true) 
 
     await new Promise(resolve => setTimeout(resolve, 1500)) 
 
@@ -1190,17 +1201,22 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     });
 
     const opt = {
-      margin:       [15, 10, 15, 10], 
+      // 🚀 FIX: Reduced margins so windowWidth perfectly fits
+      margin:       [12, 8, 12, 8], 
       filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        windowWidth: 780 
+        // 🚀 FIX: Narrower window width prevents right-side clipping
+        windowWidth: 740,
+        letterRendering: true,
+        logging: false
       },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-      pagebreak:    { mode: ['css', 'legacy'] } 
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
+      // 🚀 FIX: 'css' mode only to honor our explicit page breaks
+      pagebreak:    { mode: 'css', before: '.pdf-page-break', avoid: '.avoid-break' } 
     }
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
@@ -1208,7 +1224,8 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      const wmSize = 100;
+      // 🚀 FIX: Smaller watermark, lower opacity
+      const wmSize = 40;
       const wmX = (pageWidth - wmSize) / 2;
       const wmY = (pageHeight - wmSize) / 2;
       
@@ -1216,47 +1233,47 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         pdf.setPage(i);
         
         if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
-          pdf.setGState(new pdf.GState({ opacity: 0.05 }));
+          pdf.setGState(new pdf.GState({ opacity: 0.03 }));
           pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
           pdf.setGState(new pdf.GState({ opacity: 1.0 }));
         }
 
-        pdf.setFontSize(8);
-        pdf.setTextColor(150);
+        pdf.setFontSize(7);
+        pdf.setTextColor(160);
         const text = `SARATHI Career Roadmap Report | ${safeText(studentName)} | Page ${i} of ${totalPages} | This report is personalised and confidential`; 
         
-        pdf.text(text, pageWidth / 2, pageHeight - 8, {
+        pdf.text(text, pageWidth / 2, pageHeight - 6, {
           align: 'center'
         });
       }
     }).save().then(() => {
-        setIsPdfMode(false)
-        setIsDownloading(false)
+        setIsPdfMode_val(false)
+        setIsDownloading_val(false)
     }).catch((err) => {
         console.error("PDF Generation Failed:", err);
-        setIsPdfMode(false)
-        setIsDownloading(false)
+        setIsPdfMode_val(false)
+        setIsDownloading_val(false)
         alert("PDF download failed on this browser. Please try again on Chrome or open this link on a Desktop/Laptop.")
     });
   }
 
-  if (loading || analyzing) return <LoadingView analyzing={analyzing} elapsed={elapsed} />
+  if (loading_val || analyzing_val) return <LoadingView analyzing={analyzing_val} elapsed={elapsed_val} />
 
-  if (error) {
-    const isGenerationError = error.toLowerCase().includes('503') || 
-                              error.toLowerCase().includes('failed') || 
-                              error.toLowerCase().includes('ai') || 
-                              error.toLowerCase().includes('generation');
+  if (error_val) {
+    const isGenerationError = error_val.toLowerCase().includes('503') || 
+                              error_val.toLowerCase().includes('failed') || 
+                              error_val.toLowerCase().includes('ai') || 
+                              error_val.toLowerCase().includes('generation');
 
     return (
       <div className="container mx-auto py-20 text-center">
         <Card className="mx-auto max-w-md border-red-100 bg-red-50 p-8 shadow-sm">
           <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-4" />
           <p className="font-bold text-red-700 text-lg mb-2">Oops! Something went wrong.</p>
-          <p className="text-sm text-red-600/80 mb-6">{error}</p>
+          <p className="text-sm text-red-600/80 mb-6">{error_val}</p>
           
           {isGenerationError ? (
-            <Button onClick={() => setRetryTrigger(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
+            <Button onClick={() => setRetryTrigger_val(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
               Try Again (Data is Saved)
             </Button>
           ) : (
@@ -1269,28 +1286,28 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     )
   }
 
-  const fullAnalysis = assessment?.ai_analysis_result || assessment?.ai_analysis
+  const fullAnalysis = assessment_val?.ai_analysis_result || assessment_val?.ai_analysis
 
   return (
-    <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-    {!isPdfMode && (
+    <main className={isPdfMode_val ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
+    {!isPdfMode_val && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-col sm:flex-row justify-end gap-3">
           
           <Button 
             onClick={handleShare} 
             variant="outline"
-            className={`hidden sm:inline-flex font-bold transition-all ${isCopied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
+            className={`hidden sm:inline-flex font-bold transition-all ${isCopied_val ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
           >
-            {isCopied ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
-            {isCopied ? 'Link Copied!' : 'Share Result'}
+            {isCopied_val ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
+            {isCopied_val ? 'Link Copied!' : 'Share Result'}
           </Button>
 
           <Button 
             onClick={handleDownloadPdf} 
-            disabled={isDownloading}
+            disabled={isDownloading_val}
             className="w-full sm:w-auto bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
           >
-            {isDownloading ? (
+            {isDownloading_val ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
             ) : (
               'Download Career Roadmap PDF'
@@ -1299,12 +1316,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         </div>
       )}
 
-      <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
+      <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode_val ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
         <FullReportView
           analysis={fullAnalysis}
           studentName={studentName}
           assessmentId={assessmentId}
-          isPdfMode={isPdfMode}
+          isPdfMode={isPdfMode_val}
         />
       </div>
     </main>
