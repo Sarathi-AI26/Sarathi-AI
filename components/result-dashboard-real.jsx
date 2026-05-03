@@ -153,7 +153,7 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 const TruthBomb = ({ data, isPdfMode }) => {
   if (!data || !data.headline) return null;
   return (
-    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
+    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
       <div 
         className={isPdfMode ? '' : `bg-gradient-to-r from-red-50 to-white`}
         style={{
@@ -402,6 +402,7 @@ const LoadingView = ({ analyzing, elapsed }) => (
         ? 'Our AI is reading all 60 of your answers. This takes about 30 seconds — please do not refresh.'
         : 'Fetching your results...'}
     </p>
+
     {analyzing && elapsed > 20 && (
       <div className="mt-6 max-w-md rounded-xl bg-amber-50 border border-amber-200 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
         <div className="flex items-start gap-3">
@@ -415,6 +416,7 @@ const LoadingView = ({ analyzing, elapsed }) => (
         </div>
       </div>
     )}
+
     <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
       <Loader2 className="h-4 w-4 animate-spin" /> {analyzing && elapsed > 0 ? `Processing... (${elapsed}s)` : 'Processing...'}
     </div>
@@ -478,7 +480,8 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
 
   return (
     <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
-      <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />
+      {/* 🚀 FIX: Removed the isolated SectionHeading wrapper to merge it with detailed cards */}
+      {!isPdfMode && <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />}
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
           <div className="flex flex-col gap-4 py-2">
@@ -880,30 +883,40 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       </div>
 
       {/* ========================================================================= */}
-      {/* PAGE 4: Career Compatibility Chart */}
-      {/* ========================================================================= */}
-      {isPdfMode && <div className="pdf-page-break" />}
-
-      <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
-
-      {/* ========================================================================= */}
-      {/* PAGE 5: Detailed Career Matches */}
+      {/* PAGE 4: Career Compatibility Chart AND Matches */}
       {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
       <section className={`${sp.section}`}>
-        <SectionHeading
-          icon={Target}
-          title="Your Career Matches — In Detail"
-          subtitle="Each matched to your specific scores."
-          isPdfMode={isPdfMode}
-        />
+        {/* 🚀 FIX: Grouped Compatibility Chart and Matches Header into one unbreakable block */}
+        <div className="avoid-break">
+          {isPdfMode && (
+            <SectionHeading 
+              icon={Activity} 
+              title="Career Compatibility & Matches" 
+              subtitle="How well each career fits, and your path forward." 
+              isPdfMode={isPdfMode} 
+            />
+          )}
+          <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
+          
+          <div className={isPdfMode ? 'mt-2' : ''}>
+            {!isPdfMode && (
+              <SectionHeading
+                icon={Target}
+                title="Your Career Matches — In Detail"
+                subtitle="Each matched to your specific scores."
+                isPdfMode={isPdfMode}
+              />
+            )}
+          </div>
+        </div>
+
         <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
           {(analysis.top_career_matches || []).map((match, i) => (
             <Card
               key={i}
-              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
-              style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
+              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
             >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
@@ -919,7 +932,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                 <h3 className={`font-bold text-[#0A2351] mb-2 ${isPdfMode ? 'text-base' : 'text-xl'}`}>
                   {safeText(match.career_title)}
                 </h3>
-                <p className="text-sm text-slate-500 mb-2">
+                <p className="text-sm text-slate-500 mb-2" style={{ orphans: 3, widows: 3 }}>
                   {safeText(match.match_reason || match.why_it_fits)}
                 </p>
                 {match.growth_path && (
@@ -956,7 +969,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       </section>
 
       {/* ========================================================================= */}
-      {/* PAGE 6: What To Avoid & Growth Warnings */}
+      {/* PAGE 5: What To Avoid & Growth Warnings */}
       {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
@@ -992,7 +1005,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       )}
 
       {/* ========================================================================= */}
-      {/* PAGE 7: Action Plan & Routing */}
+      {/* PAGE 6: Action Plan & Routing */}
       {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
@@ -1061,7 +1074,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       </div>
 
       {/* ========================================================================= */}
-      {/* PAGE 8: 5-Year Roadmap */}
+      {/* PAGE 7: 5-Year Roadmap */}
       {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
       
@@ -1206,7 +1219,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     });
 
     const opt = {
-      // Standard professional 10mm margins on all sides
       margin:       [10, 10, 10, 10], 
       filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
@@ -1214,13 +1226,11 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        // 🚀 FIX: Hardcoded to standard A4 pixel width so right-side text absolutely NEVER clips
         windowWidth: 800,
         letterRendering: true,
         logging: false
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      // 🚀 FIX: Mode set strictly to CSS so it respects our manual 8-page break system
       pagebreak:    { mode: 'css' } 
     }
 
