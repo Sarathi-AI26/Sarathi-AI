@@ -230,7 +230,7 @@ const FinalCTA = ({ isPdfMode }) => {
     <section className="mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
       <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
       <div className="relative z-10">
-        <h2 className="font-extrabold mb-4 text-3xl sm:text-4xl">
+        <h2 className="text-white font-extrabold mb-4 text-3xl sm:text-4xl">
           Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
         </h2>
         <p className="text-white/80 mb-8 max-w-xl mx-auto text-sm sm:text-base">
