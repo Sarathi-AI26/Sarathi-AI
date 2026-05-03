@@ -153,15 +153,14 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 const TruthBomb = ({ data, isPdfMode }) => {
   if (!data || !data.headline) return null;
   return (
-    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
       <div 
         className={isPdfMode ? '' : `bg-gradient-to-r from-red-50 to-white`}
         style={{
-          borderRadius: isPdfMode ? 24 : 32,
+          borderRadius: isPdfMode ? 16 : 32,
           borderLeft: '8px solid #ef4444',
-          // 🚀 FIX: Solid background for PDF so it doesn't render white
           backgroundColor: isPdfMode ? '#fff5f5' : undefined,
-          padding: isPdfMode ? '24px 32px' : '40px',
+          padding: isPdfMode ? '20px' : '40px',
           position: 'relative',
           overflow: 'hidden',
           boxShadow: isPdfMode ? 'none' : '0 1px 2px 0 rgb(0 0 0 / 0.05)'
@@ -190,11 +189,9 @@ const TruthBomb = ({ data, isPdfMode }) => {
 // COMPARISON TABLE
 // ─────────────────────────────────────────────
 const ComparisonTable = ({ isPdfMode }) => {
-  // 🚀 FIX: Completely remove from PDF via React logic
   if (isPdfMode) return null;
-
   return (
-    <section className="avoid-break mb-8">
+    <section className="mb-8">
       <SectionHeading icon={Scale} title="Why This Matters" subtitle="Generic Advice vs. Your DNA Blueprint" isPdfMode={false} />
       <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <table className="w-full text-left text-sm">
@@ -228,11 +225,9 @@ const ComparisonTable = ({ isPdfMode }) => {
 // FINAL CTA
 // ─────────────────────────────────────────────
 const FinalCTA = ({ isPdfMode }) => {
-  // 🚀 FIX: Completely remove from PDF via React logic
   if (isPdfMode) return null;
-
   return (
-    <section className="avoid-break mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
+    <section className="mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
       <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
       <div className="relative z-10">
         <h2 className="font-extrabold mb-4 text-3xl sm:text-4xl">
@@ -290,7 +285,6 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
 
   return (
     <div
-      className="avoid-break"
       style={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -408,7 +402,6 @@ const LoadingView = ({ analyzing, elapsed }) => (
         ? 'Our AI is reading all 60 of your answers. This takes about 30 seconds — please do not refresh.'
         : 'Fetching your results...'}
     </p>
-
     {analyzing && elapsed > 20 && (
       <div className="mt-6 max-w-md rounded-xl bg-amber-50 border border-amber-200 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
         <div className="flex items-start gap-3">
@@ -422,7 +415,6 @@ const LoadingView = ({ analyzing, elapsed }) => (
         </div>
       </div>
     )}
-
     <div className="mt-8 flex items-center gap-2 text-[#F57D14] font-medium">
       <Loader2 className="h-4 w-4 animate-spin" /> {analyzing && elapsed > 0 ? `Processing... (${elapsed}s)` : 'Processing...'}
     </div>
@@ -430,7 +422,7 @@ const LoadingView = ({ analyzing, elapsed }) => (
 )
 
 const IdentityStatement = ({ statement, isPdfMode }) => (
-  <div className={`avoid-break relative overflow-hidden rounded-2xl bg-[#0A2351] ${isPdfMode ? 'p-5 mb-4' : 'p-8 mb-8'}`}>
+  <div className={`relative overflow-hidden rounded-2xl bg-[#0A2351] ${isPdfMode ? 'p-5 mb-4' : 'p-8 mb-8'}`}>
     <div className="absolute top-4 left-6 opacity-10">
       <Quote className="h-16 w-16 text-[#F57D14]" />
     </div>
@@ -449,7 +441,7 @@ const IdentityStatement = ({ statement, isPdfMode }) => (
 const StrengthSignals = ({ signals, isPdfMode }) => {
   if (!signals?.length) return null
   return (
-    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
       <SectionHeading icon={Zap} title="Your Core Strengths" subtitle="What your scores say you're genuinely good at." isPdfMode={isPdfMode} />
       <div className={`grid gap-3 ${isPdfMode ? 'grid-cols-2' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}>
         {signals.map((signal, i) => {
@@ -458,6 +450,7 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
             <div
               key={i}
               className={`rounded-2xl border border-slate-100 bg-white p-4 flex gap-3 items-start ${isPdfMode ? '' : 'shadow-sm hover:shadow-md transition-all'}`}
+              style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
             >
               <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F57D14]/10">
                 <Icon className="h-4 w-4 text-[#F57D14]" />
@@ -484,7 +477,7 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
   }))
 
   return (
-    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
       <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
@@ -519,13 +512,14 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
 const WhatToAvoid = ({ items, isPdfMode }) => {
   if (!items?.length) return null
   return (
-    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
       <SectionHeading icon={XCircle} title="What to Avoid" subtitle="Roles, environments, and habits that your profile says are a bad fit." isPdfMode={isPdfMode} />
       <div className={`grid gap-3 ${isPdfMode ? '' : 'sm:grid-cols-2 lg:grid-cols-3'}`}>
         {items.map((item, i) => (
           <div
             key={i}
             className={`rounded-2xl border border-red-100 bg-red-50/60 p-4 ${isPdfMode ? 'mb-2' : ''}`}
+            style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
           >
             <div className="flex items-start gap-3">
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-100 mt-0.5">
@@ -558,8 +552,8 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
         return (
           <div
             key={i}
-            className={`avoid-break flex gap-4 ${isPdfMode ? 'mb-2' : 'mb-6'}`}
-            style={{ pageBreakInside: 'avoid', breakInside: 'avoid' }}
+            className={`flex gap-4 ${isPdfMode ? 'mb-2' : 'mb-6'}`}
+            style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
           >
             {!isPdfMode && (
               <div className="relative flex-shrink-0">
@@ -605,7 +599,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     ? { section: 'mb-4', text: 'text-sm' }
     : { section: 'mb-8', text: 'text-lg' }
 
-  // 🛡️ Ensure all objects are safely defaulted to prevent undefined access
   const profile = analysis?.psychometric_profile || {}
   const roadmap = analysis?.five_year_roadmap || {}
   const immediateAction = analysis?.immediate_action_plan || {}
@@ -647,11 +640,10 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
     day: 'numeric', month: 'long', year: 'numeric',
   })
 
-  // Helper for rendering bullet lists
   const renderList = (title, items, icon) => {
     if (!items || items.length === 0) return null;
     return (
-      <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm">
+      <div className="flex-1 rounded-2xl border border-slate-100 bg-white p-5 shadow-sm" style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}>
         <div className="flex items-center gap-2 font-bold text-[#0A2351] mb-3 border-b border-slate-100 pb-2">
            {icon} {title}
         </div>
@@ -670,16 +662,19 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   return (
     <div className={isPdfMode ? 'block' : 'space-y-8'}>
 
-      {/* 🚀 FIX: Updated CSS for perfect page breaks, orphans, and avoiding clipping */}
+      {/* 🚀 PERFECT PAGINATION CSS */}
       {isPdfMode && (
         <style dangerouslySetInnerHTML={{ __html: `
-          .avoid-break { page-break-inside: avoid !important; break-inside: avoid !important; }
-          .pdf-page-break { page-break-before: always !important; break-before: always !important; display: block; height: 0; margin: 0; padding: 0; }
+          .pdf-page-break { page-break-before: always !important; display: block; height: 0; margin: 0; padding: 0; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
           section { margin-bottom: 14px !important; }
           p, li, span { orphans: 3 !important; widows: 3 !important; }
         `}} />
       )}
+
+      {/* ========================================================================= */}
+      {/* PAGE 1: Identity & Report Intro */}
+      {/* ========================================================================= */}
 
       {isPdfMode && (
         <PdfHeader
@@ -690,7 +685,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       )}
 
       {!isPdfMode && (
-        <section className="avoid-break rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+        <section className="rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
           <div className="relative z-10">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
               <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
@@ -710,7 +705,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       )}
 
       {isPdfMode && (
-        <section className="avoid-break rounded-xl bg-[#0A2351] p-5 mb-4 text-white">
+        <section className="rounded-xl bg-[#0A2351] p-5 mb-4 text-white">
           <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-2">
             <Sparkles className="h-3 w-3" /> Real-Time AI Analysis
           </div>
@@ -752,14 +747,17 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       )}
 
-      {/* 🚀 NEW: TRUTH BOMB */}
       <TruthBomb data={analysis.truth_bomb} isPdfMode={isPdfMode} />
 
-      {/* 🚀 UPGRADED: CAREER DNA SNAPSHOT */}
+      {/* ========================================================================= */}
+      {/* PAGE 2: DNA Snapshot & Strengths */}
+      {/* ========================================================================= */}
+      {isPdfMode && <div className="pdf-page-break" />}
+
       <section className={`${sp.section}`}>
-        <div className="avoid-break"><SectionHeading icon={BrainCircuit} title="Career DNA Snapshot" subtitle="The core wiring dictating your path." isPdfMode={isPdfMode} /></div>
+        <SectionHeading icon={BrainCircuit} title="Career DNA Snapshot" subtitle="The core wiring dictating your path." isPdfMode={isPdfMode} />
         {summaryBullets.core_wiring?.length > 0 && typeof summaryBullets.core_wiring[0] === 'string' && !summaryBullets.risk_profile?.length ? (
-           <Card className="border-0 shadow-sm avoid-break">
+           <Card className="border-0 shadow-sm">
             <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
               {summaryBullets.core_wiring.map((para, i) => (
                 <p key={i} style={{ orphans: 3, widows: 3 }}>{safeText(para)}</p>
@@ -777,15 +775,16 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
       <StrengthSignals signals={analysis.strength_signals} isPdfMode={isPdfMode} />
 
-      {/* 🚀 HARD PAGE BREAK 1 */}
+      {/* ========================================================================= */}
+      {/* PAGE 3: Dimensions & Traits (Side-by-side in PDF) */}
+      {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
-      {/* 🚀 FIX: Hardcoded CSS Grid to force Radar & Traits side-by-side in PDF */}
       <div 
         style={isPdfMode ? { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' } : undefined} 
         className={isPdfMode ? '' : 'grid gap-6 lg:grid-cols-2'}
       >
-        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
+        <section className={`${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Activity} title="Psychometric Dimensions" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3' : 'p-4'}>
@@ -824,7 +823,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           </Card>
         </section>
 
-        <section className={`avoid-break ${isPdfMode ? '' : sp.section}`}>
+        <section className={`${isPdfMode ? '' : sp.section}`}>
           <SectionHeading icon={Compass} title="Psychometric Traits" isPdfMode={isPdfMode} />
           <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
             <CardContent className={isPdfMode ? 'p-3 space-y-3' : 'p-5 space-y-5'}>
@@ -880,25 +879,31 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       </div>
 
-      {/* 🚀 HARD PAGE BREAK 2 */}
+      {/* ========================================================================= */}
+      {/* PAGE 4: Career Compatibility Chart */}
+      {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
       <CareerCompatibilityChart careers={analysis.top_career_matches} isPdfMode={isPdfMode} />
 
+      {/* ========================================================================= */}
+      {/* PAGE 5: Detailed Career Matches */}
+      {/* ========================================================================= */}
+      {isPdfMode && <div className="pdf-page-break" />}
+
       <section className={`${sp.section}`}>
-        <div className="avoid-break">
-          <SectionHeading
-            icon={Target}
-            title="Your Career Matches — In Detail"
-            subtitle="Each matched to your specific scores."
-            isPdfMode={isPdfMode}
-          />
-        </div>
+        <SectionHeading
+          icon={Target}
+          title="Your Career Matches — In Detail"
+          subtitle="Each matched to your specific scores."
+          isPdfMode={isPdfMode}
+        />
         <div className={isPdfMode ? 'block space-y-3' : 'grid gap-6 md:grid-cols-3'}>
           {(analysis.top_career_matches || []).map((match, i) => (
             <Card
               key={i}
-              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
             >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
@@ -950,13 +955,15 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </div>
       </section>
 
-      {/* 🚀 HARD PAGE BREAK 3 */}
+      {/* ========================================================================= */}
+      {/* PAGE 6: What To Avoid & Growth Warnings */}
+      {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
 
       <WhatToAvoid items={analysis.what_to_avoid} isPdfMode={isPdfMode} />
 
       {blindSpots.length > 0 && (
-        <section className={`avoid-break ${sp.section}`}>
+        <section className={`${sp.section}`}>
           <SectionHeading
             icon={Lightbulb}
             title="Growth Warnings"
@@ -984,8 +991,13 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
+      {/* ========================================================================= */}
+      {/* PAGE 7: Action Plan & Routing */}
+      {/* ========================================================================= */}
+      {isPdfMode && <div className="pdf-page-break" />}
+
       {immediateAction?.next_30_days && (
-        <section className={`avoid-break ${sp.section}`}>
+        <section className={`${sp.section}`}>
           <SectionHeading
             icon={Timer}
             title="Your Action Plan"
@@ -1026,7 +1038,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       )}
 
       {analysis.india_vs_abroad_guidance && (
-        <section className={`avoid-break ${sp.section}`}>
+        <section className={`${sp.section}`}>
           <SectionHeading
             icon={Globe}
             title="India vs Abroad — Your Path"
@@ -1043,26 +1055,30 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         </section>
       )}
 
-      {/* 🚀 FIX: Returns null via React if isPdfMode is true */}
-      <ComparisonTable isPdfMode={isPdfMode} />
+      {/* 🚀 WEB ONLY: Locked out of PDF processing completely */}
+      <div data-html2canvas-ignore="true">
+        <ComparisonTable isPdfMode={isPdfMode} />
+      </div>
 
-      {/* 🚀 HARD PAGE BREAK 4 */}
+      {/* ========================================================================= */}
+      {/* PAGE 8: 5-Year Roadmap */}
+      {/* ========================================================================= */}
       {isPdfMode && <div className="pdf-page-break" />}
       
       <section className={isPdfMode ? 'pt-2' : 'mt-4'}>
-        <div className="avoid-break">
-          <SectionHeading
-            icon={TrendingUp}
-            title="Your 5-Year Roadmap"
-            subtitle="Year by year — from where you are to where you want to be."
-            isPdfMode={isPdfMode}
-          />
-        </div>
+        <SectionHeading
+          icon={TrendingUp}
+          title="Your 5-Year Roadmap"
+          subtitle="Year by year — from where you are to where you want to be."
+          isPdfMode={isPdfMode}
+        />
         <RoadmapTimeline steps={roadmapSteps} isPdfMode={isPdfMode} />
       </section>
 
-      {/* 🚀 FIX: Returns null via React if isPdfMode is true */}
-      <FinalCTA isPdfMode={isPdfMode} />
+      {/* 🚀 WEB ONLY: Locked out of PDF processing completely */}
+      <div data-html2canvas-ignore="true">
+        <FinalCTA isPdfMode={isPdfMode} />
+      </div>
 
     </div>
   )
@@ -1072,7 +1088,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 const ResultDashboardReal = ({ assessmentId, onReady }) => {
-  // 🚀 FIX: Clean, standard React state declarations. No array destructuring tricks.
   const [loading, setLoading] = useState(true)
   const [analyzing, setAnalyzing] = useState(false)
   const [assessment, setAssessment] = useState(null)
@@ -1191,22 +1206,22 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     });
 
     const opt = {
-      // 🚀 FIX: Reduced margins so windowWidth perfectly fits without right-side clipping
-      margin:       [12, 8, 12, 8], 
+      // Standard professional 10mm margins on all sides
+      margin:       [10, 10, 10, 10], 
       filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        // 🚀 FIX: Narrower window width prevents text clipping
-        windowWidth: 740,
+        // 🚀 FIX: Hardcoded to standard A4 pixel width so right-side text absolutely NEVER clips
+        windowWidth: 800,
         letterRendering: true,
         logging: false
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      // 🚀 FIX: 'css' mode only to strictly honor our custom page breaks
-      pagebreak:    { mode: 'css', before: '.pdf-page-break', avoid: '.avoid-break' } 
+      // 🚀 FIX: Mode set strictly to CSS so it respects our manual 8-page break system
+      pagebreak:    { mode: 'css' } 
     }
 
     html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
@@ -1214,7 +1229,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // 🚀 FIX: Smaller watermark
       const wmSize = 40;
       const wmX = (pageWidth - wmSize) / 2;
       const wmY = (pageHeight - wmSize) / 2;
@@ -1223,7 +1237,6 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         pdf.setPage(i);
         
         if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
-          // 🚀 FIX: Subtler watermark opacity
           pdf.setGState(new pdf.GState({ opacity: 0.03 }));
           pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
           pdf.setGState(new pdf.GState({ opacity: 1.0 }));
