@@ -153,7 +153,7 @@ const PdfHeader = ({ studentName, archetype, generatedDate }) => (
 const TruthBomb = ({ data, isPdfMode }) => {
   if (!data || !data.headline) return null;
   return (
-    <section className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8'}`}>
+    <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
       <div 
         className={isPdfMode ? '' : `bg-gradient-to-r from-red-50 to-white`}
         style={{
@@ -303,9 +303,12 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
         alignItems: 'center',
         gap: isPdfMode ? 12 : 16,
       }}>
+        {/* 🚀 FIX: Locked medal dimensions */}
         <div style={{
-          width: isPdfMode ? 44 : 56,
-          height: isPdfMode ? 44 : 56,
+          width: isPdfMode ? '44px' : '56px',
+          height: isPdfMode ? '44px' : '56px',
+          minWidth: isPdfMode ? '44px' : '56px',
+          minHeight: isPdfMode ? '44px' : '56px',
           borderRadius: '50%',
           background: tier.color,
           display: 'flex',
@@ -379,7 +382,11 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
 
 const SectionHeading = ({ icon: Icon, title, subtitle, isPdfMode }) => (
   <div className={`flex items-center gap-3 ${isPdfMode ? 'mb-3' : 'mb-6'}`}>
-    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] shrink-0">
+    {/* 🚀 FIX: Locked Section Heading Icon dimensions */}
+    <div 
+      className="flex items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] shrink-0"
+      style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
+    >
       <Icon className="h-5 w-5" />
     </div>
     <div>
@@ -454,7 +461,11 @@ const StrengthSignals = ({ signals, isPdfMode }) => {
               className={`rounded-2xl border border-slate-100 bg-white p-4 flex gap-3 items-start ${isPdfMode ? '' : 'shadow-sm hover:shadow-md transition-all'}`}
               style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F57D14]/10">
+              {/* 🚀 FIX: Locked Strength Signal Icon dimensions */}
+              <div 
+                className="flex shrink-0 items-center justify-center rounded-xl bg-[#F57D14]/10"
+                style={{ width: '36px', height: '36px', minWidth: '36px', minHeight: '36px' }}
+              >
                 <Icon className="h-4 w-4 text-[#F57D14]" />
               </div>
               <div>
@@ -480,7 +491,7 @@ const CareerCompatibilityChart = ({ careers, isPdfMode }) => {
 
   return (
     <section className={isPdfMode ? 'mb-4' : 'mb-8'}>
-      {/* 🚀 FIX: Removed the isolated SectionHeading wrapper to merge it with detailed cards */}
+      {/* Grouping header with detailed cards logic preserved */}
       {!isPdfMode && <SectionHeading icon={Activity} title="Career Compatibility" subtitle="How well each career matches your psychometric profile." isPdfMode={isPdfMode} />}
       <Card className="border-0 bg-[#0A2351]/5 shadow-none">
         <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
@@ -525,7 +536,11 @@ const WhatToAvoid = ({ items, isPdfMode }) => {
             style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
           >
             <div className="flex items-start gap-3">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-red-100 mt-0.5">
+              {/* 🚀 FIX: Locked What To Avoid Icon dimensions */}
+              <div 
+                className="flex shrink-0 items-center justify-center rounded-lg bg-red-100 mt-0.5"
+                style={{ width: '28px', height: '28px', minWidth: '28px', minHeight: '28px' }}
+              >
                 <XCircle className="h-3.5 w-3.5 text-red-500" />
               </div>
               <div>
@@ -560,9 +575,10 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
           >
             {!isPdfMode && (
               <div className="relative flex-shrink-0">
+                {/* 🚀 FIX: Locked Web Timeline Icon dimensions */}
                 <div
-                  className="flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg z-10 relative"
-                  style={{ backgroundColor: colors[i] }}
+                  className="flex items-center justify-center rounded-full text-white shadow-lg z-10 relative shrink-0"
+                  style={{ backgroundColor: colors[i], width: '44px', height: '44px', minWidth: '44px', minHeight: '44px' }}
                 >
                   <Icon className="h-5 w-5" />
                 </div>
@@ -571,9 +587,10 @@ const RoadmapTimeline = ({ steps, isPdfMode }) => {
             <div className={`flex-1 rounded-2xl border border-slate-100 bg-white ${isPdfMode ? 'p-3 shadow-none' : 'p-5 shadow-sm hover:shadow-md transition-all'}`}>
               <div className="flex items-center gap-3 mb-2">
                 {isPdfMode && (
+                  /* 🚀 FIX: Locked PDF Timeline Icon dimensions */
                   <div
-                    className="flex h-6 w-6 items-center justify-center rounded-md text-white shrink-0"
-                    style={{ backgroundColor: colors[i] }}
+                    className="flex items-center justify-center rounded-md text-white shrink-0"
+                    style={{ backgroundColor: colors[i], width: '24px', height: '24px', minWidth: '24px', minHeight: '24px' }}
                   >
                     <Icon className="h-3 w-3" />
                   </div>
@@ -653,7 +670,11 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <ul className="space-y-3">
            {items.map((item, idx) => (
              <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-600">
-               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#F57D14]" />
+               {/* 🚀 FIX: Locked Bullet Dimensions */}
+               <span 
+                  className="mt-1.5 shrink-0 rounded-full bg-[#F57D14]" 
+                  style={{ width: '6px', height: '6px', minWidth: '6px', minHeight: '6px' }}
+               />
                <span className="leading-relaxed">{item}</span>
              </li>
            ))}
@@ -888,8 +909,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       {isPdfMode && <div className="pdf-page-break" />}
 
       <section className={`${sp.section}`}>
-        {/* 🚀 FIX: Grouped Compatibility Chart and Matches Header into one unbreakable block */}
-        <div className="avoid-break">
+        <div style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}>
           {isPdfMode && (
             <SectionHeading 
               icon={Activity} 
@@ -916,7 +936,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
           {(analysis.top_career_matches || []).map((match, i) => (
             <Card
               key={i}
-              className={`avoid-break border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              className={`border-0 border-l-4 border-l-[#F57D14] ${isPdfMode ? 'shadow-none border border-slate-200' : 'shadow-sm hover:shadow-md transition-all'}`}
+              style={isPdfMode ? { pageBreakInside: 'avoid' } : undefined}
             >
               <CardContent className={isPdfMode ? 'p-3' : 'p-6'}>
                 <div className="flex items-center justify-between mb-2">
