@@ -756,13 +756,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
       <TruthBomb data={analysis.truth_bomb} isPdfMode={isPdfMode} />
 
       {/* 🚀 UPGRADED: CAREER DNA SNAPSHOT */}
-      <section className={`avoid-break ${sp.section}`}>
-        <SectionHeading
-          icon={BrainCircuit}
-          title="Career DNA Snapshot"
-          subtitle="The core wiring dictating your path."
-          isPdfMode={isPdfMode}
-        />
+      <section className={`${sp.section}`}>
+        <div className="avoid-break"><SectionHeading icon={BrainCircuit} title="Career DNA Snapshot" subtitle="The core wiring dictating your path." isPdfMode={isPdfMode} /></div>
         {summaryBullets.core_wiring?.length > 0 && typeof summaryBullets.core_wiring[0] === 'string' && !summaryBullets.risk_profile?.length ? (
            <Card className="border-0 shadow-sm avoid-break">
             <CardContent className={`text-slate-700 leading-relaxed ${isPdfMode ? 'p-4 text-sm space-y-3' : 'p-8 text-lg space-y-5'}`}>
@@ -1077,45 +1072,40 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 const ResultDashboardReal = ({ assessmentId, onReady }) => {
-  const [loading, setAnalyzing, assessment, setAssessment, error, setError, isPdfMode, setIsPdfMode, isDownloading, setIsDownloading, isCopied, setIsCopied, elapsed, setElapsed, retryTrigger, setRetryTrigger] = [
-    useState(true)[0], useState(false)[1], useState(null)[0], useState(null)[1], useState('')[0], useState('')[1], useState(false)[0], useState(false)[1], useState(false)[0], useState(false)[1], useState(false)[0], useState(false)[1], useState(0)[0], useState(0)[1], useState(0)[0], useState(0)[1]
-  ];
-  // Redeclare states properly
-  const [loading_val, setLoading_val] = useState(true)
-  const [analyzing_val, setAnalyzing_val] = useState(false)
-  const [assessment_val, setAssessment_val] = useState(null)
-  const [error_val, setError_val] = useState('')
-  const [isPdfMode_val, setIsPdfMode_val] = useState(false)
-  const [isDownloading_val, setIsDownloading_val] = useState(false)
-  
-  const [isCopied_val, setIsCopied_val] = useState(false) 
-  
-  const [elapsed_val, setElapsed_val] = useState(0)
-  const [retryTrigger_val, setRetryTrigger_val] = useState(0)
+  // 🚀 FIX: Clean, standard React state declarations. No array destructuring tricks.
+  const [loading, setLoading] = useState(true)
+  const [analyzing, setAnalyzing] = useState(false)
+  const [assessment, setAssessment] = useState(null)
+  const [error, setError] = useState('')
+  const [isPdfMode, setIsPdfMode] = useState(false)
+  const [isDownloading, setIsDownloading] = useState(false)
+  const [isCopied, setIsCopied] = useState(false) 
+  const [elapsed, setElapsed] = useState(0)
+  const [retryTrigger, setRetryTrigger] = useState(0)
 
   useEffect(() => {
     let timer;
-    if (analyzing_val) {
-      setElapsed_val(0);
+    if (analyzing) {
+      setElapsed(0);
       timer = setInterval(() => {
-        setElapsed_val(prev => prev + 1);
+        setElapsed(prev => prev + 1);
       }, 1000);
     } else {
-      setElapsed_val(0);
+      setElapsed(0);
     }
     return () => clearInterval(timer);
-  }, [analyzing_val]);
+  }, [analyzing]);
 
   useEffect(() => {
     const load = async () => {
       if (!assessmentId) {
-        setError_val('No assessment ID found.')
-        setLoading_val(false)
+        setError('No assessment ID found.')
+        setLoading(false)
         return
       }
       
-      setError_val('')
-      setLoading_val(true) 
+      setError('')
+      setLoading(true) 
 
       try {
         const res = await fetch(`/api/results/${assessmentId}`)
@@ -1125,13 +1115,13 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         const current = data?.assessment
 
         if (current?.payment_status && hasFullAnalysis(current?.ai_analysis_result)) {
-          setAssessment_val(current)
-          setLoading_val(false)
+          setAssessment(current)
+          setLoading(false)
           return
         }
 
         if (current?.payment_status) {
-          setAnalyzing_val(true)
+          setAnalyzing(true)
           const r = await fetch('/api/generate-roadmap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1139,48 +1129,48 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
           })
           const d = await r.json()
           if (!r.ok) throw new Error(d?.error || 'Generation failed')
-          setAssessment_val(d?.assessment)
-          setAnalyzing_val(false)
-          setLoading_val(false)
+          setAssessment(d?.assessment)
+          setAnalyzing(false)
+          setLoading(false)
           return
         }
 
         window.location.href = `/checkout?assessmentId=${assessmentId}`
 
       } catch (err) {
-        setError_val(err.message)
-        setLoading_val(false)
-        setAnalyzing_val(false)
+        setError(err.message)
+        setLoading(false)
+        setAnalyzing(false)
       }
     }
     load()
-  }, [assessmentId, retryTrigger_val])
+  }, [assessmentId, retryTrigger])
 
   useEffect(() => {
-    if (!loading_val && !analyzing_val && !error_val && assessment_val) {
+    if (!loading && !analyzing && !error && assessment) {
       if (onReady) onReady()
     }
-  }, [loading_val, analyzing_val, error_val, assessment_val, onReady])
+  }, [loading, analyzing, error, assessment, onReady])
 
   const studentName = useMemo(
-    () => assessment_val?.users?.name || assessment_val?.user?.name || 'Student',
-    [assessment_val]
+    () => assessment?.users?.name || assessment?.user?.name || 'Student',
+    [assessment]
   )
 
   const handleShare = async () => {
     try {
       const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
       await navigator.clipboard.writeText(shareUrl);
-      setIsCopied_val(true);
-      setTimeout(() => setIsCopied_val(false), 2500);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2500);
     } catch (err) {
       console.error("Failed to copy link:", err);
     }
   }
 
   const handleDownloadPdf = async () => {
-    setIsDownloading_val(true)
-    setIsPdfMode_val(true) 
+    setIsDownloading(true)
+    setIsPdfMode(true) 
 
     await new Promise(resolve => setTimeout(resolve, 1500)) 
 
@@ -1201,7 +1191,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     });
 
     const opt = {
-      // 🚀 FIX: Reduced margins so windowWidth perfectly fits
+      // 🚀 FIX: Reduced margins so windowWidth perfectly fits without right-side clipping
       margin:       [12, 8, 12, 8], 
       filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
@@ -1209,13 +1199,13 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         scale: 2, 
         useCORS: true, 
         scrollY: 0,
-        // 🚀 FIX: Narrower window width prevents right-side clipping
+        // 🚀 FIX: Narrower window width prevents text clipping
         windowWidth: 740,
         letterRendering: true,
         logging: false
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
-      // 🚀 FIX: 'css' mode only to honor our explicit page breaks
+      // 🚀 FIX: 'css' mode only to strictly honor our custom page breaks
       pagebreak:    { mode: 'css', before: '.pdf-page-break', avoid: '.avoid-break' } 
     }
 
@@ -1224,7 +1214,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // 🚀 FIX: Smaller watermark, lower opacity
+      // 🚀 FIX: Smaller watermark
       const wmSize = 40;
       const wmX = (pageWidth - wmSize) / 2;
       const wmY = (pageHeight - wmSize) / 2;
@@ -1233,6 +1223,7 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         pdf.setPage(i);
         
         if (watermarkImg.complete && watermarkImg.naturalHeight !== 0) {
+          // 🚀 FIX: Subtler watermark opacity
           pdf.setGState(new pdf.GState({ opacity: 0.03 }));
           pdf.addImage(watermarkImg, 'PNG', wmX, wmY, wmSize, wmSize);
           pdf.setGState(new pdf.GState({ opacity: 1.0 }));
@@ -1247,33 +1238,33 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         });
       }
     }).save().then(() => {
-        setIsPdfMode_val(false)
-        setIsDownloading_val(false)
+        setIsPdfMode(false)
+        setIsDownloading(false)
     }).catch((err) => {
         console.error("PDF Generation Failed:", err);
-        setIsPdfMode_val(false)
-        setIsDownloading_val(false)
+        setIsPdfMode(false)
+        setIsDownloading(false)
         alert("PDF download failed on this browser. Please try again on Chrome or open this link on a Desktop/Laptop.")
     });
   }
 
-  if (loading_val || analyzing_val) return <LoadingView analyzing={analyzing_val} elapsed={elapsed_val} />
+  if (loading || analyzing) return <LoadingView analyzing={analyzing} elapsed={elapsed} />
 
-  if (error_val) {
-    const isGenerationError = error_val.toLowerCase().includes('503') || 
-                              error_val.toLowerCase().includes('failed') || 
-                              error_val.toLowerCase().includes('ai') || 
-                              error_val.toLowerCase().includes('generation');
+  if (error) {
+    const isGenerationError = error.toLowerCase().includes('503') || 
+                              error.toLowerCase().includes('failed') || 
+                              error.toLowerCase().includes('ai') || 
+                              error.toLowerCase().includes('generation');
 
     return (
       <div className="container mx-auto py-20 text-center">
         <Card className="mx-auto max-w-md border-red-100 bg-red-50 p-8 shadow-sm">
           <AlertTriangle className="h-10 w-10 text-red-500 mx-auto mb-4" />
           <p className="font-bold text-red-700 text-lg mb-2">Oops! Something went wrong.</p>
-          <p className="text-sm text-red-600/80 mb-6">{error_val}</p>
+          <p className="text-sm text-red-600/80 mb-6">{error}</p>
           
           {isGenerationError ? (
-            <Button onClick={() => setRetryTrigger_val(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
+            <Button onClick={() => setRetryTrigger(prev => prev + 1)} className="w-full bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12">
               Try Again (Data is Saved)
             </Button>
           ) : (
@@ -1286,28 +1277,28 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
     )
   }
 
-  const fullAnalysis = assessment_val?.ai_analysis_result || assessment_val?.ai_analysis
+  const fullAnalysis = assessment?.ai_analysis_result || assessment?.ai_analysis
 
   return (
-    <main className={isPdfMode_val ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
-    {!isPdfMode_val && (
+    <main className={isPdfMode ? 'h-max bg-white' : 'min-h-screen bg-slate-50 py-8'}>
+    {!isPdfMode && (
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mb-6 flex flex-col sm:flex-row justify-end gap-3">
           
           <Button 
             onClick={handleShare} 
             variant="outline"
-            className={`hidden sm:inline-flex font-bold transition-all ${isCopied_val ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
+            className={`hidden sm:inline-flex font-bold transition-all ${isCopied ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'text-[#0A2351] border-[#0A2351]/20 hover:bg-[#0A2351]/5'}`}
           >
-            {isCopied_val ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
-            {isCopied_val ? 'Link Copied!' : 'Share Result'}
+            {isCopied ? <CheckCircle2 className="mr-2 h-4 w-4" /> : <Share2 className="mr-2 h-4 w-4" />}
+            {isCopied ? 'Link Copied!' : 'Share Result'}
           </Button>
 
           <Button 
             onClick={handleDownloadPdf} 
-            disabled={isDownloading_val}
+            disabled={isDownloading}
             className="w-full sm:w-auto bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold transition-colors"
           >
-            {isDownloading_val ? (
+            {isDownloading ? (
               <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating PDF...</>
             ) : (
               'Download Career Roadmap PDF'
@@ -1316,12 +1307,12 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
         </div>
       )}
 
-      <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode_val ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
+      <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
         <FullReportView
           analysis={fullAnalysis}
           studentName={studentName}
           assessmentId={assessmentId}
-          isPdfMode={isPdfMode_val}
+          isPdfMode={isPdfMode}
         />
       </div>
     </main>
