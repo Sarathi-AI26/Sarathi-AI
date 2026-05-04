@@ -268,7 +268,7 @@ const FinalCTA = ({ isPdfMode }) => {
             <Button 
               onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
               variant="outline"
-              className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-4 sm:px-8 text-sm sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
+             className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-3 sm:px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
             >
               3 Sessions Pack (₹1,299)
             </Button>
