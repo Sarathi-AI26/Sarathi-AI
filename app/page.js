@@ -602,7 +602,7 @@ export default function Home() {
                 </div>
               </div>
               <Button
-                onClick={() => window.open('YOUR_ZOHO_FORM_LINK', '_blank')}
+                onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
                 variant="outline"
                 className="shrink-0 h-12 rounded-full border-[#F57D14] text-[#F57D14] font-bold hover:bg-[#F57D14] hover:text-white px-6 transition-all hover:scale-105"
               >
