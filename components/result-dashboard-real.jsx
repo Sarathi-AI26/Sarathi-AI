@@ -270,7 +270,7 @@ const FinalCTA = ({ isPdfMode }) => {
               variant="outline"
               className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-8 rounded-full transition-transform hover:scale-105"
             >
-              3 Sessions Pack (₹999)
+              3 Sessions Pack (₹1299)
             </Button>
           </div>
           
