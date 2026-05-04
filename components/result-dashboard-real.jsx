@@ -222,23 +222,62 @@ const ComparisonTable = ({ isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// FINAL CTA
+// FINAL CTA (Validation Phase)
 // ─────────────────────────────────────────────
 const FinalCTA = ({ isPdfMode }) => {
-  if (isPdfMode) return null;
+  // 🚀 SAFETY LOCK: Prevents the CTA from ever rendering in the PDF
+  if (isPdfMode) return null; 
+
   return (
     <section className="mt-12 mb-4 rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
       <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
-      <div className="relative z-10">
-        <h2 className="text-white font-extrabold mb-4 text-3xl sm:text-4xl">
-          Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
-        </h2>
-        <p className="text-white/80 mb-8 max-w-xl mx-auto text-sm sm:text-base">
-          You now have the exact roadmap based on your psychological DNA. The guesswork is over. The next step is execution.
-        </p>
-        <Button asChild className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-14 px-8 rounded-full text-lg shadow-lg transition-transform hover:scale-105">
-          <Link href="/">Return to Home <ArrowRight className="ml-2 h-5 w-5" /></Link>
-        </Button>
+      
+      <div className="relative z-10 space-y-8">
+        {/* Primary — Report Action */}
+        <div>
+          {/* 🚀 FIX: Explicit text-white to override global styles */}
+          <h2 className="text-white font-extrabold text-3xl sm:text-4xl mb-3">
+            Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
+          </h2>
+          <p className="text-white/70 text-sm max-w-lg mx-auto">
+            You have the roadmap. The next step is execution.
+          </p>
+        </div>
+
+        {/* Divider & Upsell (The Painted Door Test) */}
+        <div className="border-t border-white/10 pt-6">
+          <p className="text-[#F57D14] font-bold text-xs uppercase tracking-widest mb-2">
+            Want to go deeper?
+          </p>
+          <h3 className="text-white text-xl font-bold mb-2">
+            Discuss your report 1-on-1 with an expert
+          </h3>
+          <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
+            Get a personalised session where a career expert breaks down your report, 
+            answers your questions, and maps your next 90 days.
+          </p>
+          
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {/* 🚀 Replace 'YOUR_ZOHO_FORM_LINK' with your actual Zoho Form Public URL */}
+            <Button 
+              onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
+              className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 rounded-full transition-transform hover:scale-105"
+            >
+              Register Interest — 1 Session (₹499)
+            </Button>
+            <Button 
+              onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
+              variant="outline"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-8 rounded-full transition-transform hover:scale-105"
+            >
+              3 Sessions Pack (₹1,999)
+            </Button>
+          </div>
+          
+          <p className="text-white/40 text-xs mt-4">
+            Sessions launching soon — register your interest and we will reach out within 48-72 hours.
+          </p>
+        </div>
       </div>
     </section>
   )
