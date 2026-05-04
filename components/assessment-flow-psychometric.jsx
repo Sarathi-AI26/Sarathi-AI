@@ -173,7 +173,7 @@ const AssessmentFlowPsychometric = () => {
       }
 
      if (data.assessmentId) {
-        router.push(`/checkout?assessmentId=${data.assessmentId}`) // <--- THE FIX
+       router.push(`/checkout?assessmentId=${data.assessmentId}`) 
       } else {
         throw new Error('No assessment ID returned')
       }
@@ -335,33 +335,45 @@ const AssessmentFlowPsychometric = () => {
                         {currentQuestion.question}
                       </p>
                     </div>
-                    <textarea
-                      value={textResponse}
-                      onChange={(e) => setTextResponse(e.target.value)}
-                      placeholder="Type your reflection here. AI uses this to build your personalised roadmap..."
-                      className="w-full h-40 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
-                    />
+                    {/* 🚀 THE FIX: Max length, character counter, and disabled resizing */}
+                    <div className="relative">
+                      <textarea
+                        value={textResponse}
+                        onChange={(e) => setTextResponse(e.target.value)}
+                        maxLength={1000}
+                        placeholder="Type your reflection here. AI uses this to build your personalised roadmap..."
+                        className="w-full h-40 resize-none rounded-2xl border border-slate-200 bg-slate-50 p-4 pb-8 text-sm focus:border-[#F57D14] focus:outline-none focus:ring-1 focus:ring-[#F57D14]"
+                      />
+                      <div className="absolute bottom-4 right-4 text-[10px] font-medium text-slate-400">
+                        {textResponse.length}/1000
+                      </div>
+                    </div>
                     {submitError && (
                       <div className="text-sm text-red-600 font-bold bg-red-50 p-4 rounded-xl border border-red-200">
                         {submitError}
                       </div>
                     )}
-                    <div className="flex items-center justify-between pt-6">
+                    <div className="flex items-center justify-between gap-2 pt-6">
                       <Button
                         variant="ghost"
                         onClick={handlePrevious}
                         disabled={isTransitioning}
-                        className="text-slate-500 hover:text-[#0A2351]"
+                        className="text-slate-500 hover:text-[#0A2351] px-1 sm:px-4"
                       >
-                        <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+                        <ArrowLeft className="mr-1 sm:mr-2 h-4 w-4" /> 
+                        <span className="text-sm sm:text-base">Previous</span>
                       </Button>
                       <Button
                         onClick={() => handleNext(null)}
                         disabled={!canProceedOpenEnded || isTransitioning}
-                        className="h-14 rounded-full bg-[#F57D14] px-4 sm:px-8 font-bold text-white shadow-xl hover:bg-[#dd6f11] transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="h-14 shrink-0 rounded-full bg-[#F57D14] px-6 sm:px-8 text-sm sm:text-base font-bold text-white shadow-xl hover:bg-[#dd6f11] transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
                       >
-                        {isLastStep ? 'Finish & View Results' : 'Next Reflection'}{' '}
-                        <ArrowRight className="ml-2 h-5 w-5" />
+                        {isLastStep ? (
+                          <span>Finish<span className="hidden sm:inline"> & View Results</span></span>
+                        ) : (
+                          <span>Next<span className="hidden sm:inline"> Reflection</span></span>
+                        )}
+                        <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
                       </Button>
                     </div>
                   </div>
@@ -385,7 +397,6 @@ const AssessmentFlowPsychometric = () => {
                       {currentQuestion.options.map((opt) => {
                         const isSelected = currentAnswer === opt.value
                         return (
-                          // Mobile-friendly active states and transition lock applied here
                           <button
                             key={opt.value}
                             onClick={() => handleNext(opt.value)}
