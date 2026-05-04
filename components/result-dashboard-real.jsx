@@ -261,14 +261,14 @@ const FinalCTA = ({ isPdfMode }) => {
             {/* 🚀 Changed px-8 to px-4 on mobile, and added text-sm on mobile to prevent squishing */}
             <Button 
               onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
-              className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-4 sm:px-8 text-sm sm:text-base rounded-full transition-transform hover:scale-105"
+             className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-3 sm:px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
             >
               Register Interest — 1 Session (₹499)
             </Button>
             <Button 
               onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
               variant="outline"
-              className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-4 sm:px-8 text-sm sm:text-base rounded-full transition-transform hover:scale-105"
+              className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-4 sm:px-8 text-sm sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
             >
               3 Sessions Pack (₹1,299)
             </Button>
