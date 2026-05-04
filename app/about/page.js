@@ -10,7 +10,8 @@ import {
   ArrowRight,
   Rocket,
   Award,
-  AlertTriangle
+  AlertTriangle,
+  CalendarDays
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -158,6 +159,17 @@ export default function AboutPage() {
                         </p>
                       </div>
                     </li>
+                    <li className="flex gap-4">
+                      <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F57D14]/20 text-[#F57D14]">
+                        <CalendarDays className="h-4 w-4" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-[#0A2351]">1-on-1 Expert Guidance</h4>
+                        <p className="mt-1 text-sm text-slate-600">
+                          Personalised counseling to map your exact next 90 days.
+                        </p>
+                      </div>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -195,12 +207,12 @@ export default function AboutPage() {
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: Target,      title: 'No More Confusion',   desc: 'Cutting through the noise to help students find their true north.',                                   color: 'bg-blue-600'    },
-                { icon: Sparkles,    title: 'AI That Understands You', desc: 'Leveraging Gemini to process complex psychometric data in real-time.',                          color: 'bg-[#F57D14]'  },
-                { icon: BrainCircuit,title: 'Backed by Real Science',  desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and SDT.', color: 'bg-indigo-600' },
-                { icon: Award,       title: 'Built for Your Future',   desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',                      color: 'bg-emerald-600' },
+                { icon: Target,      title: 'No More Confusion',   desc: 'Cutting through the noise to help students find their true north.',                                    color: 'bg-[#0A2351]'    },
+                { icon: Sparkles,    title: 'AI That Understands', desc: 'Leveraging cutting-edge AI to process complex psychometric data in real-time.',                      color: 'bg-[#F57D14]'  },
+                { icon: BrainCircuit,title: 'Backed by Science',   desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and SDT.',                 color: 'bg-[#0A2351]' },
+                { icon: Award,       title: 'Built for Your Future',   desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',               color: 'bg-[#F57D14]' },
               ].map((value, i) => (
-                <div key={i} className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all hover:shadow-xl hover:-translate-y-1">
+                <div key={i} className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all hover:shadow-xl hover:-translate-y-1 hover:border-[#F57D14]/30">
                   <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md ${value.color}`}>
                     <value.icon className="h-6 w-6" />
                   </div>
@@ -212,29 +224,37 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* ── FINAL CTA ── */}
+        {/* ── FINAL CTA (Merged With Landing Page Aesthetic) ── */}
         <section className="py-16 lg:py-20 relative overflow-hidden">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="mx-auto max-w-4xl rounded-[3rem] bg-[#0A2351] p-10 text-center shadow-2xl sm:p-16 relative overflow-hidden">
+            <div className="mx-auto max-w-5xl rounded-[2rem] bg-[#0A2351] p-10 text-center shadow-2xl sm:p-16 relative overflow-hidden">
               <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-[80px]" />
-              <h2 className="text-3xl font-extrabold text-white sm:text-5xl">
-                Ready to find your <span className="text-[#F57D14]">True North?</span>
-              </h2>
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-white/80">
-                Stop guessing about your future. Take the 15-minute AI-powered psychometric assessment and get your personalised roadmap today.
-              </p>
-              <div className="mt-10 flex flex-col items-center justify-center">
-                <Button
-                  asChild
-                  className="h-14 rounded-full bg-[#F57D14] px-10 text-lg font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/20 transition-transform hover:scale-105"
-                >
-                  <Link href="/assessment">
-                    Start Career Test <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </Button>
-                <div className="mt-4 flex flex-col items-center gap-1 text-sm font-medium text-white/70">
-                   <span>Takes 15 minutes • No signup required</span>
-                   <span>Free to start • Full roadmap ₹99</span>
+              <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-blue-500/10 blur-[80px]" />
+              
+              <div className="relative z-10 space-y-8">
+                <h2 className="text-3xl font-extrabold text-white sm:text-5xl">
+                  Ready to find your <span className="text-[#F57D14]">True North?</span>
+                </h2>
+                <p className="mx-auto max-w-2xl text-lg text-white/80">
+                  Stop guessing about your future. Take the 15-minute AI-powered psychometric assessment and get your personalised roadmap today.
+                </p>
+                
+                <div className="flex flex-col items-center justify-center">
+                  <Button
+                    asChild
+                    className="h-14 rounded-full bg-[#F57D14] px-10 text-lg font-bold text-white hover:bg-[#dd6f11] shadow-lg shadow-[#F57D14]/30 transition-transform hover:scale-105"
+                  >
+                    <Link href="/assessment">
+                      Start Career Test <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  <div className="mt-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm font-medium text-white/70">
+                     <span>Free preview</span>
+                     <span className="hidden sm:inline">•</span>
+                     <span>Full roadmap ₹99</span>
+                     <span className="hidden sm:inline">•</span>
+                     <span>Expert Sessions from ₹499</span>
+                  </div>
                 </div>
               </div>
             </div>
