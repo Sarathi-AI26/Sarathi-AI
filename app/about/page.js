@@ -207,10 +207,10 @@ export default function AboutPage() {
             </div>
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { icon: Target,      title: 'No More Confusion',   desc: 'Cutting through the noise to help students find their true north.',                                    color: 'bg-[#0A2351]'    },
-                { icon: Sparkles,    title: 'AI That Understands', desc: 'Leveraging cutting-edge AI to process complex psychometric data in real-time.',                      color: 'bg-[#F57D14]'  },
+                { icon: Target,      title: 'No More Confusion',   desc: 'Cutting through the noise to help students find their true north.',                                   color: 'bg-[#0A2351]'    },
+                { icon: Sparkles,    title: 'AI That Understands', desc: 'Leveraging cutting-edge AI to process complex psychometric data in real-time.',                       color: 'bg-[#F57D14]'  },
                 { icon: BrainCircuit,title: 'Backed by Science',   desc: 'Built on proven psychological frameworks including Big Five, Holland Codes, and SDT.',                 color: 'bg-[#0A2351]' },
-                { icon: Award,       title: 'Built for Your Future',   desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',               color: 'bg-[#F57D14]' },
+                { icon: Award,       title: 'Built for Your Future',   desc: 'Empowering the individual above all else, keeping data encrypted and never shared.',                color: 'bg-[#F57D14]' },
               ].map((value, i) => (
                 <div key={i} className="rounded-3xl border border-slate-200 bg-slate-50 p-8 transition-all hover:shadow-xl hover:-translate-y-1 hover:border-[#F57D14]/30">
                   <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl text-white shadow-md ${value.color}`}>
@@ -253,7 +253,7 @@ export default function AboutPage() {
                      <span className="hidden sm:inline">•</span>
                      <span>Full roadmap ₹99</span>
                      <span className="hidden sm:inline">•</span>
-                     <span>Chat with Madhav ₹249</span>
+                     <span>Chat with Madhav ₹149</span>
                   </div>
                 </div>
               </div>
