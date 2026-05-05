@@ -1,5 +1,6 @@
 // app/about/page.js
 import Link from 'next/link';
+import PeacockFeatherIcon from '@/components/PeacockFeatherIcon';
 import { 
   BrainCircuit, 
   Target, 
@@ -10,8 +11,7 @@ import {
   ArrowRight,
   Rocket,
   Award,
-  AlertTriangle,
-  CalendarDays
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -161,12 +161,12 @@ export default function AboutPage() {
                     </li>
                     <li className="flex gap-4">
                       <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#F57D14]/20 text-[#F57D14]">
-                        <CalendarDays className="h-4 w-4" />
+                        <PeacockFeatherIcon className="h-4 w-4" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-[#0A2351]">1-on-1 Expert Guidance</h4>
+                        <h4 className="font-bold text-[#0A2351]">Meet Madhav: AI Coach</h4>
                         <p className="mt-1 text-sm text-slate-600">
-                          Personalised counseling to map your exact next 90 days.
+                          Chat directly with Madhav to map your exact next 90 days.
                         </p>
                       </div>
                     </li>
@@ -253,7 +253,7 @@ export default function AboutPage() {
                      <span className="hidden sm:inline">•</span>
                      <span>Full roadmap ₹99</span>
                      <span className="hidden sm:inline">•</span>
-                     <span>Expert Sessions from ₹499</span>
+                     <span>Chat with Madhav ₹249</span>
                   </div>
                 </div>
               </div>
