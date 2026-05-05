@@ -64,8 +64,8 @@
         "vaul": "^1.1.2",
         "zod": "^3.25.67",
         "@google/generative-ai": "latest",
-        "html2pdf.js": "^0.10.1"
-        "razorpay": "^2.9.4",
+        "html2pdf.js": "^0.10.1",
+        "razorpay": "^2.9.4"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.19",
