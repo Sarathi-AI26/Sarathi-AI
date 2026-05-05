@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import PeacockFeatherIcon from '@/components/PeacockFeatherIcon'
 import {
   BadgeIndianRupee, BrainCircuit, Compass, Lightbulb,
   Network, Sparkles, Target, Loader2,
@@ -249,33 +250,35 @@ const FinalCTA = ({ isPdfMode }) => {
           <p className="text-[#F57D14] font-bold text-xs uppercase tracking-widest mb-2">
             Want to go deeper?
           </p>
-          <h3 className="text-white text-xl font-bold mb-2">
-            Discuss your report 1-on-1 with an expert
+          <h3 className="text-white text-xl sm:text-2xl font-bold mb-3 flex items-center justify-center gap-2">
+            <PeacockFeatherIcon className="h-6 w-6 text-[#F57D14]" />
+            Meet Madhav: Your AI Coach
           </h3>
-          <p className="text-white/60 text-sm mb-6 max-w-md mx-auto">
-            Get a personalised session where a career expert breaks down your report, 
-            answers your questions, and maps your next 90 days.
+          <p className="text-white/60 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+            Don't just read your report—discuss it. Unlock 50 interactive queries with Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            {/* 🚀 Changed px-8 to px-4 on mobile, and added text-sm on mobile to prevent squishing */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="text-center sm:text-right sm:pr-4 sm:border-r border-white/10 sm:mr-1 hidden sm:block">
+               <p className="text-2xl font-extrabold text-white">₹249</p>
+               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">90-Day Access</p>
+            </div>
+            {/* Mobile-only pricing view */}
+            <div className="text-center sm:hidden mb-2 border-b border-white/10 pb-4 w-full">
+               <p className="text-2xl font-extrabold text-white">₹249</p>
+               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">90-Day Access</p>
+            </div>
+            
             <Button 
               onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
-             className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-3 sm:px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
+              className="w-full sm:w-auto bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap shadow-xl shadow-[#F57D14]/20"
             >
-              Register Interest — 1 Session (₹499)
-            </Button>
-            <Button 
-              onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
-              variant="outline"
-             className="border-white/30 bg-transparent text-white hover:bg-white/10 font-bold h-12 px-3 sm:px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap"
-            >
-              3 Sessions Pack (₹1,299)
+              Unlock Madhav <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           
-          <p className="text-white/40 text-xs mt-4">
-            Sessions launching soon — register your interest and we will reach out within 48-72 hours.
+          <p className="text-white/40 text-xs mt-6">
+            Madhav is launching soon — register your interest to secure early access.
           </p>
         </div>
       </div>
