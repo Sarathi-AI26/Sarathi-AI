@@ -313,9 +313,8 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    // 🚀 BULLETPROOF COPY-PASTE FIX: Replaced RegExp literals with RegExp constructor
-    const cleanText = text.replace(new RegExp('```json', 'g'), '').replace(new RegExp('
-```', 'g'), '').trim()
+    // 🚀 BULLETPROOF COPY-PASTE FIX: Using native regex literals to prevent line-break errors
+    const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
     throw new Error('JSON_PARSE_FAILED')
