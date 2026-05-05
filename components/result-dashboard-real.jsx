@@ -237,8 +237,9 @@ const FinalCTA = ({ isPdfMode }) => {
           <h2 className="text-white font-extrabold text-3xl sm:text-4xl mb-3">
             Ready to execute your <span className="text-[#F57D14]">blueprint?</span>
           </h2>
+          {/* UPDATED: The new emotional hook tailored to their post-report state */}
           <p className="text-white/70 text-sm max-w-lg mx-auto">
-            You have the roadmap. The next step is execution.
+            You know your profile. Now let's plan your Monday.
           </p>
         </div>
 
@@ -250,18 +251,21 @@ const FinalCTA = ({ isPdfMode }) => {
             <PeacockFeatherIcon className="h-6 w-6 text-[#F57D14]" />
             Meet Madhav: Your AI Coach
           </h3>
+          {/* UPDATED: Changed from 50 queries to 30 days unlimited access */}
           <p className="text-white/60 text-sm mb-6 max-w-md mx-auto leading-relaxed">
-            Don't just read your report—discuss it. Unlock 50 interactive queries with Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
+            Don't just read your report—discuss it. Get 30 days of unlimited access to Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* UPDATED: Desktop pricing to ₹149 / 30-Day Access */}
             <div className="text-center sm:text-right sm:pr-4 sm:border-r border-white/10 sm:mr-1 hidden sm:block">
-               <p className="text-2xl font-extrabold text-white">₹249</p>
-               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">90-Day Access</p>
+               <p className="text-2xl font-extrabold text-white">₹149</p>
+               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">30-Day Access</p>
             </div>
+            {/* UPDATED: Mobile pricing to ₹149 / 30-Day Access */}
             <div className="text-center sm:hidden mb-2 border-b border-white/10 pb-4 w-full">
-               <p className="text-2xl font-extrabold text-white">₹249</p>
-               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">90-Day Access</p>
+               <p className="text-2xl font-extrabold text-white">₹149</p>
+               <p className="text-[10px] font-bold uppercase tracking-wider text-white/50 mt-0.5">30-Day Access</p>
             </div>
             
             <Button 
