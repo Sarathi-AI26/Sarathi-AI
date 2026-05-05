@@ -65,7 +65,8 @@
         "zod": "^3.25.67",
         "@google/generative-ai": "latest",
         "html2pdf.js": "^0.10.1",
-        "razorpay": "^2.9.4"
+        "razorpay": "^2.9.4",
+        "nodemailer": "^6.9.13"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.19",
