@@ -289,8 +289,7 @@ export default function Home() {
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
-                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹249</p>
-                </div>
+                 <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹149</p>
 
                 <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
                   {[
