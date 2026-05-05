@@ -289,7 +289,8 @@ export default function Home() {
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
-                 <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹149</p>
+                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹149</p>
+                </div>
 
                 <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
                   {[
@@ -587,14 +588,14 @@ export default function Home() {
                 </h3>
                 
                 <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed max-w-xl">
-                  Don't just read your report—discuss it. Unlock 50 interactive queries with Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
+                  Don't just read your report—discuss it. Get 30 days of unlimited access to Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
                 </p>
               </div>
               
               <div className="flex flex-col items-center gap-4 shrink-0 w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-[#F57D14]/20 pt-6 md:pt-0 md:pl-8">
                 <div className="text-center">
-                  <p className="text-4xl font-extrabold text-[#0A2351]">₹249</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">90-Day Access</p>
+                  <p className="text-4xl font-extrabold text-[#0A2351]">₹149</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">30-Day Access</p>
                 </div>
                 <Button
                   onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
@@ -736,7 +737,7 @@ export default function Home() {
                      <span className="hidden sm:inline">•</span>
                      <span>Full roadmap ₹99</span>
                      <span className="hidden sm:inline">•</span>
-                     <span>Chat with Madhav ₹249</span>
+                     <span>Chat with Madhav ₹149</span>
                   </div>
                 </div>
               </div>
