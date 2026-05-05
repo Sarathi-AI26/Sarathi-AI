@@ -531,11 +531,11 @@ export default function Home() {
                 <p className="text-sm font-bold uppercase tracking-widest text-slate-400">Free</p>
                 <p className="mt-4 text-5xl font-extrabold text-[#0A2351]">₹0</p>
                 <p className="mt-2 text-sm text-slate-500">No credit card required</p>
-                <ul className="mt-8 space-y-3">
+               <ul className="mt-8 space-y-3">
                   {[
                     '60-question psychometric test',
                     'Basic personality insights',
-                    'Top 3 career matches (preview only)',
+                    'Personalised radar chart across 5 dimensions', // UPDATED LINE
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-400" />
