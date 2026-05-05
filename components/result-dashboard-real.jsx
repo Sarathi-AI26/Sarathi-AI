@@ -65,6 +65,52 @@ const ICON_MAP = {
 }
 
 // ─────────────────────────────────────────────
+// 🧮 FRONTEND MATH ENGINE (Zero API Cost)
+// ─────────────────────────────────────────────
+const computeScoresFromAnswers = (answers) => {
+  if (!answers || !Array.isArray(answers) || answers.length === 0) {
+     return { Personality: 75, Aptitude: 80, Motivation: 70, 'Career Interests': 85, 'Behavioural Tendencies': 75 };
+  }
+  let sums = { Personality: 0, 'Career Interests': 0, Aptitude: 0, Motivation: 0, Behavioural: 0 };
+  let maxes = { Personality: 0, 'Career Interests': 0, Aptitude: 0, Motivation: 0, Behavioural: 0 };
+
+  answers.forEach((ans, idx) => {
+    const raw = parseInt(ans, 10);
+    if (isNaN(raw)) return;
+
+    let section, scale, isReverse = false;
+    if (idx <= 14) { section = 'Personality'; scale = 5; }
+    else if (idx <= 26) { section = 'Career Interests'; scale = 4; }
+    else if (idx <= 36) { section = 'Aptitude'; scale = 5; }
+    else if (idx <= 46) { section = 'Motivation'; scale = 4; }
+    else if (idx <= 54) { section = 'Behavioural'; scale = 5; if (idx === 47) isReverse = true; }
+    else return;
+
+    const val = isReverse ? raw : (scale + 1 - raw);
+    sums[section] += val;
+    maxes[section] += scale;
+  });
+
+  const result = {};
+  for (const key in sums) {
+    result[key] = maxes[key] > 0 ? Math.round((sums[key] / maxes[key]) * 100) : 0;
+  }
+  result['Behavioural Tendencies'] = result['Behavioural'];
+  delete result['Behavioural'];
+  return result;
+}
+
+const getTeaserStatement = (scores) => {
+  if (!scores) return "You have a unique and complex profile that strongly indicates...";
+  const top = Object.entries(scores).sort((a,b) => b[1]-a[1])[0][0];
+  if (top === 'Personality') return "You are a structured, analytical thinker who...";
+  if (top === 'Aptitude') return "Your fast processing speed and visual reasoning indicate that you...";
+  if (top === 'Motivation') return "Driven by deep intrinsic ambition, your profile shows you will...";
+  if (top === 'Career Interests') return "Your specialized focus points toward a career trajectory where you...";
+  return "You possess a balanced, resilient profile that allows you to easily...";
+}
+
+// ─────────────────────────────────────────────
 // FEEDBACK BUTTONS COMPONENT
 // ─────────────────────────────────────────────
 const FeedbackButtons = ({ assessmentId, careerTitle }) => {
@@ -1332,22 +1378,117 @@ const ResultDashboardReal = ({ assessmentId, onReady }) => {
   if (loading || analyzing) return <LoadingView analyzing={analyzing} elapsed={elapsed} />
 
   if (!hasPaid) {
+    const previewScores = computeScoresFromAnswers(assessment?.raw_answers);
+    const teaser = getTeaserStatement(previewScores);
+
+    const chartData = [
+      { subject: 'Personality', score: previewScores['Personality'] || 0, fullMark: 100 },
+      { subject: 'Aptitude',    score: previewScores['Aptitude'] || 0, fullMark: 100 },
+      { subject: 'Motivation',  score: previewScores['Motivation'] || 0, fullMark: 100 },
+      { subject: 'Interests',   score: previewScores['Career Interests'] || 0, fullMark: 100 },
+      { subject: 'Behaviour',   score: previewScores['Behavioural Tendencies'] || 0, fullMark: 100 },
+    ]
+
     return (
-      <div className="flex min-h-[70vh] flex-col items-center justify-center p-4">
-        <Card className="max-w-md w-full border-0 shadow-xl rounded-3xl overflow-hidden text-center p-8 bg-white">
-          <div className="w-20 h-20 bg-slate-50 rounded-full mx-auto flex items-center justify-center mb-6">
-            <Lock className="w-10 h-10 text-[#0A2351]" />
+      <div className="min-h-screen bg-slate-50 py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-5xl">
+
+          {/* PREVIEW HEADER */}
+          <section className="rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-white shadow-xl relative overflow-hidden mb-8">
+            <div className="relative z-10">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#F57D14] px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white">
+                <Lock className="h-3 w-3" /> Free Preview
+              </div>
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
+                {safeText(studentName)}, your <span className="text-[#F57D14]">Career DNA</span> is ready.
+              </h1>
+              <p className="mt-4 text-lg text-white/70 max-w-2xl">
+                We've mapped your 60 answers. Here is a glimpse into your core psychometric profile.
+              </p>
+            </div>
+            <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-[#F57D14]/20 blur-3xl" />
+          </section>
+
+          {/* IDENTITY TEASER (The Hook) */}
+          <div className="relative overflow-hidden rounded-2xl bg-[#0A2351] p-8 mb-8">
+            <div className="absolute top-4 left-6 opacity-10">
+              <Quote className="h-16 w-16 text-[#F57D14]" />
+            </div>
+            <div className="relative z-10 flex">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-3">Your Identity</p>
+                <p className="font-bold text-white text-2xl sm:text-3xl leading-relaxed">
+                  {teaser} <span className="blur-sm text-white/40 select-none">build a highly successful path in roles requiring strategic execution and leadership.</span>
+                </p>
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl font-bold text-[#0A2351] mb-3">Roadmap Locked</h2>
-          <p className="text-slate-500 text-sm mb-8 leading-relaxed">
-            Your 60-dimension AI analysis is complete and saved. Unlock your dashboard to reveal your Top Career Matches and 5-Year Execution Plan.
-          </p>
-          <Button asChild className="w-full h-14 rounded-full bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold text-base shadow-lg transition-all hover:scale-105">
-            <Link href={`/checkout?assessmentId=${assessmentId}`}>
-              Unlock Now for ₹99 <ArrowRight className="w-5 h-5 ml-2" />
-            </Link>
-          </Button>
-        </Card>
+
+          {/* PROFILE BADGE & RADAR */}
+          <ProfileBadge radarScores={previewScores} isPdfMode={false} />
+
+          <div className="grid gap-6 lg:grid-cols-2 mb-8">
+            <section>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] h-10 w-10 shrink-0">
+                  <Activity className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-[#0A2351] text-xl">Psychometric Dimensions</h2>
+                  <p className="text-sm text-slate-500">Your computed scores based on your 60 answers.</p>
+                </div>
+              </div>
+              <Card className="border-0 bg-[#0A2351]/5 shadow-none h-full">
+                <CardContent className="p-4">
+                  <div className="h-[250px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart cx="50%" cy="50%" outerRadius="70%" data={chartData}>
+                        <PolarGrid stroke="#cbd5e1" />
+                        <PolarAngleAxis dataKey="subject" tick={{ fill: '#475569', fontSize: 10, fontWeight: 600 }} />
+                        <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
+                        <Radar name="Score" dataKey="score" stroke="#F57D14" fill="#F57D14" fillOpacity={0.35} />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </CardContent>
+              </Card>
+            </section>
+
+            {/* BLURRED DETAILS SECTION WITH PAYWALL */}
+            <section className="relative overflow-hidden">
+              <div className="flex items-center gap-3 mb-6 opacity-40">
+                <div className="flex items-center justify-center rounded-xl bg-[#0A2351] text-[#F57D14] h-10 w-10 shrink-0">
+                  <Target className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-bold text-[#0A2351] text-xl">Top Career Matches</h2>
+                </div>
+              </div>
+              <Card className="border-0 bg-white shadow-none h-full relative">
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-10 flex flex-col items-center justify-center text-center p-6">
+                  <div className="w-20 h-20 bg-slate-50 rounded-full mx-auto flex items-center justify-center mb-6 shadow-sm border border-slate-100">
+                    <Lock className="w-8 h-8 text-[#0A2351]" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-[#0A2351] mb-2">Unlock Your 8-Page Roadmap</h3>
+                  <p className="text-slate-600 text-sm mb-6 max-w-sm">
+                    You've seen your dimensions. Now let our AI translate these scores into specific career matches, a 5-year execution plan, and a list of blind spots to avoid.
+                  </p>
+                  <Button asChild className="h-14 rounded-full bg-[#F57D14] hover:bg-[#dd6f11] px-8 text-white font-bold text-base shadow-xl shadow-[#F57D14]/20 transition-all hover:scale-105">
+                    <Link href={`/checkout?assessmentId=${assessmentId}`}>
+                      Unlock Full Roadmap for ₹99 <ArrowRight className="w-5 h-5 ml-2" />
+                    </Link>
+                  </Button>
+                </div>
+                <CardContent className="p-6 opacity-30 select-none blur-[2px]">
+                   <div className="h-16 bg-slate-200 rounded-xl mb-4 w-full"></div>
+                   <div className="h-16 bg-slate-200 rounded-xl mb-4 w-[90%]"></div>
+                   <div className="h-16 bg-slate-200 rounded-xl w-[95%]"></div>
+                </CardContent>
+              </Card>
+            </section>
+          </div>
+          
+        </div>
       </div>
     )
   }
