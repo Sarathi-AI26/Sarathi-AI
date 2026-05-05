@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PeacockFeatherIcon from '@/components/PeacockFeatherIcon'
 import {
   BrainCircuit,
   LineChart,
@@ -82,9 +83,9 @@ const OUTCOMES = [
     desc: 'Get a clear 5-year execution plan.',
   },
   {
-    icon: CalendarDays,
-    title: '1-on-1 Expert Session',
-    desc: 'Discuss your report with a career expert who maps your next 90 days.',
+    icon: PeacockFeatherIcon,
+    title: 'Meet Madhav: Your AI Coach',
+    desc: 'Chat directly with Madhav to map your exact next 90 days and execute your plan.',
   },
 ]
 
@@ -127,12 +128,8 @@ const FAQS = [
     a: 'You receive an interactive web dashboard and a beautifully formatted 8-page PDF. The PDF is yours to keep and share with mentors.',
   },
   {
-    q: 'What is the 1-on-1 expert session?',
-    a: 'After receiving your roadmap, you can book a 30-minute session with a career expert who will break down your report, answer your questions, and help you plan your first 90 days. Sessions are ₹499 for one or ₹1,299 for three.',
-  },
-  {
-    q: 'How do I book an expert session?',
-    a: 'After completing your assessment, click "Register Interest" on your report page. We will reach out within 48-72 hours to schedule your Google Meet session.',
+    q: 'Who is Madhav?',
+    a: 'Madhav is your interactive AI Career Coach. After receiving your ₹99 roadmap, you can unlock Madhav for ₹249. Pre-loaded with your exact psychometric DNA, Madhav acts as your personal guide to help you build weekly schedules, prepare for interviews, and execute your 5-year plan without any guesswork.',
   },
 ]
 
@@ -292,7 +289,7 @@ export default function Home() {
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
-                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99</p>
+                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹249</p>
                 </div>
 
                 <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
@@ -578,36 +575,35 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Added Upsell Box for Counselling */}
-            <div className="mx-auto mt-8 max-w-4xl rounded-3xl border border-[#F57D14]/30 bg-[#F57D14]/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all hover:shadow-lg">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-1">
-                  Go Deeper
+            {/* Madhav AI Coach Upsell Block */}
+            <div className="mx-auto mt-8 max-w-4xl rounded-3xl border border-[#F57D14]/30 bg-[#F57D14]/5 p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6 transition-all hover:shadow-lg">
+              <div className="flex-1 text-center md:text-left">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#F57D14] mb-2">
+                  Execute Your Plan
                 </p>
-                <h3 className="text-lg font-bold text-[#0A2351]">
-                  1-on-1 Report Discussion with an Expert
+                
+                <h3 className="text-xl sm:text-2xl font-extrabold text-[#0A2351] flex items-center justify-center md:justify-start gap-3">
+                  <PeacockFeatherIcon className="h-7 w-7" />
+                  Meet Madhav: Your AI Coach
                 </h3>
-                <p className="text-sm text-slate-500 mt-1">
-                  A career expert breaks down your report and maps your next 90 days.
+                
+                <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed max-w-xl">
+                  Don't just read your report—discuss it. Unlock 50 interactive queries with Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
+              
+              <div className="flex flex-col items-center gap-4 shrink-0 w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-[#F57D14]/20 pt-6 md:pt-0 md:pl-8">
                 <div className="text-center">
-                  <p className="text-2xl font-extrabold text-[#0A2351]">₹499</p>
-                  <p className="text-xs text-slate-400">1 Session</p>
+                  <p className="text-4xl font-extrabold text-[#0A2351]">₹249</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">90-Day Access</p>
                 </div>
-                <div className="text-center">
-                  <p className="text-2xl font-extrabold text-[#0A2351]">₹1,299</p>
-                  <p className="text-xs text-slate-400">3 Sessions Pack</p>
-                </div>
+                <Button
+                  onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
+                  className="w-full md:w-auto bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap shadow-xl shadow-[#F57D14]/20"
+                >
+                  Unlock Madhav <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
               </div>
-              <Button
-                onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
-                variant="outline"
-                className="shrink-0 h-12 rounded-full border-[#F57D14] text-[#F57D14] font-bold hover:bg-[#F57D14] hover:text-white px-6 transition-all hover:scale-105"
-              >
-                Register Interest <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
             </div>
           </div>
         </section>
@@ -736,7 +732,13 @@ export default function Home() {
                       Start Your Career Test Now <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  <p className="mt-3 text-sm font-medium text-white/50">Takes 15 minutes • No signup required</p>
+                  <div className="mt-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm font-medium text-white/70">
+                     <span>Free preview</span>
+                     <span className="hidden sm:inline">•</span>
+                     <span>Full roadmap ₹99</span>
+                     <span className="hidden sm:inline">•</span>
+                     <span>Chat with Madhav ₹249</span>
+                  </div>
                 </div>
               </div>
             </div>
