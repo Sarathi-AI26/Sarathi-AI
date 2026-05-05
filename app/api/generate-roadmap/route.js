@@ -314,7 +314,8 @@ ${OUTPUT_SCHEMA}
 
   try {
     // 🚀 BULLETPROOF COPY-PASTE FIX: Replaced RegExp literals with RegExp constructor
-    const cleanText = text.replace(new RegExp('```json', 'g'), '').replace(new RegExp('```', 'g'), '').trim()
+    const cleanText = text.replace(new RegExp('```json', 'g'), '').replace(new RegExp('
+```', 'g'), '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
     throw new Error('JSON_PARSE_FAILED')
@@ -374,6 +375,11 @@ export async function POST(request) {
       .single()
 
     if (fetchError || !assessment) return jsonResponse({ error: 'Assessment not found' }, 404)
+
+    // 🛡️ THE BACKEND BOUNCER: Prevent AI generation if the user hasn't paid
+    if (assessment.payment_status !== true) {
+      return jsonResponse({ error: 'Payment required to generate roadmap' }, 403)
+    }
 
     if (assessment.ai_analysis_result?.user_archetype) {
       return jsonResponse({ ok: true, assessment: normalizeAssessment(assessment) })
