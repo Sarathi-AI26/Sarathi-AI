@@ -129,7 +129,7 @@ const FAQS = [
   },
   {
     q: 'Who is Madhav?',
-    a: 'Madhav is your interactive AI Career Coach. After receiving your ₹99 roadmap, you can unlock Madhav for ₹249. Pre-loaded with your exact psychometric DNA, Madhav acts as your personal guide to help you build weekly schedules, prepare for interviews, and execute your 5-year plan without any guesswork.',
+    a: 'Madhav is your interactive AI Career Coach. After receiving your ₹99 roadmap, you can unlock Madhav for ₹149. Pre-loaded with your exact psychometric DNA, Madhav acts as your personal guide to help you build weekly schedules, prepare for interviews, and execute your 5-year plan without any guesswork.',
   },
 ]
 
