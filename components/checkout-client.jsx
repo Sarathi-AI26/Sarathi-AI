@@ -72,6 +72,7 @@ const CheckoutClient = ({ assessmentId }) => {
         currency: orderData.currency,
         name: 'SARATHI',
         description: 'Full 5-Year Career Roadmap',
+        image: 'https://www.sarathiapp.in/logo-square.png', // 🚀 YOUR LOGO ADDED HERE
         order_id: orderData.orderId,
         theme: {
           color: '#0A2351', // SARATHI Navy Blue
