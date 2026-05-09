@@ -5,6 +5,7 @@ import { Toaster } from 'sonner'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 
+// OPTIMIZATION: Ensure display: 'swap' is utilized for immediate text rendering
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
@@ -20,9 +21,13 @@ export const metadata = {
 
 const App = ({ children }) => {
   return (
-    // 🚀 THE FIX: Template literals allow the font variable and the scroll padding to coexist
     <html lang="en" className={`${inter.variable} scroll-pt-16 sm:scroll-pt-24`}>
       <head>
+        {/* OPTIMIZATION: Preconnect to common origins to speed up resource loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Safe error handling script */}
         <script
           dangerouslySetInnerHTML={{
             __html:
