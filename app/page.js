@@ -141,7 +141,7 @@ const INSTITUTION_FEATURES = [
 ]
 
 // ─────────────────────────────────────────────
-// CONTACT FORM COMPONENT
+// CONTACT FORM COMPONENT (OPTIMIZED FOR A11Y)
 // ─────────────────────────────────────────────
 const ContactForm = () => {
   const [formData, setFormData] = useState({
@@ -174,7 +174,7 @@ const ContactForm = () => {
       <div className="flex flex-col items-center justify-center py-16 text-center">
         <CheckCircle2 className="h-16 w-16 text-[#F57D14] mb-4" />
         <h3 className="text-xl font-bold text-[#0A2351]">Request Received!</h3>
-        <p className="mt-2 text-sm text-slate-500 max-w-xs">
+        <p className="mt-2 text-sm text-slate-600 max-w-xs">
           We will reach out to <span className="font-semibold text-[#0A2351]">{formData.email}</span> within one business day to schedule your demo.
         </p>
       </div>
@@ -185,25 +185,26 @@ const ContactForm = () => {
     <form onSubmit={handleSubmit} className="mt-8 space-y-5">
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Your Name *</label>
-          <input type="text" required placeholder="Dr. Sharma" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClass} />
+          {/* OPTIMIZATION: Added htmlFor and id to link label and input */}
+          <label htmlFor="contact-name" className="text-xs font-bold uppercase tracking-wider text-slate-500">Your Name *</label>
+          <input id="contact-name" type="text" required placeholder="Dr. Sharma" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClass} />
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Designation</label>
-          <input type="text" placeholder="TPO / Principal" value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className={inputClass} />
+          <label htmlFor="contact-designation" className="text-xs font-bold uppercase tracking-wider text-slate-500">Designation</label>
+          <input id="contact-designation" type="text" placeholder="TPO / Principal" value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className={inputClass} />
         </div>
       </div>
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Institution Name *</label>
-        <input type="text" required placeholder="Full college name" value={formData.institution} onChange={(e) => setFormData({ ...formData, institution: e.target.value })} className={inputClass} />
+        <label htmlFor="contact-institution" className="text-xs font-bold uppercase tracking-wider text-slate-500">Institution Name *</label>
+        <input id="contact-institution" type="text" required placeholder="Full college name" value={formData.institution} onChange={(e) => setFormData({ ...formData, institution: e.target.value })} className={inputClass} />
       </div>
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Official Email *</label>
-        <input type="email" required placeholder="director@college.edu.in" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputClass} />
+        <label htmlFor="contact-email" className="text-xs font-bold uppercase tracking-wider text-slate-500">Official Email *</label>
+        <input id="contact-email" type="email" required placeholder="director@college.edu.in" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className={inputClass} />
       </div>
       <div className="space-y-2">
-        <label className="text-xs font-bold uppercase tracking-wider text-slate-400">Approximate Student Strength</label>
-        <select value={formData.batchSize} onChange={(e) => setFormData({ ...formData, batchSize: e.target.value })} className={inputClass}>
+        <label htmlFor="contact-batch" className="text-xs font-bold uppercase tracking-wider text-slate-500">Approximate Student Strength</label>
+        <select id="contact-batch" value={formData.batchSize} onChange={(e) => setFormData({ ...formData, batchSize: e.target.value })} className={inputClass}>
           <option value="">Select batch size</option>
           <option>Under 500 students</option>
           <option>500 – 2,000 students</option>
@@ -260,10 +261,10 @@ export default function Home() {
                   </span>
                 </h1>
 
-                <p className="mt-6 text-base leading-relaxed text-white/70 sm:mt-8 sm:max-w-lg md:text-lg">
+                <p className="mt-6 text-base leading-relaxed text-white/80 sm:mt-8 sm:max-w-lg md:text-lg">
                   Get a clear career roadmap matched to your personality in just 15 minutes.
                 </p>
-                <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 text-sm font-medium text-white/80 border border-white/10">
+                <div className="mt-3 inline-flex items-center gap-2 rounded-lg bg-white/5 px-3 py-1 text-sm font-medium text-white/90 border border-white/10">
                   <Zap className="h-4 w-4 text-[#F57D14]" /> Takes 15 minutes • No signup required
                 </div>
 
@@ -273,7 +274,7 @@ export default function Home() {
                       asChild
                       className="h-14 w-full sm:w-auto rounded-full bg-[#F57D14] px-8 text-base font-bold text-white shadow-2xl shadow-[#F57D14]/30 transition-all hover:scale-105 hover:bg-[#dd6f11]"
                     >
-                      <Link href="/assessment">
+                      <Link href="/assessment" aria-label="Start your career test">
                         Start Career Test
                         <ArrowRight className="ml-2 h-5 w-5" />
                       </Link>
@@ -283,13 +284,14 @@ export default function Home() {
                       href="/sample-report.pdf"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="group flex items-center justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0 text-sm font-semibold text-white/60 transition-colors hover:text-white"
+                      aria-label="View sample PDF report"
+                      className="group flex items-center justify-center gap-1 w-full sm:w-auto mt-2 sm:mt-0 text-sm font-semibold text-white/80 transition-colors hover:text-white"
                     >
                       <span className="underline underline-offset-4">View sample report</span>
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </a>
                   </div>
-                  <p className="text-xs font-medium text-white/50 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹149</p>
+                  <p className="text-xs font-medium text-white/70 pl-2">Free to start • Full roadmap ₹99 • Chat with Madhav ₹149</p>
                 </div>
 
                 <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-white/10 pt-8">
@@ -298,7 +300,7 @@ export default function Home() {
                     { icon: Zap,   text: '15 Min to Clarity' },
                     { icon: Award, text: '60 Scientific Dimensions' },
                   ].map(({ icon: Icon, text }) => (
-                    <div key={text} className="flex items-center gap-2 text-xs sm:text-sm font-medium text-white/50">
+                    <div key={text} className="flex items-center gap-2 text-xs sm:text-sm font-medium text-white/80">
                       <Icon className="h-4 w-4 text-[#F57D14]" />
                       {text}
                     </div>
@@ -322,7 +324,7 @@ export default function Home() {
                       <div className="h-3 w-3 rounded-full bg-red-400/70" />
                       <div className="h-3 w-3 rounded-full bg-yellow-400/70" />
                       <div className="h-3 w-3 rounded-full bg-green-400/70" />
-                      <p className="ml-3 text-xs font-semibold text-white/40">sarathiapp.in · Career Report</p>
+                      <p className="ml-3 text-xs font-semibold text-white/70">sarathiapp.in · Career Report</p>
                     </div>
                   </div>
 
@@ -333,7 +335,7 @@ export default function Home() {
                       </div>
                       <div>
                         <p className="text-sm font-bold text-white">Rohan V.</p>
-                        <p className="text-xs text-white/50">B.Tech Student</p>
+                        <p className="text-xs text-white/70">B.Tech Student</p>
                       </div>
                       <span className="ml-auto rounded-full bg-green-500/20 px-3 py-1 text-[10px] font-bold uppercase text-green-400">
                         Report Ready
@@ -341,7 +343,7 @@ export default function Home() {
                     </div>
 
                     <div className="rounded-2xl bg-white p-5">
-                      <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                      <p className="mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-500">
                         Top Role Matches
                       </p>
                       <div className="space-y-4">
@@ -379,7 +381,7 @@ export default function Home() {
                     <Icon className="h-6 w-6 text-[#F57D14]" />
                   </div>
                   <p className="text-4xl font-extrabold text-[#0A2351]">{value}</p>
-                  <p className="text-sm font-medium text-slate-500">{label}</p>
+                  <p className="text-sm font-medium text-slate-600">{label}</p>
                 </div>
               ))}
             </div>
@@ -393,7 +395,7 @@ export default function Home() {
               <h2 className="text-3xl font-extrabold tracking-tight text-[#0A2351] sm:text-4xl">
                 What You'll Walk Away With
               </h2>
-              <p className="mt-4 text-base text-slate-500">
+              <p className="mt-4 text-base text-slate-600">
                 Stop guessing. Start executing. Here is exactly what your personalized roadmap delivers.
               </p>
             </div>
@@ -413,7 +415,7 @@ export default function Home() {
             {/* Scroll Catcher CTA */}
             <div className="mt-16 text-center">
                <Button asChild variant="outline" className="h-12 rounded-full border-slate-300 font-bold text-[#0A2351] hover:bg-slate-100 hover:border-[#0A2351] px-8 transition-all hover:scale-105">
-                 <Link href="/assessment">Start Career Test <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                 <Link href="/assessment" aria-label="Start your career test">Start Career Test <ArrowRight className="ml-2 h-4 w-4" /></Link>
                </Button>
             </div>
           </div>
@@ -438,7 +440,7 @@ export default function Home() {
                     <span className="text-5xl font-extrabold text-slate-100">{step}</span>
                   </div>
                   <h3 className="text-xl font-bold text-[#0A2351]">{title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-500">{desc}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{desc}</p>
                 </div>
               ))}
             </div>
@@ -502,14 +504,14 @@ export default function Home() {
                       <Star key={i} className="h-4 w-4 fill-[#F57D14] text-[#F57D14]" />
                     ))}
                   </div>
-                  <p className="flex-1 text-sm leading-relaxed text-white/70 italic">{t.quote}</p>
+                  <p className="flex-1 text-sm leading-relaxed text-white/80 italic">{t.quote}</p>
                   <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-6">
                     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F57D14] text-xs font-extrabold text-white">
                       {t.avatar}
                     </div>
                     <div>
                       <p className="text-sm font-bold text-white">{t.name}</p>
-                      <p className="text-xs text-white/40">{t.college}</p>
+                      <p className="text-xs text-white/70">{t.college}</p>
                     </div>
                   </div>
                 </div>
@@ -528,14 +530,14 @@ export default function Home() {
 
             <div className="mx-auto mt-16 grid max-w-4xl gap-8 md:grid-cols-2">
               <div className="rounded-3xl border border-slate-200 bg-white p-8 transition-all hover:shadow-lg">
-                <p className="text-sm font-bold uppercase tracking-widest text-slate-400">Free</p>
+                <p className="text-sm font-bold uppercase tracking-widest text-slate-500">Free</p>
                 <p className="mt-4 text-5xl font-extrabold text-[#0A2351]">₹0</p>
-                <p className="mt-2 text-sm text-slate-500">No credit card required</p>
-               <ul className="mt-8 space-y-3">
+                <p className="mt-2 text-sm text-slate-600">No credit card required</p>
+                <ul className="mt-8 space-y-3">
                   {[
                     '60-question psychometric test',
                     'Basic personality insights',
-                    'Personalised radar chart across 5 dimensions', // UPDATED LINE
+                    'Personalised radar chart across 5 dimensions',
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-3 text-sm text-slate-700">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-slate-400" />
@@ -549,9 +551,9 @@ export default function Home() {
                 <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-[#F57D14] px-5 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white">
                   Most Popular
                 </div>
-                <p className="text-sm font-bold uppercase tracking-widest text-white/50">Full Roadmap</p>
+                <p className="text-sm font-bold uppercase tracking-widest text-white/70">Full Roadmap</p>
                 <p className="mt-4 text-5xl font-extrabold text-white">₹99</p>
-                <p className="mt-2 text-sm text-white/50">One-time payment, yours forever</p>
+                <p className="mt-2 text-sm text-white/70">One-time payment, yours forever</p>
                 <ul className="mt-8 space-y-3">
                   {[
                     'Everything in Free',
@@ -561,14 +563,14 @@ export default function Home() {
                     'Downloadable PDF report, keep forever',
                     'Blind spot and growth risk analysis',
                   ].map((f) => (
-                    <li key={f} className="flex items-center gap-3 text-sm text-white/80">
+                    <li key={f} className="flex items-center gap-3 text-sm text-white/90">
                       <CheckCircle2 className="h-4 w-4 shrink-0 text-[#F57D14]" />
                       {f}
                     </li>
                   ))}
                 </ul>
                 <Button asChild className="mt-10 h-12 w-full rounded-full bg-[#F57D14] font-bold text-white hover:bg-[#dd6f11] shadow-xl shadow-[#F57D14]/30 transition-all hover:scale-105">
-                  <Link href="/assessment">
+                  <Link href="/assessment" aria-label="Unlock full roadmap">
                     Unlock Full Roadmap – ₹99 <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -587,7 +589,7 @@ export default function Home() {
                   Meet Madhav: Your AI Coach
                 </h3>
                 
-                <p className="text-sm sm:text-base text-slate-600 mt-3 leading-relaxed max-w-xl">
+                <p className="text-sm sm:text-base text-slate-700 mt-3 leading-relaxed max-w-xl">
                   Don't just read your report—discuss it. Get 30 days of unlimited access to Madhav to build weekly schedules, ask about specific internships, and clarify doubts with a mentor trained exactly on your psychometric profile.
                 </p>
               </div>
@@ -595,10 +597,11 @@ export default function Home() {
               <div className="flex flex-col items-center gap-4 shrink-0 w-full md:w-auto mt-4 md:mt-0 border-t md:border-t-0 md:border-l border-[#F57D14]/20 pt-6 md:pt-0 md:pl-8">
                 <div className="text-center">
                   <p className="text-4xl font-extrabold text-[#0A2351]">₹149</p>
-                  <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mt-1">30-Day Access</p>
+                  <p className="text-xs font-bold uppercase tracking-wider text-slate-600 mt-1">30-Day Access</p>
                 </div>
                 <Button
                   onClick={() => window.open('https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4', '_blank')}
+                  aria-label="Unlock Madhav AI Coach"
                   className="w-full md:w-auto bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 text-[13px] sm:text-base rounded-full transition-transform hover:scale-105 whitespace-nowrap shadow-xl shadow-[#F57D14]/20"
                 >
                   Unlock Madhav <ArrowRight className="ml-2 h-5 w-5" />
@@ -630,7 +633,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <Button asChild className="mt-10 h-12 rounded-full bg-[#0A2351] px-8 font-bold text-white hover:bg-[#0d2d6b] transition-all hover:scale-105 shadow-xl shadow-[#0A2351]/20">
-                  <Link href="#contact">
+                  <Link href="#contact" aria-label="Request a campus demo">
                     Request a Campus Demo <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -641,7 +644,7 @@ export default function Home() {
                 <div className="absolute -top-20 -left-20 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
                 <Users className="mb-4 h-16 w-16 text-[#F57D14] relative z-10" />
                 <h3 className="text-2xl font-bold text-white mb-3 relative z-10">Placement Intelligence Dashboard</h3>
-                <p className="text-sm text-white/50 max-w-xs mb-8 relative z-10">
+                <p className="text-sm text-white/70 max-w-xs mb-8 relative z-10">
                   Real-time cohort analytics, skill gap heatmaps, and predictive placement scores.
                 </p>
               </div>
@@ -682,7 +685,7 @@ export default function Home() {
                   <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl md:text-5xl">
                     Bring SARATHI to Your Campus
                   </h2>
-                  <p className="mt-4 max-w-lg text-base leading-relaxed text-white/70">
+                  <p className="mt-4 max-w-lg text-base leading-relaxed text-white/80">
                     Join institutions across India that are transforming student outcomes with data. Schedule a demo to see how predictive placement intelligence works.
                   </p>
                 </div>
@@ -692,8 +695,8 @@ export default function Home() {
                       <Mail className="h-5 w-5 text-[#F57D14] group-hover:text-white" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold uppercase tracking-widest text-white/40">Partnerships</p>
-                      <a href="mailto:admin@sarathiapp.in" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
+                      <p className="text-xs font-bold uppercase tracking-widest text-white/50">Partnerships</p>
+                      <a href="mailto:admin@sarathiapp.in" aria-label="Email SARATHI Partnerships" className="text-lg font-semibold text-white hover:text-[#F57D14] transition-colors">
                         admin@sarathiapp.in
                       </a>
                     </div>
@@ -709,7 +712,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ── FINAL CTA (Perfectly Merged to Dashboard Theme) ── */}
+        {/* ── FINAL CTA ── */}
         <section className="bg-slate-50 py-16 lg:py-20">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-5xl rounded-[2rem] bg-[#0A2351] p-8 sm:p-12 text-center text-white shadow-2xl relative overflow-hidden">
@@ -721,18 +724,18 @@ export default function Home() {
                   <h2 className="text-white font-extrabold text-3xl sm:text-4xl md:text-5xl mb-4">
                     Stop guessing your <span className="text-[#F57D14]">career.</span>
                   </h2>
-                  <p className="text-white/70 text-base md:text-lg max-w-xl mx-auto">
+                  <p className="text-white/80 text-base md:text-lg max-w-xl mx-auto">
                     Get clarity in 15 minutes. Take the assessment, receive your custom roadmap, and start executing.
                   </p>
                 </div>
                 
                 <div className="flex flex-col items-center justify-center gap-3">
                   <Button asChild className="h-14 rounded-full bg-[#F57D14] px-10 text-base font-extrabold text-white shadow-xl shadow-[#F57D14]/30 transition-transform hover:scale-105 hover:bg-[#dd6f11]">
-                    <Link href="/assessment">
+                    <Link href="/assessment" aria-label="Start Your Career Test Now">
                       Start Your Career Test Now <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
                   </Button>
-                  <div className="mt-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm font-medium text-white/70">
+                  <div className="mt-4 flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm font-medium text-white/80">
                      <span>Free preview</span>
                      <span className="hidden sm:inline">•</span>
                      <span>Full roadmap ₹99</span>
