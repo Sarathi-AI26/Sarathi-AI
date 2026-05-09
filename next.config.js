@@ -1,12 +1,18 @@
 const nextConfig = {
   output: 'standalone',
+  
+  // 🚀 FIX 1: We removed "unoptimized: true" so Next.js can finally compress your 2MB logo!
   images: {
-    unoptimized: true,
+    // You can add remote patterns here later if you load images from external databases
   },
+  
   experimental: {
     // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
+    // 🚀 FIX 2: Added CSS optimization as requested by your reviewer to fix render-blocking
+    optimizeCss: true,
   },
+  
   webpack(config, { dev }) {
     if (dev) {
       // Reduce CPU/memory from file watching
@@ -18,10 +24,12 @@ const nextConfig = {
     }
     return config;
   },
+  
   onDemandEntries: {
     maxInactiveAge: 10000,
     pagesBufferLength: 2,
   },
+  
   async headers() {
     return [
       {
