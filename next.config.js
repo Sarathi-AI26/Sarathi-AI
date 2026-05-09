@@ -1,24 +1,20 @@
 const nextConfig = {
   output: 'standalone',
   
-  // 🚀 FIX 1: We removed "unoptimized: true" so Next.js can finally compress your 2MB logo!
   images: {
-    // You can add remote patterns here later if you load images from external databases
+    // Left empty so Next.js CAN compress your images!
   },
   
   experimental: {
-    // Remove if not using Server Components
     serverComponentsExternalPackages: ['mongodb'],
-    // 🚀 FIX 2: Added CSS optimization as requested by your reviewer to fix render-blocking
-    optimizeCss: true,
+    // Removed optimizeCss so Vercel stops looking for the critters package
   },
   
   webpack(config, { dev }) {
     if (dev) {
-      // Reduce CPU/memory from file watching
       config.watchOptions = {
-        poll: 2000, // check every 2 seconds
-        aggregateTimeout: 300, // wait before rebuilding
+        poll: 2000, 
+        aggregateTimeout: 300, 
         ignored: ['**/node_modules'],
       };
     }
