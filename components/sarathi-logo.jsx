@@ -1,17 +1,21 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
-// 🚀 FIX: Point directly to your new horizontal logo in the public folder
+// Pointing directly to your new horizontal logo in the public folder
 const LOGO_URL = '/logo-horizontal.png'
 
-// 🚀 FIX: Adjusted default height to be perfect for a horizontal layout
 const SarathiLogo = ({ href = '/', className, imageClassName = 'h-auto w-[140px] sm:w-[180px] lg:w-[220px] object-contain' }) => {
   const logoImage = (
-    <img
+    // 🚀 THE FIX: Upgraded to Next.js Image component with priority and explicit dimensions
+    <Image
       src={LOGO_URL}
-      alt="SARATHI logo"
+      alt="SARATHI Logo"
+      width={440} 
+      height={120} 
+      priority 
       className={cn('w-auto object-contain', imageClassName)}
     />
   )
