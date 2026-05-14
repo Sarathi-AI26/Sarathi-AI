@@ -43,7 +43,7 @@ export default function ClientDashboard() {
         if (data.user_id) {
           // This might be blocked by RLS if the user isn't logged in, which is fine!
           const { data: userData, error: userError } = await supabase
-            .from('user') 
+            .from('users') 
             .select('*')
             .eq('id', data.user_id)
             .single()
