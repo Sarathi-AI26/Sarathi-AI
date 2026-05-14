@@ -4,21 +4,16 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { Loader2, LogOut, User } from 'lucide-react'
-import { toast } from 'sonner'
 import FullReportView from '@/components/result-dashboard-real'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default function ClientDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  
   const id = searchParams.get('id')
-  const isSuccess = searchParams.get('success')
 
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -26,23 +21,14 @@ export default function ClientDashboard() {
   const [reportData, setReportData] = useState(null)
   const [error, setError] = useState(null)
 
-  // Payment Success Toast
   useEffect(() => {
-    if (isSuccess === 'true') {
-      toast.success('Payment successful! Welcome to your SARATHI Dashboard.')
-      router.replace(`/dashboard/student?id=${id}`)
+    if (!id) {
+      setError('No assessment ID found in the URL. Please return to checkout.')
+      setLoading(false)
+      return
     }
-  }, [isSuccess, id, router])
 
-  // Data Fetching
-  useEffect(() => {
     const fetchDashboardData = async () => {
-      if (!id) {
-        setError('No assessment ID provided. Please return to checkout.')
-        setLoading(false)
-        return
-      }
-
       try {
         const { data: assessData, error: dbError } = await supabase
           .from('assessments')
@@ -88,15 +74,10 @@ export default function ClientDashboard() {
     fetchDashboardData()
   }, [id, router])
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
-
   if (loading || generating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
-        <Loader2 className="w-12 h-12 text-[#F57D14] animate-spin mb-4" />
+        <div className="w-12 h-12 border-4 border-[#F57D14] border-t-transparent rounded-full animate-spin mb-4" />
         <h2 className="text-2xl font-bold text-[#0A2351]">
           {generating ? "Generating Your 5-Year Roadmap..." : "Retrieving Your Data..."}
         </h2>
@@ -123,7 +104,7 @@ export default function ClientDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
+      <header className="bg-[#0A2351] text-white px-6 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <h1 className="font-extrabold text-xl tracking-tight">SARATHI</h1>
           <div className="hidden sm:block h-8 w-px bg-white/20"></div>
@@ -134,14 +115,12 @@ export default function ClientDashboard() {
             </span>
           </div>
         </div>
-
-        <button onClick={handleLogout} className="flex items-center gap-2 text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 transition-all">
-          <LogOut className="w-4 h-4" />
-          <span className="hidden sm:inline">Sign Out</span>
+        <button onClick={() => router.push('/')} className="text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 transition-all">
+          Exit
         </button>
       </header>
 
-      <main className="flex-1 w-full">
+      <main className="flex-1 w-full relative">
         <FullReportView data={reportData} /> 
       </main>
     </div>
