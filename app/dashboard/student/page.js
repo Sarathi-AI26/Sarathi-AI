@@ -31,7 +31,7 @@ function DashboardEngine() {
 
     const loadData = async () => {
       try {
-        // 1. Safe Fetch: Get the assessment data without strict foreign key relations
+        // 1. Safe Fetch: Get the assessment data 
         const { data, error } = await supabase
           .from('assessments')
           .select('*')
@@ -41,17 +41,23 @@ function DashboardEngine() {
         if (error) throw error
         if (!data) throw new Error("Assessment not found.")
 
-        // 2. Two-Step Fetch: Grab the user's name manually using their user_id
+        // 2. Two-Step Fetch: Grab the user safely
         if (data.user_id) {
           const { data: userData } = await supabase
             .from('user') // Note: if your table is plural in Supabase, change this to 'users'
-            .select('name')
+            .select('*') // Changed to * to prevent "column not found" errors
             .eq('id', data.user_id)
             .single()
 
-          // Stitch the name into the user_details object so the header can read it
-          if (userData && userData.name) {
-            data.user_details = { ...data.user_details, name: userData.name }
+          console.log("Supabase User Data found:", userData) // Hidden console check
+
+          if (userData) {
+            // Checks multiple common column names just in case
+            const actualName = userData.name || userData.full_name || userData.first_name || userData.student_name;
+            
+            if (actualName) {
+              data.user_details = { ...data.user_details, name: actualName }
+            }
           }
         }
         
