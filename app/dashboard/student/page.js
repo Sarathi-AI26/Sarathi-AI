@@ -1,43 +1,29 @@
 // app/dashboard/student/page.js
 "use client"
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
+import dynamic from 'next/dynamic'
+import { Loader2 } from 'lucide-react'
+
+// Pass the data down to the newly cleaned View Component
+const ResultDashboardReal = dynamic(() => import('@/components/result-dashboard-real'), { ssr: false })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-export default function StudentDashboard() {
+function DashboardEngine() {
   const router = useRouter()
-  
-  const [isClient, setIsClient] = useState(false)
-  const [status, setStatus] = useState("Connecting to server...")
-  const [reportData, setReportData] = useState(null)
-  
-  // We store the dashboard component in state so the server CANNOT render it
-  const [ReportComponent, setReportComponent] = useState(null)
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
 
-  // 1. STRICT CLIENT MOUNT & MANUAL IMPORT
+  const [status, setStatus] = useState("Fetching your data...")
+  const [assessment, setAssessment] = useState(null)
+  const [analysisData, setAnalysisData] = useState(null)
+
   useEffect(() => {
-    setIsClient(true)
-    
-    // We import your charting component manually in the browser.
-    // Next.js SSR completely ignores this block.
-    import('@/components/result-dashboard-real')
-      .then((mod) => setReportComponent(() => mod.default))
-      .catch((err) => console.error("Failed to load dashboard:", err))
-  }, [])
-
-  // 2. VANILLA DATA FETCHING
-  useEffect(() => {
-    if (!isClient) return
-
-    // Bypassing useSearchParams to prevent Next.js Suspense crashes
-    const params = new URLSearchParams(window.location.search)
-    const id = params.get('id')
-
     if (!id) {
       setStatus("Error: No ID provided in the URL.")
       return
@@ -54,15 +40,12 @@ export default function StudentDashboard() {
         if (error) throw error
         if (!data) throw new Error("Assessment not found.")
         
-        if (!data.payment_status) {
-          router.push(`/checkout?assessmentId=${data.id}`)
-          return
-        }
+        setAssessment(data)
 
         if (data.ai_analysis_result) {
-           setReportData(data.ai_analysis_result)
+           setAnalysisData(data.ai_analysis_result)
            setStatus("SUCCESS")
-        } else {
+        } else if (data.payment_status) {
            setStatus("Synthesizing your 5-Year Roadmap...")
            const res = await fetch('/api/generate-roadmap', {
              method: 'POST',
@@ -72,7 +55,10 @@ export default function StudentDashboard() {
            const result = await res.json()
            if (!res.ok) throw new Error(result.error || "Failed to generate.")
            
-           setReportData(result.ai_analysis_result)
+           setAnalysisData(result.ai_analysis_result)
+           setStatus("SUCCESS")
+        } else {
+           // Provide preview data for unpaid users
            setStatus("SUCCESS")
         }
       } catch (err) {
@@ -81,44 +67,28 @@ export default function StudentDashboard() {
     }
 
     loadData()
-  }, [isClient, router])
+  }, [id, router])
 
-  // 3. PERFECT SSR MATCH
-  if (!isClient) {
+  if (status !== "SUCCESS" || !assessment) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
-        <h1 className="text-2xl font-extrabold text-[#0A2351] mb-6">SARATHI Dashboard</h1>
-        <p className="text-lg font-bold text-[#F57D14] animate-pulse">Initializing Environment...</p>
-      </div>
-    )
-  }
-
-  // 4. CLIENT LOADING STATE
-  if (status !== "SUCCESS" || !reportData || !ReportComponent) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
-        <h1 className="text-2xl font-extrabold text-[#0A2351] mb-6">SARATHI Dashboard</h1>
-        <p className={`text-lg font-bold animate-pulse ${status.includes('Error') ? 'text-red-600' : 'text-[#F57D14]'}`}>
+        <Loader2 className="w-12 h-12 text-[#F57D14] animate-spin mb-4 mx-auto" />
+        <h1 className="text-2xl font-extrabold text-[#0A2351] mb-2">SARATHI Dashboard</h1>
+        <p className={`text-lg font-bold ${status.includes('Error') ? 'text-red-600' : 'text-[#F57D14]'}`}>
           {status}
         </p>
       </div>
     )
   }
 
-  // 5. THE REAL DASHBOARD
+  // Passing the fetched data into the View Component
+  return <ResultDashboardReal assessment={assessment} analysisData={analysisData} />
+}
+
+export default function StudentDashboard() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-[#0A2351] text-white px-6 py-4 flex justify-between items-center shadow-md">
-        <h1 className="font-extrabold text-xl tracking-tight">SARATHI</h1>
-        <button onClick={() => router.push('/')} className="text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full px-4 py-2">
-          Exit Dashboard
-        </button>
-      </header>
-      
-      <main className="flex-1 w-full">
-        {/* Rendered securely with no server interference */}
-        <ReportComponent data={reportData} />
-      </main>
-    </div>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-[#0A2351]">Initializing Environment...</div>}>
+      <DashboardEngine />
+    </Suspense>
   )
 }
