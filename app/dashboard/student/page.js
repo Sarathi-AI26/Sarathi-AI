@@ -14,7 +14,7 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const urlAssessmentId = searchParams.get('id') // <-- Grabs the ID from the URL!
+  const urlAssessmentId = searchParams.get('id')
   
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
@@ -25,22 +25,19 @@ function DashboardContent() {
     const fetchDashboardData = async () => {
       try {
         if (!urlAssessmentId) {
-          throw new Error('No ID provided in the URL.')
+          throw new Error('No ID provided in the URL. Ensure you accessed this via a valid checkout redirect.')
         }
 
-        // Fetch the assessment
         const { data: assessment, error: dbError } = await supabase
           .from('assessments')
           .select('*')
           .eq('id', urlAssessmentId)
           .single()
 
-        // DIAGNOSTIC 1: Did Supabase block us?
         if (dbError) {
           throw new Error(`Supabase Error: ${dbError.message}`)
         }
 
-        // DIAGNOSTIC 2: Did it return empty?
         if (!assessment) {
           throw new Error('Supabase connected, but found no record for this specific ID.')
         }
@@ -63,7 +60,6 @@ function DashboardContent() {
           
           const data = await res.json()
           
-          // DIAGNOSTIC 3: Did the API fail?
           if (!res.ok) {
             throw new Error(`API Error: ${data.error || 'Failed to generate roadmap'}`)
           }
@@ -75,7 +71,7 @@ function DashboardContent() {
 
       } catch (err) {
         console.error('Dashboard Error:', err)
-        setError(err.message) // This will force the red error box to show on screen!
+        setError(err.message)
         setLoading(false)
       }
     }
@@ -106,11 +102,11 @@ function DashboardContent() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-red-100 max-w-md">
-          <p className="text-red-500 font-bold mb-3 text-lg">Error loading dashboard</p>
-          <p className="text-slate-600 mb-6 text-sm">{error}</p>
-          <button onClick={() => window.location.reload()} className="rounded-full bg-[#0A2351] px-6 py-3 font-bold text-white hover:bg-[#0d2d6b]">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="text-center p-8 bg-white rounded-3xl shadow-sm border border-red-100 max-w-md w-full">
+          <p className="text-red-600 font-bold mb-3 text-lg">Error loading dashboard</p>
+          <p className="text-slate-600 mb-6 text-sm bg-slate-50 p-3 rounded-lg border border-slate-100 break-words">{error}</p>
+          <button onClick={() => window.location.reload()} className="rounded-full bg-[#0A2351] px-6 py-3 font-bold text-white transition-all hover:bg-[#0d2d6b]">
             Try Again
           </button>
         </div>
@@ -137,6 +133,17 @@ function DashboardContent() {
 }
 
 export default function StudentDashboard() {
+  // THE FIX: Prevents Hydration Errors by forcing Client-Side Rendering only
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return null // Prevents server-side mismatch
+  }
+
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" /></div>}>
       <DashboardContent />
