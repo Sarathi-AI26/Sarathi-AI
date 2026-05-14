@@ -144,7 +144,7 @@ export default function ClientDashboard() {
       </header>
 
       <main className="flex-1 w-full">
-        <ResultDashboardReal assessment={assessment} analysisData={analysisData} />
+        <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
       </main>
     </div>
   )
