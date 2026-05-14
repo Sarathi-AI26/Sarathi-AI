@@ -96,7 +96,7 @@ function DashboardEngine() {
       {/* THE RESTORED HEADER WITH LOGOUT */}
       <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
         <div className="flex items-center gap-3 sm:gap-4">
-         <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-white">SARATHI</h1>
+         <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-white">SARATHI Personalised Dashboard</h1>
           <div className="hidden sm:block h-8 w-px bg-white/20"></div>
           <div className="hidden sm:flex flex-col">
             <span className="text-sm font-bold truncate max-w-[150px]">{studentName}</span>
