@@ -5,7 +5,14 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { Loader2 } from 'lucide-react'
-import FullReportView from '@/components/result-dashboard-real'
+import dynamic from 'next/dynamic'
+
+// 1. DYNAMIC IMPORT WITH SSR DISABLED
+// This ensures the component is NOT even bundled on the server side.
+const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { 
+  ssr: false,
+  loading: () => <div className="p-20 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-[#F57D14]" /></div>
+})
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -14,19 +21,16 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export default function StudentDashboard() {
   const router = useRouter()
   
-  // 1. Core State
   const [isMounted, setIsMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [reportData, setReportData] = useState(null)
   const [error, setError] = useState(null)
 
-  // 2. The Mounting Lock (Crucial for fixing #418)
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  // 3. Data Fetching Logic
   useEffect(() => {
     if (!isMounted) return
 
@@ -35,7 +39,7 @@ export default function StudentDashboard() {
         const params = new URLSearchParams(window.location.search)
         const id = params.get('id')
 
-        if (!id) throw new Error('No ID provided in the URL.')
+        if (!id) throw new Error('No assessment ID found.')
 
         const { data: assessment, error: dbError } = await supabase
           .from('assessments')
@@ -44,20 +48,17 @@ export default function StudentDashboard() {
           .single()
 
         if (dbError) throw new Error(dbError.message)
-        if (!assessment) throw new Error('No record found for this ID.')
+        if (!assessment) throw new Error('Assessment record not found.')
 
-        // Payment check
         if (!assessment.payment_status) {
           router.push(`/checkout?assessmentId=${assessment.id}`)
           return
         }
 
-        // Check if we already have the AI result
         if (assessment.ai_analysis_result) {
           setReportData(assessment.ai_analysis_result)
           setLoading(false)
         } else {
-          // Trigger Generation
           setGenerating(true)
           const res = await fetch('/api/generate-roadmap', {
             method: 'POST',
@@ -73,7 +74,7 @@ export default function StudentDashboard() {
           setLoading(false)
         }
       } catch (err) {
-        console.error('Dashboard Fetch Error:', err)
+        console.error(err)
         setError(err.message)
         setLoading(false)
       }
@@ -82,10 +83,8 @@ export default function StudentDashboard() {
     fetchDashboardData()
   }, [isMounted, router])
 
-  // 4. THE HYDRATION SHIELD
-  // If the server is rendering, or if the browser hasn't fully "mounted" yet,
-  // we return a simple loading div. This prevents the server from ever seeing the 
-  // complex Dashboard UI, which stops the #418 mismatch dead in its tracks.
+  // 2. THE SHIELD
+  // If the server is rendering, we return the same type of div that worked in your Isolation Test.
   if (!isMounted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
@@ -94,7 +93,6 @@ export default function StudentDashboard() {
     )
   }
 
-  // 5. UI States (Post-Mount)
   if (loading || generating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
@@ -107,20 +105,17 @@ export default function StudentDashboard() {
         <h2 className="text-2xl font-bold text-[#0A2351]">
           {generating ? "Generating Your Roadmap..." : "Loading Your Dashboard..."}
         </h2>
-        <p className="text-sm text-slate-500 mt-2 text-center">
-          {generating ? "Synthesizing your psychometric DNA..." : "Securely retrieving your data..."}
-        </p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4 text-center">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-red-100 max-w-md w-full">
-          <p className="text-red-600 font-bold mb-3 text-lg">Dashboard Error</p>
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-red-100 max-w-md w-full text-center">
+          <p className="text-red-600 font-bold mb-3 text-lg">Error</p>
           <p className="text-slate-600 mb-6">{error}</p>
-          <button onClick={() => window.location.reload()} className="rounded-full bg-[#0A2351] px-6 py-3 font-bold text-white transition-all hover:bg-[#0d2d6b]">
+          <button onClick={() => window.location.reload()} className="rounded-full bg-[#0A2351] px-6 py-3 font-bold text-white">
             Try Again
           </button>
         </div>
@@ -128,19 +123,14 @@ export default function StudentDashboard() {
     )
   }
 
-  // 6. The Final Dashboard Render
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-50">
-        <div>
-          <h1 className="font-extrabold text-lg sm:text-xl tracking-tight">SARATHI</h1>
-          <p className="text-[10px] sm:text-xs text-[#F57D14] uppercase tracking-widest font-bold">Student Dashboard</p>
-        </div>
-        <button onClick={() => router.push('/')} className="text-xs sm:text-sm font-bold bg-white/10 hover:bg-white/20 rounded-full px-4 py-2 transition-all">
-          Exit Dashboard
-        </button>
+      <header className="bg-[#0A2351] text-white px-4 py-4 flex justify-between items-center shadow-md">
+        <h1 className="font-extrabold text-xl tracking-tight">SARATHI</h1>
+        <button onClick={() => router.push('/')} className="text-sm font-bold bg-white/10 rounded-full px-4 py-2">Exit</button>
       </header>
       <main className="flex-1 w-full relative">
+        {/* Only rendered on the client after mounting */}
         <FullReportView data={reportData} /> 
       </main>
     </div>
