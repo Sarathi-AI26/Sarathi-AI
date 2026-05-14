@@ -40,24 +40,27 @@ export default function ClientDashboard() {
 
         console.log("Raw Assessment Data:", data) 
 
-        // 1. Fetching the name from the 'users' table
+      // 1. Fetching the name from the 'users' table - ULTIMATE SAFE VERSION
         if (data.user_id) {
-          const { data: userData, error: userError } = await supabase
+          const { data: userArray, error: userError } = await supabase
             .from('users') 
             .select('*')
-            .eq('id', data.user_id)
-            .single()
+            .eq('id', data.user_id);
+            // Removed .single() to prevent the coercion error
             
           if (userError) {
-            console.warn("Supabase RLS or Schema blocked user fetch:", userError.message)
+            console.warn("Supabase Fetch Error:", userError.message);
           }
 
-          if (userData) {
-            console.log("Found User in Table:", userData)
-            // Checks various common column names for the name
+          // Check if we got an array with at least one user
+          if (userArray && userArray.length > 0) {
+            const userData = userArray[0]; // Take the first matching user
+            console.log("User found in database:", userData);
+            
+            // Check all possible name columns
             const actualName = userData.name || userData.full_name || userData.first_name || userData.student_name;
             if (actualName) {
-              setFetchedName(actualName)
+              setFetchedName(actualName);
             }
           }
         }
