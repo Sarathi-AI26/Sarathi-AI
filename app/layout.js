@@ -4,9 +4,8 @@ import { Inter } from 'next/font/google'
 import { Toaster } from 'sonner'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { Analytics } from '@vercel/analytics/react' // <-- Added Vercel Analytics Import
+import { Analytics } from '@vercel/analytics/react'
 
-// OPTIMIZATION: Ensure display: 'swap' is utilized for immediate text rendering
 const inter = Inter({
   subsets: ['latin'],
   weight: ['400', '500', '600', '700', '800'],
@@ -20,15 +19,14 @@ export const metadata = {
     'Find your true north with SARATHI through a guided assessment, mock checkout, and career roadmap dashboard.',
 }
 
-const App = ({ children }) => {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${inter.variable} scroll-pt-16 sm:scroll-pt-24`}>
+    // FIX 1: Added suppressHydrationWarning to HTML tag
+    <html lang="en" className={`${inter.variable} scroll-pt-16 sm:scroll-pt-24`} suppressHydrationWarning>
       <head>
-        {/* OPTIMIZATION: Preconnect to common origins to speed up resource loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         
-        {/* Safe error handling script */}
         <script
           dangerouslySetInnerHTML={{
             __html:
@@ -36,17 +34,17 @@ const App = ({ children }) => {
           }}
         />
       </head>
-      <body className="min-h-screen bg-background text-foreground font-sans antialiased">
+      
+      // FIX 2: Added suppressHydrationWarning to BODY tag
+      <body className="min-h-screen bg-background text-foreground font-sans antialiased" suppressHydrationWarning>
         <div className="page-shell flex min-h-screen flex-col">
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
         </div>
         <Toaster richColors position="top-right" />
-        <Analytics /> {/* <-- Added Vercel Analytics Component */}
+        <Analytics />
       </body>
     </html>
   )
 }
-
-export default App
