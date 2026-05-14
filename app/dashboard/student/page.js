@@ -31,17 +31,33 @@ function DashboardEngine() {
 
     const loadData = async () => {
       try {
+        // 1. Safe Fetch: Get the assessment data without strict foreign key relations
         const { data, error } = await supabase
           .from('assessments')
-          .select('*, user(*)')
+          .select('*')
           .eq('id', id)
           .single()
 
         if (error) throw error
         if (!data) throw new Error("Assessment not found.")
+
+        // 2. Two-Step Fetch: Grab the user's name manually using their user_id
+        if (data.user_id) {
+          const { data: userData } = await supabase
+            .from('user') // Note: if your table is plural in Supabase, change this to 'users'
+            .select('name')
+            .eq('id', data.user_id)
+            .single()
+
+          // Stitch the name into the user_details object so the header can read it
+          if (userData && userData.name) {
+            data.user_details = { ...data.user_details, name: userData.name }
+          }
+        }
         
         setAssessment(data)
 
+        // 3. AI Generation Logic
         if (data.ai_analysis_result) {
            setAnalysisData(data.ai_analysis_result)
            setStatus("SUCCESS")
