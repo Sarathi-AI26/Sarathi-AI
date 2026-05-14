@@ -7,15 +7,10 @@ import { createClient } from '@supabase/supabase-js'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
-// THE MAGIC FIX: We dynamically import your report component and completely disable Server-Side Rendering (SSR).
-// This permanently stops Recharts and React from throwing Hydration Errors (#418 & #423).
+// 1. Force Recharts to only render on the client
 const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { 
   ssr: false,
-  loading: () => (
-    <div className="flex justify-center p-12">
-      <Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" />
-    </div>
-  )
+  loading: () => <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" /></div>
 })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -27,12 +22,22 @@ function DashboardContent() {
   const searchParams = useSearchParams()
   const urlAssessmentId = searchParams.get('id')
   
+  // 2. Add an isMounted state to synchronize Server and Client
+  const [isMounted, setIsMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [reportData, setReportData] = useState(null)
   const [error, setError] = useState(null)
 
+  // 3. Set mounted to true ONLY after the browser takes over
   useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  // 4. Fetch data ONLY when mounted (prevents the server from throwing the missing ID error)
+  useEffect(() => {
+    if (!isMounted) return
+
     const fetchDashboardData = async () => {
       try {
         if (!urlAssessmentId) {
@@ -81,9 +86,10 @@ function DashboardContent() {
     }
 
     fetchDashboardData()
-  }, [router, urlAssessmentId])
+  }, [isMounted, router, urlAssessmentId])
 
-  if (loading || generating) {
+  // 5. STRICT HYDRATION MATCH: The server and the initial browser load will both render this exact screen
+  if (!isMounted || loading || generating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
         <div className="relative mb-6">
@@ -93,10 +99,10 @@ function DashboardContent() {
           </div>
         </div>
         <h2 className="text-2xl font-bold text-[#0A2351]">
-          {generating ? "Generating Your 5-Year Roadmap..." : "Loading Your Dashboard..."}
+          {!isMounted ? "Connecting..." : (generating ? "Generating Your 5-Year Roadmap..." : "Loading Your Dashboard...")}
         </h2>
         <p className="text-sm text-slate-500 mt-2 text-center">
-          {generating ? "Synthesizing your psychometric DNA..." : "Retrieving your data..."}
+          {!isMounted ? "Establishing secure connection" : (generating ? "Synthesizing your psychometric DNA..." : "Retrieving your data...")}
         </p>
       </div>
     )
@@ -135,7 +141,6 @@ function DashboardContent() {
 }
 
 export default function StudentDashboard() {
-  // Removed the isMounted logic entirely and rely safely on Next.js native Suspense
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
