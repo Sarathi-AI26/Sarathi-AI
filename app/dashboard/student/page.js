@@ -5,7 +5,18 @@ import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { Loader2 } from 'lucide-react'
-import FullReportView from '@/components/result-dashboard-real'
+import dynamic from 'next/dynamic'
+
+// THE MAGIC FIX: We dynamically import your report component and completely disable Server-Side Rendering (SSR).
+// This permanently stops Recharts and React from throwing Hydration Errors (#418 & #423).
+const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { 
+  ssr: false,
+  loading: () => (
+    <div className="flex justify-center p-12">
+      <Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" />
+    </div>
+  )
+})
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -34,13 +45,8 @@ function DashboardContent() {
           .eq('id', urlAssessmentId)
           .single()
 
-        if (dbError) {
-          throw new Error(`Supabase Error: ${dbError.message}`)
-        }
-
-        if (!assessment) {
-          throw new Error('Supabase connected, but found no record for this specific ID.')
-        }
+        if (dbError) throw new Error(`Supabase Error: ${dbError.message}`)
+        if (!assessment) throw new Error('Supabase connected, but found no record for this specific ID.')
 
         if (!assessment.payment_status) {
           router.push(`/checkout?assessmentId=${assessment.id}`)
@@ -60,9 +66,7 @@ function DashboardContent() {
           
           const data = await res.json()
           
-          if (!res.ok) {
-            throw new Error(`API Error: ${data.error || 'Failed to generate roadmap'}`)
-          }
+          if (!res.ok) throw new Error(`API Error: ${data.error || 'Failed to generate roadmap'}`)
           
           setReportData(data.ai_analysis_result)
           setGenerating(false)
@@ -91,10 +95,8 @@ function DashboardContent() {
         <h2 className="text-2xl font-bold text-[#0A2351]">
           {generating ? "Generating Your 5-Year Roadmap..." : "Loading Your Dashboard..."}
         </h2>
-        <p className="text-sm text-slate-500 mt-2 max-w-sm text-center">
-          {generating 
-            ? "Our AI is synthesizing your psychometric DNA. This takes about 15 seconds." 
-            : "Securely retrieving your data..."}
+        <p className="text-sm text-slate-500 mt-2 text-center">
+          {generating ? "Synthesizing your psychometric DNA..." : "Retrieving your data..."}
         </p>
       </div>
     )
@@ -133,19 +135,13 @@ function DashboardContent() {
 }
 
 export default function StudentDashboard() {
-  // THE FIX: Prevents Hydration Errors by forcing Client-Side Rendering only
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
-  if (!isMounted) {
-    return null // Prevents server-side mismatch
-  }
-
+  // Removed the isMounted logic entirely and rely safely on Next.js native Suspense
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" /></div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" />
+      </div>
+    }>
       <DashboardContent />
     </Suspense>
   )
