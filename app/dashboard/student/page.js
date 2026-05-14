@@ -1,45 +1,45 @@
 // app/dashboard/student/page.js
 "use client"
 
-import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
-// 1. Force Recharts to only render on the client
-const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { 
-  ssr: false,
-  loading: () => <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" /></div>
-})
+// 1. Force the heavy report component to NEVER touch the server
+const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { ssr: false })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-function DashboardContent() {
+export default function StudentDashboard() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const urlAssessmentId = searchParams.get('id')
   
-  // 2. Add an isMounted state to synchronize Server and Client
-  const [isMounted, setIsMounted] = useState(false)
+  // 2. The Strict Client Lock
+  const [isClient, setIsClient] = useState(false)
+  
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
   const [reportData, setReportData] = useState(null)
   const [error, setError] = useState(null)
 
-  // 3. Set mounted to true ONLY after the browser takes over
+  // 3. Tell React it is officially safe to act like a browser
   useEffect(() => {
-    setIsMounted(true)
+    setIsClient(true)
   }, [])
 
-  // 4. Fetch data ONLY when mounted (prevents the server from throwing the missing ID error)
   useEffect(() => {
-    if (!isMounted) return
+    // Stop immediately if the server is trying to run this
+    if (!isClient) return
 
     const fetchDashboardData = async () => {
       try {
+        // THE NUCLEAR FIX: We use vanilla JavaScript instead of Next.js hooks
+        const params = new URLSearchParams(window.location.search)
+        const urlAssessmentId = params.get('id')
+
         if (!urlAssessmentId) {
           throw new Error('No ID provided in the URL. Ensure you accessed this via a valid checkout redirect.')
         }
@@ -70,14 +70,12 @@ function DashboardContent() {
           })
           
           const data = await res.json()
-          
           if (!res.ok) throw new Error(`API Error: ${data.error || 'Failed to generate roadmap'}`)
           
           setReportData(data.ai_analysis_result)
           setGenerating(false)
           setLoading(false)
         }
-
       } catch (err) {
         console.error('Dashboard Error:', err)
         setError(err.message)
@@ -86,10 +84,14 @@ function DashboardContent() {
     }
 
     fetchDashboardData()
-  }, [isMounted, router, urlAssessmentId])
+  }, [isClient, router])
 
-  // 5. STRICT HYDRATION MATCH: The server and the initial browser load will both render this exact screen
-  if (!isMounted || loading || generating) {
+  // 4. THE SHIELD: The server renders this empty, harmless div. Zero mismatch possible.
+  if (!isClient) {
+    return <div className="min-h-screen bg-slate-50" suppressHydrationWarning />
+  }
+
+  if (loading || generating) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
         <div className="relative mb-6">
@@ -99,10 +101,10 @@ function DashboardContent() {
           </div>
         </div>
         <h2 className="text-2xl font-bold text-[#0A2351]">
-          {!isMounted ? "Connecting..." : (generating ? "Generating Your 5-Year Roadmap..." : "Loading Your Dashboard...")}
+          {generating ? "Generating Your 5-Year Roadmap..." : "Loading Your Dashboard..."}
         </h2>
         <p className="text-sm text-slate-500 mt-2 text-center">
-          {!isMounted ? "Establishing secure connection" : (generating ? "Synthesizing your psychometric DNA..." : "Retrieving your data...")}
+          {generating ? "Synthesizing your psychometric DNA..." : "Retrieving your data..."}
         </p>
       </div>
     )
@@ -137,17 +139,5 @@ function DashboardContent() {
         <FullReportView data={reportData} /> 
       </main>
     </div>
-  )
-}
-
-export default function StudentDashboard() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <Loader2 className="w-8 h-8 animate-spin text-[#F57D14]" />
-      </div>
-    }>
-      <DashboardContent />
-    </Suspense>
   )
 }
