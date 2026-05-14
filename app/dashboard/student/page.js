@@ -33,7 +33,7 @@ function DashboardEngine() {
       try {
         const { data, error } = await supabase
           .from('assessments')
-          .select('*')
+          .select('*, user(*)')
           .eq('id', id)
           .single()
 
