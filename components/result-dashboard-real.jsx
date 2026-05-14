@@ -1008,14 +1008,18 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 }
 
 // ─────────────────────────────────────────────
-// MAIN COMPONENT (FIXED: Accepts Data as Prop)
+// MAIN COMPONENT (UPDATED: Corrected Prop Handling)
 // ─────────────────────────────────────────────
-const ResultDashboardReal = ({ assessment, analysisData }) => {
+const ResultDashboardReal = ({ assessment, analysisData, studentName }) => {
   const [isPdfMode, setIsPdfMode] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
   const [isCopied, setIsCopied] = useState(false) 
 
-  const studentName = useMemo(() => assessment?.users?.name || assessment?.user_details?.name || 'Student', [assessment])
+  // We now use the studentName passed from the parent as the primary source
+  const finalName = useMemo(() => {
+    return studentName || assessment?.users?.name || assessment?.user_details?.name || 'Student'
+  }, [assessment, studentName])
+
   const assessmentId = assessment?.id
   const hasPaid = assessment?.payment_status === true
 
@@ -1053,7 +1057,7 @@ const ResultDashboardReal = ({ assessment, analysisData }) => {
 
     const opt = {
       margin:       [10, 10, 10, 10], 
-      filename:     `SARATHI_Roadmap_${safeText(studentName).replace(/\s+/g, '_')}.pdf`,
+      filename:     `SARATHI_Roadmap_${safeText(finalName).replace(/\s+/g, '_')}.pdf`,
       image:        { type: 'jpeg', quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true, scrollY: 0, windowWidth: 800, letterRendering: true, logging: false },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait', compress: true },
@@ -1077,7 +1081,7 @@ const ResultDashboardReal = ({ assessment, analysisData }) => {
         }
         pdf.setFontSize(7);
         pdf.setTextColor(160);
-        pdf.text(`SARATHI Career Roadmap Report | ${safeText(studentName)} | Page ${i} of ${totalPages} | This report is personalised and confidential`, pageWidth / 2, pageHeight - 6, { align: 'center' });
+        pdf.text(`SARATHI Career Roadmap Report | ${safeText(finalName)} | Page ${i} of ${totalPages} | This report is personalised and confidential`, pageWidth / 2, pageHeight - 6, { align: 'center' });
       }
     }).save().then(() => {
         setIsPdfMode(false)
@@ -1112,7 +1116,7 @@ const ResultDashboardReal = ({ assessment, analysisData }) => {
                 <Lock className="h-3 w-3" /> Free Preview
               </div>
               <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl text-white">
-                {safeText(studentName)}, your <span className="text-[#F57D14]">Career DNA</span> is ready.
+                {safeText(finalName)}, your <span className="text-[#F57D14]">Career DNA</span> is ready.
               </h1>
               <p className="mt-4 text-lg text-white/70 max-w-2xl">
                 We've mapped your 60 answers. Here is a glimpse into your core psychometric profile.
@@ -1232,7 +1236,7 @@ const ResultDashboardReal = ({ assessment, analysisData }) => {
       <div id="pdf-wrapper" className={`container mx-auto ${isPdfMode ? 'px-4 max-w-none' : 'px-4 sm:px-6 lg:px-8'}`}>
         <FullReportView
           analysis={analysisData}
-          studentName={studentName}
+          studentName={finalName}
           assessmentId={assessmentId}
           isPdfMode={isPdfMode}
         />
