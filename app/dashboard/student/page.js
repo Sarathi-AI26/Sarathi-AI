@@ -24,31 +24,32 @@ function DashboardContent() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // MVP FIX: We use the secure URL ID instead of requiring a full Auth Session right now
         if (!urlAssessmentId) {
-          router.push('/assessment') 
-          return
+          throw new Error('No ID provided in the URL.')
         }
 
-        // Fetch the assessment using the secure UUID
+        // Fetch the assessment
         const { data: assessment, error: dbError } = await supabase
           .from('assessments')
           .select('*')
           .eq('id', urlAssessmentId)
           .single()
 
-        if (dbError || !assessment) {
-          router.push('/assessment')
-          return
+        // DIAGNOSTIC 1: Did Supabase block us?
+        if (dbError) {
+          throw new Error(`Supabase Error: ${dbError.message}`)
         }
 
-        // Check Payment Gate
+        // DIAGNOSTIC 2: Did it return empty?
+        if (!assessment) {
+          throw new Error('Supabase connected, but found no record for this specific ID.')
+        }
+
         if (!assessment.payment_status) {
           router.push(`/checkout?assessmentId=${assessment.id}`)
           return
         }
 
-        // Check Cache or Generate
         if (assessment.ai_analysis_result) {
           setReportData(assessment.ai_analysis_result)
           setLoading(false)
@@ -61,7 +62,11 @@ function DashboardContent() {
           })
           
           const data = await res.json()
-          if (!res.ok) throw new Error(data.error || 'Failed to generate roadmap')
+          
+          // DIAGNOSTIC 3: Did the API fail?
+          if (!res.ok) {
+            throw new Error(`API Error: ${data.error || 'Failed to generate roadmap'}`)
+          }
           
           setReportData(data.ai_analysis_result)
           setGenerating(false)
@@ -70,7 +75,7 @@ function DashboardContent() {
 
       } catch (err) {
         console.error('Dashboard Error:', err)
-        setError(err.message)
+        setError(err.message) // This will force the red error box to show on screen!
         setLoading(false)
       }
     }
