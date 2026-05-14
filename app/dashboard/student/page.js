@@ -1,28 +1,43 @@
 // app/dashboard/student/page.js
 "use client"
 
-import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import dynamic from 'next/dynamic'
-
-// 1. Force the charts to ONLY load in the browser
-const FullReportView = dynamic(() => import('@/components/result-dashboard-real'), { ssr: false })
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-function DashboardEngine() {
+export default function StudentDashboard() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const id = searchParams.get('id')
-
-  // Using the exact same State structure from the successful Diagnostic Test
-  const [status, setStatus] = useState("Fetching your data...")
+  
+  const [isClient, setIsClient] = useState(false)
+  const [status, setStatus] = useState("Connecting to server...")
   const [reportData, setReportData] = useState(null)
+  
+  // We store the dashboard component in state so the server CANNOT render it
+  const [ReportComponent, setReportComponent] = useState(null)
 
+  // 1. STRICT CLIENT MOUNT & MANUAL IMPORT
   useEffect(() => {
+    setIsClient(true)
+    
+    // We import your charting component manually in the browser.
+    // Next.js SSR completely ignores this block.
+    import('@/components/result-dashboard-real')
+      .then((mod) => setReportComponent(() => mod.default))
+      .catch((err) => console.error("Failed to load dashboard:", err))
+  }, [])
+
+  // 2. VANILLA DATA FETCHING
+  useEffect(() => {
+    if (!isClient) return
+
+    // Bypassing useSearchParams to prevent Next.js Suspense crashes
+    const params = new URLSearchParams(window.location.search)
+    const id = params.get('id')
+
     if (!id) {
       setStatus("Error: No ID provided in the URL.")
       return
@@ -60,18 +75,26 @@ function DashboardEngine() {
            setReportData(result.ai_analysis_result)
            setStatus("SUCCESS")
         }
-
       } catch (err) {
         setStatus(`Error: ${err.message}`)
       }
     }
 
     loadData()
-  }, [id, router])
+  }, [isClient, router])
 
-  // 2. THE DIAGNOSTIC RENDER
-  // If we don't have the data yet, we show the simple layout that we PROVED works without crashing
-  if (status !== "SUCCESS" || !reportData) {
+  // 3. PERFECT SSR MATCH
+  if (!isClient) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
+        <h1 className="text-2xl font-extrabold text-[#0A2351] mb-6">SARATHI Dashboard</h1>
+        <p className="text-lg font-bold text-[#F57D14] animate-pulse">Initializing Environment...</p>
+      </div>
+    )
+  }
+
+  // 4. CLIENT LOADING STATE
+  if (status !== "SUCCESS" || !reportData || !ReportComponent) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
         <h1 className="text-2xl font-extrabold text-[#0A2351] mb-6">SARATHI Dashboard</h1>
@@ -82,8 +105,7 @@ function DashboardEngine() {
     )
   }
 
-  // 3. THE REAL DASHBOARD
-  // Only rendered once the browser has safely downloaded the JSON
+  // 5. THE REAL DASHBOARD
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <header className="bg-[#0A2351] text-white px-6 py-4 flex justify-between items-center shadow-md">
@@ -94,16 +116,9 @@ function DashboardEngine() {
       </header>
       
       <main className="flex-1 w-full">
-        <FullReportView data={reportData} />
+        {/* Rendered securely with no server interference */}
+        <ReportComponent data={reportData} />
       </main>
     </div>
-  )
-}
-
-export default function StudentDashboard() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 font-bold text-[#0A2351]">Initializing Environment...</div>}>
-      <DashboardEngine />
-    </Suspense>
   )
 }
