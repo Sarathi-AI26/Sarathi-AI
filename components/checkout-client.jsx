@@ -97,7 +97,7 @@ const CheckoutClient = ({ assessmentId }) => {
             clearAssessmentSession()
             toast.dismiss()
             toast.success('Report unlocked successfully!')
-            router.push('/dashboard/student?success=true')
+            router.push(`/dashboard/student?id=${assessmentId}`)
           } else {
              toast.dismiss()
              toast.error('Payment verification failed. Please contact support.')
