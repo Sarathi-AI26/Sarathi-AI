@@ -1,32 +1,30 @@
 // app/dashboard/student/page.js
 "use client"
 
-import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
+import { Loader2 } from 'lucide-react'
 
-// We load the Manager ONLY on the client. 
-// This makes it impossible for the server to "see" the dashboard code.
+// 1. DYNAMIC IMPORT: Natively prevents hydration errors without the "mounted" anti-pattern
 const DashboardManager = dynamic(() => import('@/components/DashboardManager'), { 
-  ssr: false 
+  ssr: false,
+  loading: () => (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+      <Loader2 className="w-10 h-10 animate-spin text-[#F57D14]" />
+      <p className="mt-4 text-[#0A2351] font-bold">Initializing Environment...</p>
+    </div>
+  )
 })
 
-export default function StudentDashboard() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
-
+export default function StudentDashboardPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col">
-      <header className="bg-[#0A2351] text-white px-6 py-4 flex justify-between items-center shadow-md">
-        <h1 className="font-extrabold text-xl tracking-tight">SARATHI</h1>
-      </header>
-      <main className="flex-1 w-full">
-        <DashboardManager />
-      </main>
-    </div>
+    // 2. ERROR BOUNDARY & SUSPENSE: Safely wraps the client-side router hooks
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <Loader2 className="w-10 h-10 animate-spin text-[#F57D14]" />
+      </div>
+    }>
+      <DashboardManager />
+    </Suspense>
   )
 }
