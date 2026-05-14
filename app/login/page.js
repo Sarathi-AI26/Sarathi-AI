@@ -29,23 +29,37 @@ export default function StudentLogin() {
     setLoading(true)
 
     try {
-      // 1. Verify the email actually exists in your assessments table
-      const { data: assessment, error: dbError } = await supabase
-        .from('assessments')
+      // 1. Verify the email exists in your public.user table
+      // Note: If your table is plural, change 'user' to 'users'
+      const { data: studentUser, error: userError } = await supabase
+        .from('user') 
         .select('id')
-        // Adjust this depending on how you store the email (e.g., in a JSON object or a dedicated column)
-        .eq('user_details->>email', email.toLowerCase()) 
+        .eq('email', email.toLowerCase())
         .single()
 
-      if (dbError || !assessment) {
-        throw new Error("We couldn't find an assessment linked to this email. Did you use a different one?")
+      if (userError || !studentUser) {
+        throw new Error("We couldn't find an account registered with this email.")
       }
 
-      // 2. Send the Supabase Magic Link
+      // 2. Find their specific assessment using their user ID
+      // Note: Ensure 'user_id' matches the actual column name in your assessments table
+      const { data: assessment, error: assessError } = await supabase
+        .from('assessments')
+        .select('id')
+        .eq('user_id', studentUser.id) 
+        .order('created_at', { ascending: false }) // Gets the most recent if they have multiple
+        .limit(1)
+        .single()
+
+      if (assessError || !assessment) {
+        throw new Error("We found your account, but couldn't locate your completed assessment.")
+      }
+
+      // 3. Send the Supabase Magic Link
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase(),
         options: {
-          // This tells Supabase where to send them after they click the link
+          // Dynamically injects their specific assessment ID into the return URL
           emailRedirectTo: `${window.location.origin}/dashboard/student?id=${assessment.id}`,
         },
       })
