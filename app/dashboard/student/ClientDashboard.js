@@ -19,6 +19,7 @@ export default function ClientDashboard() {
   const [status, setStatus] = useState("Fetching your data...")
   const [assessment, setAssessment] = useState(null)
   const [analysisData, setAnalysisData] = useState(null)
+  const [fetchedName, setFetchedName] = useState(null)
 
   useEffect(() => {
     if (!id) {
@@ -37,29 +38,33 @@ export default function ClientDashboard() {
         if (error) throw error
         if (!data) throw new Error("Assessment not found.")
 
-        // THE GOLD MINE: Check the console to see where the name is actually stored!
         console.log("Raw Assessment Data:", data) 
 
+        // 1. Fetching the name from the 'users' table
         if (data.user_id) {
-          // This might be blocked by RLS if the user isn't logged in, which is fine!
           const { data: userData, error: userError } = await supabase
             .from('users') 
             .select('*')
             .eq('id', data.user_id)
             .single()
             
-          if (userError) console.warn("Supabase RLS blocked user fetch:", userError.message)
+          if (userError) {
+            console.warn("Supabase RLS or Schema blocked user fetch:", userError.message)
+          }
 
           if (userData) {
+            console.log("Found User in Table:", userData)
+            // Checks various common column names for the name
             const actualName = userData.name || userData.full_name || userData.first_name || userData.student_name;
             if (actualName) {
-              data.user_details = { ...data.user_details, name: actualName }
+              setFetchedName(actualName)
             }
           }
         }
         
         setAssessment(data)
 
+        // 2. AI Logic
         if (data.ai_analysis_result) {
            setAnalysisData(data.ai_analysis_result)
            setStatus("SUCCESS")
@@ -103,8 +108,9 @@ export default function ClientDashboard() {
     )
   }
 
-  // Look for the name in multiple places where guest checkout forms usually save it
-  const studentName = assessment?.user_details?.name || assessment?.user_details?.full_name || assessment?.name || 'Student'
+  // 3. NAME PRIORITIZATION: 
+  // First check our manual fetch, then check user_details JSON, then fallback to 'Student'
+  const studentName = fetchedName || assessment?.user_details?.name || assessment?.user_details?.full_name || 'Student'
   const archetypeTitle = analysisData?.user_archetype || 'Explorer'
 
   return (
