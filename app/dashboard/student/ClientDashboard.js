@@ -40,34 +40,22 @@ export default function ClientDashboard() {
 
         console.log("Raw Assessment Data:", data) 
 
-      // 1. Fetching the name from the 'users' table - ULTIMATE SAFE VERSION
+        // 1. SAFE USER FETCH (No .single() to avoid JSON coercion errors)
         if (data.user_id) {
-          const { data: userArray, error: userError } = await supabase
+          const { data: users, error: userError } = await supabase
             .from('users') 
             .select('*')
-            .eq('id', data.user_id);
-            // Removed .single() to prevent the coercion error
+            .eq('id', data.user_id)
             
-          if (userError) {
-            console.warn("Supabase Fetch Error:", userError.message);
-          }
-
-          // Check if we got an array with at least one user
-          if (userArray && userArray.length > 0) {
-            const userData = userArray[0]; // Take the first matching user
-            console.log("User found in database:", userData);
-            
-            // Check all possible name columns
-            const actualName = userData.name || userData.full_name || userData.first_name || userData.student_name;
-            if (actualName) {
-              setFetchedName(actualName);
-            }
+          if (users && users.length > 0) {
+            const userData = users[0];
+            const name = userData.name || userData.full_name || userData.first_name;
+            if (name) setFetchedName(name);
           }
         }
         
         setAssessment(data)
 
-        // 2. AI Logic
         if (data.ai_analysis_result) {
            setAnalysisData(data.ai_analysis_result)
            setStatus("SUCCESS")
@@ -111,10 +99,26 @@ export default function ClientDashboard() {
     )
   }
 
-  // 3. NAME PRIORITIZATION: 
-  // First check our manual fetch, then check user_details JSON, then fallback to 'Student'
-  const studentName = fetchedName || assessment?.user_details?.name || assessment?.user_details?.full_name || 'Student'
-  const archetypeTitle = analysisData?.user_archetype || 'Explorer'
+  // 2. ULTIMATE NAME RESOLVER
+  // We check: 1. Users Table -> 2. user_details JSON -> 3. Executive Summary text -> 4. Fallback
+  const getDisplayName = () => {
+    if (fetchedName) return fetchedName;
+    if (assessment?.user_details?.name) return assessment.user_details.name;
+    
+    // Check if the name is mentioned in the first paragraph of the AI summary
+    const summary = analysisData?.executive_summary;
+    if (Array.isArray(summary) && summary[0]) {
+        const firstPara = summary[0];
+        // Look for common patterns like "Harish, your..."
+        const match = firstPara.match(/^([^,]+),/);
+        if (match && match[1] && match[1].length < 20) return match[1];
+    }
+    
+    return 'Student';
+  }
+
+  const studentName = getDisplayName();
+  const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
