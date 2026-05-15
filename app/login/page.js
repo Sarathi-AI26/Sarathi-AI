@@ -18,7 +18,7 @@ export default function LoginPage() {
   const [status, setStatus]   = useState('idle') // idle | loading | verify | verifying | error
   const [errorMsg, setErrorMsg] = useState('')
 
-  // STEP 1: Request the 6-digit code
+  // STEP 1: Request the 8-digit code
   const handleRequestOtp = async (e) => {
     e.preventDefault()
     if (!email || !email.includes('@')) {
@@ -48,11 +48,11 @@ export default function LoginPage() {
     }
   }
 
-  // STEP 2: Verify the 6-digit code
+  // STEP 2: Verify the 8-digit code
   const handleVerifyOtp = async (e) => {
     e.preventDefault()
-    if (otp.length < 6) {
-      setErrorMsg('Please enter the full 6-digit code.')
+    if (otp.length < 8) {
+      setErrorMsg('Please enter the full 8-digit code.')
       return
     }
     
@@ -99,7 +99,7 @@ export default function LoginPage() {
                 Enter your code
               </h2>
               <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                We sent a 6-digit secure code to <span className="font-bold text-[#0A2351]">{email}</span>.
+                We sent an 8-digit secure code to <span className="font-bold text-[#0A2351]">{email}</span>.
               </p>
               
               <form onSubmit={handleVerifyOtp} className="space-y-4">
@@ -107,8 +107,8 @@ export default function LoginPage() {
                   <input
                     type="text"
                     required
-                    maxLength={6}
-                    placeholder="000000"
+                    maxLength={8}
+                    placeholder="00000000"
                     value={otp}
                     onChange={(e) => {
                       setOtp(e.target.value.replace(/[^0-9]/g, '')) // Only allow numbers
@@ -123,7 +123,7 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={status === 'verifying' || otp.length < 6}
+                  disabled={status === 'verifying' || otp.length < 8}
                   className="w-full h-12 rounded-full bg-[#F57D14] font-bold text-white text-sm shadow-lg shadow-[#F57D14]/25 transition-all hover:bg-[#dd6f11] hover:scale-[1.02] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {status === 'verifying' ? (
@@ -158,7 +158,7 @@ export default function LoginPage() {
                 </h1>
                 <p className="mt-2 text-sm text-slate-500 leading-relaxed">
                   Enter the email you used when you took the assessment.
-                  We will send you a secure 6-digit code.
+                  We will send you a secure 8-digit code.
                 </p>
               </div>
 
@@ -191,7 +191,7 @@ export default function LoginPage() {
                   {status === 'loading' ? (
                     <><Loader2 className="h-4 w-4 animate-spin" /> Sending code...</>
                   ) : (
-                    <>Send 6-Digit Code <ArrowRight className="h-4 w-4" /></>
+                    <>Send 8-Digit Code <ArrowRight className="h-4 w-4" /></>
                   )}
                 </button>
               </form>
