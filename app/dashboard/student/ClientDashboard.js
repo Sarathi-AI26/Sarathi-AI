@@ -26,8 +26,7 @@ export default function ClientDashboard() {
       try {
         let targetId = id;
 
-        // --- NEW: SESSION FALLBACK LOGIC ---
-        // If there's no ID in the URL, check if the user is logged in
+        // --- NEW: SESSION FALLBACK LOGIC WITH ORPHAN CLAIMER ---
         if (!targetId) {
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           
@@ -37,8 +36,8 @@ export default function ClientDashboard() {
             return;
           }
 
-          // Find the most recent assessment for this logged-in user
-          const { data: latestAssessment, error: latestError } = await supabase
+          // 1. Try to find the assessment using their secure Auth ID
+          let { data: latestAssessment, error: latestError } = await supabase
             .from('assessments')
             .select('id')
             .eq('user_id', session.user.id)
@@ -46,16 +45,39 @@ export default function ClientDashboard() {
             .limit(1)
             .single();
 
-          if (latestError || !latestAssessment) {
+          // 2. THE ORPHAN CLAIMER: If not found, search by their email address from their guest session!
+          if (!latestAssessment && session?.user?.email) {
+            const { data: guestUser } = await supabase
+              .from('users')
+              .select('id')
+              .eq('email', session.user.email.toLowerCase())
+              .single();
+
+            if (guestUser) {
+              const { data: guestAssessment } = await supabase
+                .from('assessments')
+                .select('id')
+                .eq('user_id', guestUser.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single();
+
+              if (guestAssessment) {
+                latestAssessment = guestAssessment; // We found the orphaned test!
+              }
+            }
+          }
+
+          if (!latestAssessment) {
             throw new Error("We couldn't find a completed assessment for your account.");
           }
           
           targetId = latestAssessment.id;
           
-          // Optional: Update the URL quietly so it looks clean
+          // Update the URL quietly so it looks clean
           window.history.replaceState(null, '', `/dashboard/student?id=${targetId}`);
         }
-        // -----------------------------------
+        // ---------------------------------------------------------
 
         const { data, error } = await supabase
           .from('assessments')
