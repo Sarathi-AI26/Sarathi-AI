@@ -25,12 +25,9 @@ export default function LoginPage() {
     setErrorMsg('')
 
     try {
-      // 1. We removed the manual '.from('users')' check to bypass the RLS Guest Block.
-      // 2. We use Supabase Auth to securely send the link and check if the user exists.
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase(),
         options: {
-          // This routes them to the dashboard, which will auto-detect their ID!
           emailRedirectTo: `${window.location.origin}/dashboard/student`,
         },
       })
@@ -41,7 +38,6 @@ export default function LoginPage() {
 
     } catch (error) {
       setStatus('error')
-      // If the email is not found, Supabase usually throws a specific error
       if (error.message.includes('Signups not allowed') || error.message.includes('user_not_found') || error.message.includes('not found')) {
          setErrorMsg('We could not find an account with this email. Did you use a different one?')
       } else {
@@ -51,25 +47,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A2351] flex flex-col items-center justify-center px-4 py-12">
-      {/* Background glow */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-[-120px] left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#F57D14] opacity-10 blur-[120px]" />
-        <div className="absolute bottom-[-80px] right-[-80px] h-[300px] w-[300px] rounded-full bg-[#F57D14] opacity-6 blur-[100px]" />
+    // FIXED: Adjusted min-height to account for the header, and added w-full overflow-hidden to prevent clipping
+    <div className="relative w-full min-h-[calc(100vh-100px)] bg-[#0A2351] flex flex-col items-center justify-center px-4 py-12 overflow-hidden">
+      
+      {/* Background glow - FIXED positioning so it blends smoothly */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute top-[-100px] left-1/2 -translate-x-1/2 h-[400px] w-[600px] rounded-full bg-[#F57D14] opacity-10 blur-[120px]" />
+        <div className="absolute bottom-[-100px] right-[-100px] h-[400px] w-[400px] rounded-full bg-[#F57D14] opacity-[0.07] blur-[100px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-10">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <span className="text-3xl font-extrabold tracking-tight text-white">
-              SARATHI
-            </span>
-          </Link>
-          <p className="mt-2 text-sm text-white/50 tracking-widest uppercase font-semibold">
-            Empowering Student Clarity
-          </p>
-        </div>
+        {/* REMOVED: Redundant SARATHI Logo and Tagline text was removed from here */}
 
         {/* Card */}
         <div className="rounded-3xl bg-white p-8 shadow-2xl">
@@ -166,7 +154,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer note */}
-        <p className="mt-6 text-center text-xs text-white/30">
+        <p className="mt-6 text-center text-xs text-white/40">
           No password required · Secure magic link login · Your data is private
         </p>
       </div>
