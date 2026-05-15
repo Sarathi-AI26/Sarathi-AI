@@ -25,31 +25,31 @@ export default function LoginPage() {
     setErrorMsg('')
 
     try {
-      // 1. Ensure the user actually exists in your database first
-      // FIXED: Using 'users' (plural) to prevent schema cache errors
-      const { data: studentUser, error: userError } = await supabase
-        .from('users')
-        .select('id')
-        .eq('email', email.toLowerCase())
-        .single()
-
-      if (userError || !studentUser) throw new Error("No account found with this email. Did you use a different one?")
-
-      // 2. Send the Magic Link
+      // 1. We removed the manual '.from('users')' check to bypass the RLS Guest Block.
+      // 2. We use Supabase Auth to securely send the link and check if the user exists.
       const { error: authError } = await supabase.auth.signInWithOtp({
         email: email.toLowerCase(),
         options: {
           // This routes them to the dashboard, which will auto-detect their ID!
           emailRedirectTo: `${window.location.origin}/dashboard/student`,
+          // CRITICAL FIX: This ensures only existing users get an email. 
+          // If they don't exist, Supabase securely throws an error.
+          shouldCreateUser: false, 
         },
       })
 
       if (authError) throw authError
+      
       setStatus('sent')
 
     } catch (error) {
       setStatus('error')
-      setErrorMsg(error.message || 'Something went wrong. Please try again.')
+      // If the email is not found, Supabase usually throws a specific error
+      if (error.message.includes('Signups not allowed') || error.message.includes('user_not_found') || error.message.includes('not found')) {
+         setErrorMsg('We could not find an account with this email. Did you use a different one?')
+      } else {
+         setErrorMsg(error.message || 'Something went wrong. Please try again.')
+      }
     }
   }
 
