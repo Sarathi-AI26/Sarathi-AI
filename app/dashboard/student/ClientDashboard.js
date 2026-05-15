@@ -64,6 +64,14 @@ export default function ClientDashboard() {
 
               if (guestAssessment) {
                 latestAssessment = guestAssessment; // We found the orphaned test!
+                
+                // --- REVIEWER FIX 1: PERMANENTLY LINK GUEST TO AUTH ID ---
+                await supabase
+                  .from('users')
+                  .update({ id: session.user.id })
+                  .eq('email', session.user.email.toLowerCase())
+                  .is('id', null);
+                // ---------------------------------------------------------
               }
             }
           }
@@ -159,7 +167,17 @@ export default function ClientDashboard() {
         {isNoAssessmentError && (
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <button 
-              onClick={() => router.push('/assessment')}
+              onClick={() => {
+                // --- REVIEWER FIX 2: PRESERVE INSTITUTION ID ---
+                const urlParams = new URLSearchParams(window.location.search);
+                const instId = urlParams.get('institution_id') || localStorage.getItem('institution_id');
+                
+                if (instId) {
+                  localStorage.setItem('institution_id', instId);
+                }
+                router.push('/assessment');
+                // -----------------------------------------------
+              }}
               className="w-full bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 rounded-full transition-all shadow-md"
             >
               Take Free Assessment
