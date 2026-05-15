@@ -32,9 +32,6 @@ export default function LoginPage() {
         options: {
           // This routes them to the dashboard, which will auto-detect their ID!
           emailRedirectTo: `${window.location.origin}/dashboard/student`,
-          // CRITICAL FIX: This ensures only existing users get an email. 
-          // If they don't exist, Supabase securely throws an error.
-          shouldCreateUser: false, 
         },
       })
 
