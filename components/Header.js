@@ -1,12 +1,33 @@
+// components/Header.js
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, ArrowRight } from 'lucide-react'
+import { createClient } from '@supabase/supabase-js'
 import SarathiLogo from './sarathi-logo' 
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
+  const [session, setSession] = useState(null)
+
+  useEffect(() => {
+    // Check if student is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
+    
+    // Listen for logins/logouts
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+    
+    return () => subscription.unsubscribe()
+  }, [])
 
   return (
     <header className="border-b border-slate-100/80 bg-white/95 backdrop-blur-md sticky top-0 z-50 shadow-sm transition-all duration-300">
@@ -39,6 +60,25 @@ export default function Header() {
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors duration-300">Methodology</Link>
           <Link href="/#institutions" className="hover:text-[#F57D14] transition-colors duration-300">For Institutions</Link>
           <Link href="/#contact" className="hover:text-[#F57D14] transition-colors duration-300">Contact</Link>
+          
+          {/* NEW: Desktop Login/Dashboard Button */}
+          <div className="pl-4 border-l-2 border-slate-100">
+            {session ? (
+              <Link
+                href="/dashboard/student"
+                className="flex items-center gap-2 rounded-full bg-[#0A2351] px-5 py-2 text-sm font-bold text-white hover:bg-[#F57D14] transition-all hover:scale-105 shadow-md shadow-[#0A2351]/20"
+              >
+                My Report <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 rounded-full border-2 border-[#0A2351] bg-white px-5 py-1.5 text-sm font-bold text-[#0A2351] hover:bg-[#0A2351] hover:text-white transition-all shadow-sm"
+              >
+                View My Report
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* 📱 Mobile Hamburger Button */}
@@ -63,6 +103,27 @@ export default function Header() {
             <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">Methodology</Link>
             <Link href="/#institutions" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">For Institutions</Link>
             <Link href="/#contact" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">Contact</Link>
+            
+            {/* NEW: Mobile Login/Dashboard Button */}
+            <div className="pt-4 border-t border-slate-100 mt-2">
+              {session ? (
+                <Link
+                  href="/dashboard/student"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center gap-2 w-full rounded-full bg-[#0A2351] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#0A2351]/20"
+                >
+                  My Report <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center justify-center w-full rounded-full border-2 border-[#0A2351] bg-white px-5 py-3 text-sm font-bold text-[#0A2351]"
+                >
+                  View My Report
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       )}
