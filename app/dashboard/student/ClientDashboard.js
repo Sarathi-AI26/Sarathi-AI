@@ -22,17 +22,45 @@ export default function ClientDashboard() {
   const [fetchedName, setFetchedName] = useState(null)
 
   useEffect(() => {
-    if (!id) {
-      setStatus("Error: No ID provided in the URL.")
-      return
-    }
-
     const loadData = async () => {
       try {
+        let targetId = id;
+
+        // --- NEW: SESSION FALLBACK LOGIC ---
+        // If there's no ID in the URL, check if the user is logged in
+        if (!targetId) {
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError || !session) {
+            setStatus("Redirecting to login...");
+            router.push('/login');
+            return;
+          }
+
+          // Find the most recent assessment for this logged-in user
+          const { data: latestAssessment, error: latestError } = await supabase
+            .from('assessments')
+            .select('id')
+            .eq('user_id', session.user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (latestError || !latestAssessment) {
+            throw new Error("We couldn't find a completed assessment for your account.");
+          }
+          
+          targetId = latestAssessment.id;
+          
+          // Optional: Update the URL quietly so it looks clean
+          window.history.replaceState(null, '', `/dashboard/student?id=${targetId}`);
+        }
+        // -----------------------------------
+
         const { data, error } = await supabase
           .from('assessments')
           .select('*')
-          .eq('id', id)
+          .eq('id', targetId) // Now using targetId
           .single()
 
         if (error) throw error
@@ -100,7 +128,6 @@ export default function ClientDashboard() {
   }
 
   // 2. ULTIMATE NAME RESOLVER
-  // We check: 1. Users Table -> 2. user_details JSON -> 3. Executive Summary text -> 4. Fallback
   const getDisplayName = () => {
     if (fetchedName) return fetchedName;
     if (assessment?.user_details?.name) return assessment.user_details.name;
