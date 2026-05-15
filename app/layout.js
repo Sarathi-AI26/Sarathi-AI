@@ -35,7 +35,6 @@ export default function RootLayout({ children }) {
         />
       </head>
       
-      // FIX 2: Added suppressHydrationWarning to BODY tag
       <body className="min-h-screen bg-background text-foreground font-sans antialiased" suppressHydrationWarning>
         <div className="page-shell flex min-h-screen flex-col">
           <Header />
