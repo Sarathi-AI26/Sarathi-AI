@@ -116,13 +116,40 @@ export default function ClientDashboard() {
   }
 
   if (status !== "SUCCESS" || !assessment) {
+    const isNoAssessmentError = status.includes("couldn't find a completed assessment");
+
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
-        <Loader2 className="w-12 h-12 text-[#F57D14] animate-spin mb-4 mx-auto" />
+        {/* Only show the spinning wheel if we are actually loading, not if we hit a hard error */}
+        {!status.includes('Error') && (
+          <Loader2 className="w-12 h-12 text-[#F57D14] animate-spin mb-4 mx-auto" />
+        )}
+        
         <h1 className="text-2xl font-extrabold text-[#0A2351] mb-2">SARATHI Dashboard</h1>
-        <p className={`text-lg font-bold ${status.includes('Error') ? 'text-red-600' : 'text-[#F57D14]'}`}>
-          {status}
+        
+        <p className={`text-lg font-bold mb-8 ${status.includes('Error') ? 'text-slate-600' : 'text-[#F57D14]'}`}>
+          {isNoAssessmentError 
+            ? "It looks like you haven't completed your career assessment yet." 
+            : status}
         </p>
+
+        {/* If no assessment is found, give them clear actions to take */}
+        {isNoAssessmentError && (
+          <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
+            <button 
+              onClick={() => router.push('/assessment')}
+              className="w-full bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 rounded-full transition-all shadow-md"
+            >
+              Take Free Assessment
+            </button>
+            <button 
+              onClick={handleLogout}
+              className="w-full border-2 border-[#0A2351] text-[#0A2351] hover:bg-[#0A2351] hover:text-white font-bold h-12 rounded-full transition-all"
+            >
+              Sign Out / Switch Account
+            </button>
+          </div>
+        )}
       </div>
     )
   }
