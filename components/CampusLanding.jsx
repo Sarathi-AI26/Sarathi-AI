@@ -49,7 +49,10 @@ export default function CampusLanding({
       {/* Background glows */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#F57D14] opacity-10 blur-[120px]" />
-        <div className="absolute -bottom-40 -right-40 h-[400px] w-[400px] rounded-full bg-[#F57D14] opacity-6 blur-[100px]" />
+        
+        {/* 🚀 THE FIX: Reduced bottom glow opacity to let the CTA button pop */}
+        <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#F57D14] opacity-5 blur-[120px]" />
+        
         {/* Grid dots */}
         <div className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -72,9 +75,9 @@ export default function CampusLanding({
           </span>
         </div>
 
-        {/* Badge */}
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#F57D14]/30 bg-[#F57D14]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#F57D14]">
-          <Shield className="h-3 w-3" />
+        {/* 🚀 THE FIX: High-contrast badge for better readability */}
+        <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#F57D14]/40 bg-[#F57D14]/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm">
+          <Shield className="h-3 w-3 text-[#F57D14]" />
           Institutional Partnership — Free for Your Batch
         </div>
 
