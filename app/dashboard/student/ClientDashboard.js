@@ -168,15 +168,17 @@ export default function ClientDashboard() {
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <button 
               onClick={() => {
-                // --- REVIEWER FIX 2: PRESERVE INSTITUTION ID ---
+                // --- REVIEWER FIX 2 (UPGRADED): PRESERVE INSTITUTION ID IN STORAGE & URL ---
                 const urlParams = new URLSearchParams(window.location.search);
                 const instId = urlParams.get('institution_id') || localStorage.getItem('institution_id');
                 
                 if (instId) {
                   localStorage.setItem('institution_id', instId);
+                  router.push(`/assessment?institution_id=${instId}`); // Belt & suspenders routing
+                } else {
+                  router.push('/assessment');
                 }
-                router.push('/assessment');
-                // -----------------------------------------------
+                // -------------------------------------------------------------------------
               }}
               className="w-full bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 rounded-full transition-all shadow-md"
             >
