@@ -67,7 +67,9 @@
         "html2pdf.js": "^0.10.1",
         "razorpay": "^2.9.4",
         "nodemailer": "^6.9.13",
-        "@vercel/analytics": "latest"
+        "@vercel/analytics": "latest",
+        "@supabase/auth-helpers-nextjs": "^0.10.0",
+        "recharts": "^2.12.7"
     },
     "devDependencies": {
         "autoprefixer": "^10.4.19",
