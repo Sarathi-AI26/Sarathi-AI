@@ -186,6 +186,14 @@ CONTENT RULES (non-negotiable):
 7. ROLE MODEL MIRROR: Year 5 roadmap milestone must explicitly connect to Q58 role model.
 8. INDIA VS ABROAD: If Q60 mentions abroad — include at least one international milestone.
 9. DREAM CAREER OVERRIDE (CRITICAL): If Q56 explicitly names a specific career, AT LEAST ONE of your top_career_matches MUST be that exact career. Tailor the 5-year roadmap to making that dream a reality.
+10. MADHAV HANDOFF (MANDATORY): The madhav_prompt field must be a specific, personalised first message the student sends to Madhav. It must reference their exact 30-day goal. Never use generic language like 'help me with my career'. Example: 'Madhav, I want to build a 30-day UPSC study schedule starting with NCERT History. My biggest risk is procrastination. Help me design a daily system that forces consistency.'
+11. INDUSTRY BUCKETING (MANDATORY for B2B): Every career match must include an industry_bucket field using ONLY the 12 approved categories listed in the schema. Never create custom industry names.
+12. PLACEMENT ROADBLOCKS (MANDATORY): For each career match, list 1-3 specific, actionable gaps the student must close before they are corporate-ready for that role. These are not general advice — they must be specific to this student's scores. Example for a low public speaking score (Q53) applying for consulting: 'Complete at least 2 mock case interview sessions before placement season.'
+13. EMPLOYABILITY ASSESSMENT (MANDATORY): 
+- inherent_potential_score: the student's overall psychometric score (average of all 5 radar dimensions)
+- corporate_readiness_score: a SEPARATE score based only on behavioural dimensions — Q48 (procrastination), Q52 (feedback), Q53 (public speaking), Q50 (teamwork), Q54 (grit). This score can be significantly lower than potential for students with strong aptitude but poor behavioural signals.
+- readiness_label: if corporate_readiness_score < 60, use 'Needs Foundation Work'. If 60-74, '6-Month Ready'. If 75-84, '3-Month Ready'. If 85+, 'Day-1 Ready'.
+- Never allow inherent_potential_score and corporate_readiness_score to be identical — they measure different things.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 }
@@ -194,7 +202,7 @@ OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 // OUTPUT SCHEMA
 // ─────────────────────────────────────────────
 const OUTPUT_SCHEMA = `{
-  "user_archetype": "2-3 word label derived from top scoring dimensions.",
+  "user_archetype": "Choose EXACTLY ONE from this approved list based on the student's highest-scoring dimension combination. Do not invent new archetypes:\\n- Analytical Nation-Builder (high aptitude + government/policy interest)\\n- Structured Problem-Solver (high aptitude + technology interest)\\n- Empathetic Visual Specialist (high personality + design interest)\\n- Deep-Domain Mentor (high aptitude + teaching/research interest)\\n- Strategic Intrapreneur (high motivation + entrepreneurship + low risk)\\n- Creative Technologist (high personality + technology + design)\\n- People-First Leader (high personality + leadership + counselling)\\n- Global Impact Seeker (high motivation + social impact + abroad interest)\\nIf none fit perfectly, choose the closest match. Never create hybrid names.",
   "archetype_translation": "Explain the archetype in plain English.",
   "identity_statement": "One powerful, emotionally resonant sentence capturing who they are.",
   "truth_bomb": {
@@ -209,6 +217,13 @@ const OUTPUT_SCHEMA = `{
   "radar_chart_scores": {
     "Personality": 0, "Aptitude": 0, "Motivation": 0, "Career Interests": 0, "Behavioural Tendencies": 0
   },
+  "employability_assessment": {
+    "inherent_potential_score": 0,
+    "corporate_readiness_score": 0,
+    "readiness_label": "One of: Day-1 Ready | 3-Month Ready | 6-Month Ready | Needs Foundation Work",
+    "readiness_rationale": "2 sentences explaining the gap between potential and readiness based on their specific scores. Reference actual Q numbers.",
+    "readiness_gaps": ["Specific gap 1", "Specific gap 2"]
+  },
   "strength_signals": [
     {
       "label": "3-4 word strength label",
@@ -219,11 +234,13 @@ const OUTPUT_SCHEMA = `{
   "top_career_matches": [
     {
       "career_title": "Specific Job Title",
+      "industry_bucket": "One of: EdTech | IT Services | Core Engineering | BFSI | Healthcare | FMCG | Government & PSU | Media & Content | Design & Creative | Research & Academia | Consulting | Legal & Policy",
       "compatibility_score": 90,
       "match_reason": "2-3 sentences written directly to the student...",
       "growth_path": "Entry Level → Mid Level → Senior Role",
       "starting_salary_inr": "₹X LPA - ₹Y LPA (Source: Naukri/LinkedIn India, 2026)",
-      "key_certifications": ["Specific Cert Name"]
+      "key_certifications": ["Specific Cert Name"],
+      "placement_roadblocks": ["Specific gap 1 the student must close before campus placement", "Specific gap 2"]
     }
   ],
   "psychometric_profile": {
@@ -245,7 +262,8 @@ const OUTPUT_SCHEMA = `{
   "immediate_action_plan": {
     "next_30_days": "One concrete action.",
     "next_90_days": "One skill or credential to pursue.",
-    "success_metric": "How they will know they completed it."
+    "success_metric": "Exactly how they will know they completed it.",
+    "madhav_prompt": "One specific opening message the student should type to Madhav to begin executing this plan. Format: 'Madhav, [specific instruction based on their exact 30-day goal].' Make it feel like a natural conversation starter, not a command."
   },
   "five_year_roadmap": {
     "year_1": "Foundation...",
