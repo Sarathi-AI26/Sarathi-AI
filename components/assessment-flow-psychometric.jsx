@@ -183,6 +183,7 @@ const AssessmentFlowPsychometric = () => {
 
         if (institutionId) {
           try {
+            // Note: Ensuring this explicitly hits /api/campus/claim-seat
             const claimRes = await fetch('/api/campus/claim-seat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
