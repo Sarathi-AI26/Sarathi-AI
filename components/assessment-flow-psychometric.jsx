@@ -1,3 +1,4 @@
+// components/assessment-flow-psychometric.jsx
 "use client"
 
 import React, { useState, useEffect } from 'react'
@@ -172,8 +173,44 @@ const AssessmentFlowPsychometric = () => {
         throw new Error(data.error || 'Submission failed')
       }
 
-     if (data.assessmentId) {
-       router.push(`/checkout?assessmentId=${data.assessmentId}`) 
+      if (data.assessmentId) {
+        // --- NEW B2B CAMPUS LOGIC ---
+        // Read from both storage types for resilience, including the fallback we created in ClientDashboard
+        const institutionId = 
+          localStorage.getItem('sarathi_institution_id') || 
+          sessionStorage.getItem('sarathi_institution_id') ||
+          localStorage.getItem('institution_id')
+
+        if (institutionId) {
+          try {
+            const claimRes = await fetch('/api/campus/claim-seat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ assessmentId: data.assessmentId, institutionId }),
+            })
+            
+            if (claimRes.ok) {
+              // Seat claimed! Clear institutional attribution storage and send straight to dashboard
+              localStorage.removeItem('sarathi_institution_id')
+              localStorage.removeItem('sarathi_institution_name')
+              sessionStorage.removeItem('sarathi_institution_id')
+              localStorage.removeItem('institution_id')
+              
+              router.push(`/dashboard/student?id=${data.assessmentId}`)
+              return; // Exit function early so we don't trigger the B2C routing below
+            } else {
+              const claimData = await claimRes.json()
+              console.warn('Seat claim failed (e.g. out of seats). Proceeding to paywall.', claimData.error)
+            }
+          } catch (err) {
+            console.error('Seat claim network error:', err)
+          }
+        }
+        
+        // --- FALLBACK B2C LOGIC ---
+        // If not a campus student, or the seat claim failed/rejected, send to normal checkout
+        router.push(`/checkout?assessmentId=${data.assessmentId}`) 
+        
       } else {
         throw new Error('No assessment ID returned')
       }
