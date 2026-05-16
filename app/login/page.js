@@ -194,6 +194,12 @@ export default function LoginPage() {
                     <>Send 8-Digit Code <ArrowRight className="h-4 w-4" /></>
                   )}
                 </button>
+                
+                {/* INTELLIGENT INJECTION: Subtle UX nudge to prevent blank account creation */}
+                <p className="text-center text-[11px] font-medium text-slate-400 mt-3">
+                  Note: If you haven't taken the assessment yet, logging in will result in an empty dashboard.
+                </p>
+
               </form>
 
               {/* Divider */}
