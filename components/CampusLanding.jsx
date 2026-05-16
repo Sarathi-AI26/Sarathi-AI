@@ -32,6 +32,7 @@ export default function CampusLanding({
             Please contact your placement cell for the next batch opening.
           </p>
           
+          <a
             href={`mailto:admin@sarathiapp.in?subject=Seats request — ${institution.name}`}
             className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 text-sm font-bold text-white hover:border-[#F57D14] hover:text-[#F57D14] transition-colors"
           >
