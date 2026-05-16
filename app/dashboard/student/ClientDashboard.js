@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { Loader2, LogOut } from 'lucide-react'
+import { Loader2, LogOut, AlertTriangle } from 'lucide-react'
 import ResultDashboardReal from '@/components/result-dashboard-real'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
@@ -125,7 +125,12 @@ export default function ClientDashboard() {
              body: JSON.stringify({ assessmentId: data.id })
            })
            const result = await res.json()
-           if (!res.ok) throw new Error(result.error || "Failed to generate.")
+           
+           // --- SAFETY NET INJECTION ---
+           if (!res.ok || !result.ai_analysis_result) {
+             throw new Error(result.error || "AI Engine timeout. Please refresh to try again.")
+           }
+           // ----------------------------
            
            setAnalysisData(result.ai_analysis_result)
            setStatus("SUCCESS")
@@ -192,6 +197,16 @@ export default function ClientDashboard() {
             </button>
           </div>
         )}
+
+        {/* --- SAFETY NET INJECTION: Show refresh button on AI timeout --- */}
+        {status.includes('AI Engine timeout') && (
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12 px-8 rounded-full transition-all shadow-md"
+            >
+              Refresh Page
+            </button>
+        )}
       </div>
     )
   }
@@ -240,7 +255,24 @@ export default function ClientDashboard() {
       </header>
 
       <main className="flex-1 w-full">
-        <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
+        {/* --- SAFETY NET INJECTION: Prevent rendering crash if data is missing --- */}
+        {analysisData ? (
+            <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
+        ) : (
+            <div className="flex flex-col items-center justify-center p-12 mt-12 text-center text-slate-500">
+               <AlertTriangle className="w-12 h-12 text-amber-500 mb-4 mx-auto" />
+               <h2 className="text-xl font-bold text-[#0A2351] mb-2">Roadmap Processing</h2>
+               <p className="text-sm mb-6 max-w-sm mx-auto">
+                 Gemini is experiencing heavy load and couldn't display your data immediately. Please refresh to view your report.
+               </p>
+               <button 
+                 onClick={() => window.location.reload()} 
+                 className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 rounded-full transition-all"
+               >
+                 Refresh Page
+               </button>
+            </div>
+        )}
       </main>
     </div>
   )
