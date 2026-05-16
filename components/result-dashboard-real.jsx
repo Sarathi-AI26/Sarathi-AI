@@ -310,7 +310,7 @@ const FinalCTA = ({ isPdfMode }) => {
   )
 }
 
-const ProfileBadge = ({ radarScores, isPdfMode }) => {
+const ProfileBadge = ({ radarScores, analysis, isPdfMode }) => {
   if (!radarScores || typeof radarScores !== 'object') return null
 
   const dims = [
@@ -347,98 +347,123 @@ const ProfileBadge = ({ radarScores, isPdfMode }) => {
   const tier = BADGE_TIERS.find(t => overall >= t.min) || BADGE_TIERS[3]
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: isPdfMode ? 10 : 14,
-        marginBottom: isPdfMode ? 16 : 28,
-        alignItems: 'stretch',
-      }}
-    >
-      <div style={{
-        flex: '1 1 220px',
-        background: tier.bg,
-        border: `1.5px solid ${tier.border}`,
-        borderRadius: isPdfMode ? 12 : 18,
-        padding: isPdfMode ? '14px 18px' : '20px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: isPdfMode ? 12 : 16,
-      }}>
+    <>
+      <div
+        style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: isPdfMode ? 10 : 14,
+          marginBottom: isPdfMode ? 16 : 28,
+          alignItems: 'stretch',
+        }}
+      >
         <div style={{
-          width: isPdfMode ? '44px' : '56px',
-          height: isPdfMode ? '44px' : '56px',
-          minWidth: isPdfMode ? '44px' : '56px',
-          minHeight: isPdfMode ? '44px' : '56px',
-          borderRadius: '50%',
-          background: tier.color,
+          flex: '1 1 220px',
+          background: tier.bg,
+          border: `1.5px solid ${tier.border}`,
+          borderRadius: isPdfMode ? 12 : 18,
+          padding: isPdfMode ? '14px 18px' : '20px 24px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0,
-          fontSize: isPdfMode ? 20 : 26,
+          gap: isPdfMode ? 12 : 16,
         }}>
-          🏅
+          <div style={{
+            width: isPdfMode ? '44px' : '56px',
+            height: isPdfMode ? '44px' : '56px',
+            minWidth: isPdfMode ? '44px' : '56px',
+            minHeight: isPdfMode ? '44px' : '56px',
+            borderRadius: '50%',
+            background: tier.color,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+            fontSize: isPdfMode ? 20 : 26,
+          }}>
+            🏅
+          </div>
+          <div>
+            <div style={{
+              fontSize: isPdfMode ? 9 : 10,
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              color: tier.color,
+              marginBottom: 3,
+            }}>
+              {safeText(tier.label)}
+            </div>
+            <div style={{
+              fontSize: isPdfMode ? 16 : 20,
+              fontWeight: 800,
+              color: '#0A2351',
+              lineHeight: 1.2,
+            }}>
+              Top {percentile}% {safeText(top1.label)} Profile
+            </div>
+            <div style={{ fontSize: isPdfMode ? 11 : 13, color: '#64748b', marginTop: 3 }}>
+              Stronger than {100 - percentile}% of students assessed
+            </div>
+          </div>
         </div>
-        <div>
-          <div style={{
-            fontSize: isPdfMode ? 9 : 10,
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase',
-            color: tier.color,
-            marginBottom: 3,
-          }}>
-            {safeText(tier.label)}
-          </div>
-          <div style={{
-            fontSize: isPdfMode ? 16 : 20,
-            fontWeight: 800,
-            color: '#0A2351',
-            lineHeight: 1.2,
-          }}>
-            Top {percentile}% {safeText(top1.label)} Profile
-          </div>
-          <div style={{ fontSize: isPdfMode ? 11 : 13, color: '#64748b', marginTop: 3 }}>
-            Stronger than {100 - percentile}% of students assessed
-          </div>
+
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: isPdfMode ? 6 : 10,
+          flex: '0 1 auto',
+          minWidth: isPdfMode ? 140 : 160,
+        }}>
+          {[top1, top2, { label: 'Overall', score: overall, isOverall: true }].map((d, i) => (
+            <div key={i} style={{
+              background: '#ffffff',
+              border: '1px solid #e2e8f0',
+              borderRadius: isPdfMode ? 8 : 12,
+              padding: isPdfMode ? '8px 12px' : '10px 16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 12,
+            }}>
+              <span style={{ fontSize: isPdfMode ? 11 : 12, fontWeight: 600, color: '#334155' }}>
+                {safeText(d.label)}
+              </span>
+              <span style={{
+                fontSize: isPdfMode ? 13 : 15,
+                fontWeight: 800,
+                color: i === 0 ? '#F57D14' : '#0A2351',
+              }}>
+                {Number(d.score) || 0}
+                <span style={{ fontSize: isPdfMode ? 9 : 10, fontWeight: 500, color: '#94a3b8' }}>/100</span>
+              </span>
+            </div>
+          ))}
         </div>
       </div>
 
-      <div style={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: isPdfMode ? 6 : 10,
-        flex: '0 1 auto',
-        minWidth: isPdfMode ? 140 : 160,
-      }}>
-        {[top1, top2, { label: 'Overall', score: overall, isOverall: true }].map((d, i) => (
-          <div key={i} style={{
-            background: '#ffffff',
-            border: '1px solid #e2e8f0',
-            borderRadius: isPdfMode ? 8 : 12,
-            padding: isPdfMode ? '8px 12px' : '10px 16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            gap: 12,
-          }}>
-            <span style={{ fontSize: isPdfMode ? 11 : 12, fontWeight: 600, color: '#334155' }}>
-              {safeText(d.label)}
-            </span>
-            <span style={{
-              fontSize: isPdfMode ? 13 : 15,
-              fontWeight: 800,
-              color: i === 0 ? '#F57D14' : '#0A2351',
-            }}>
-              {Number(d.score) || 0}
-              <span style={{ fontSize: isPdfMode ? 9 : 10, fontWeight: 500, color: '#94a3b8' }}>/100</span>
-            </span>
+      {/* 🚀 THE FIX: New Employability Assessment Section for TPOs */}
+      {analysis?.employability_assessment && (
+        <div className={`avoid-break ${isPdfMode ? 'mb-4' : 'mb-8 mt-[-10px]'} rounded-2xl border border-slate-100 bg-white p-4 flex items-center justify-between gap-4 shadow-sm`}>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+              Corporate Readiness
+            </p>
+            <p className="font-bold text-[#0A2351] text-base">
+              {safeText(analysis.employability_assessment.readiness_label)}
+            </p>
+            <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+              {safeText(analysis.employability_assessment.readiness_rationale)}
+            </p>
           </div>
-        ))}
-      </div>
-    </div>
+          <div className="text-center shrink-0">
+            <div className="text-2xl font-extrabold text-[#F57D14]">
+              {analysis.employability_assessment.corporate_readiness_score}
+            </div>
+            <div className="text-[10px] text-slate-400 font-medium">Readiness</div>
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
@@ -762,7 +787,8 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      <ProfileBadge radarScores={analysis.radar_chart_scores} isPdfMode={isPdfMode} />
+      {/* 🚀 THE FIX: Passing full analysis object here to render the Employability section */}
+      <ProfileBadge radarScores={analysis.radar_chart_scores} analysis={analysis} isPdfMode={isPdfMode} />
 
       {isPdfMode && (
         <div style={{
@@ -912,6 +938,31 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     ))}
                   </div>
                 )}
+
+                {/* 🚀 THE FIX: New Industry Bucket Badge */}
+                {match.industry_bucket && (
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="rounded-md bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[10px] font-bold text-blue-700">
+                      {safeText(match.industry_bucket)}
+                    </span>
+                  </div>
+                )}
+
+                {/* 🚀 THE FIX: New Placement Roadblocks Section */}
+                {match.placement_roadblocks?.length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-slate-100">
+                    <p className="text-[10px] font-bold uppercase tracking-wider text-amber-500 mb-1.5">
+                      Placement Roadblocks
+                    </p>
+                    {match.placement_roadblocks.map((block, i) => (
+                      <div key={i} className="flex items-start gap-2 mb-1">
+                        <span className="text-amber-500 text-xs shrink-0 mt-0.5">⚠</span>
+                        <p className="text-xs text-slate-600 leading-relaxed">{safeText(block)}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {!isPdfMode && <FeedbackButtons assessmentId={assessmentId} careerTitle={safeText(match.career_title)} />}
               </CardContent>
             </Card>
@@ -969,6 +1020,30 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                     {safeText(immediateAction.success_metric)}
                   </p>
                 </div>
+
+                {/* 🚀 THE FIX: New Madhav AI Handoff Prompt */}
+                {immediateAction?.madhav_prompt && !isPdfMode && (
+                  <div className="mt-4 border-t border-white/20 pt-4">
+                    <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
+                      Start with Madhav
+                    </p>
+                    <div className="rounded-xl bg-white/10 border border-white/20 p-3 flex items-start gap-3">
+                      <span className="text-lg shrink-0">🪶</span>
+                      <div>
+                        <p className="text-sm text-white/80 italic leading-relaxed">
+                          "{safeText(immediateAction.madhav_prompt)}"
+                        </p>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(immediateAction.madhav_prompt)}
+                          className="mt-2 text-xs font-bold text-[#F57D14] hover:underline"
+                        >
+                          Copy this prompt → open Madhav
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
               </div>
             </CardContent>
           </Card>
@@ -1139,7 +1214,8 @@ const ResultDashboardReal = ({ assessment, analysisData, studentName }) => {
             </div>
           </div>
 
-          <ProfileBadge radarScores={previewScores} isPdfMode={false} />
+          {/* Fallback to null analysis for unpaid users to prevent crash */}
+          <ProfileBadge radarScores={previewScores} analysis={null} isPdfMode={false} />
 
           <div className="grid gap-6 lg:grid-cols-2 mb-8">
             <section>
