@@ -461,7 +461,7 @@ export async function POST(request) {
     ];
     if (!validArchetypes.includes(aiAnalysis.user_archetype)) {
        // Snap to a valid default if Gemini hallucinates a hybrid
-       aiAnalysis.user_archetype = 'Strategic Intrapreneur'; 
+       aiAnalysis.user_archetype = 'Structured Problem-Solver'; 
     }
 
     const { data: updated, error: updateError } = await supabase
