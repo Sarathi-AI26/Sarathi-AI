@@ -787,7 +787,6 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <IdentityStatement statement={analysis.identity_statement} isPdfMode={isPdfMode} />
       )}
 
-      {/* 🚀 THE FIX: Passing full analysis object here to render the Employability section */}
       <ProfileBadge radarScores={analysis.radar_chart_scores} analysis={analysis} isPdfMode={isPdfMode} />
 
       {isPdfMode && (
@@ -1021,7 +1020,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                   </p>
                 </div>
 
-                {/* 🚀 THE FIX: New Madhav AI Handoff Prompt */}
+                {/* 🚀 THE FIX: New Madhav AI Handoff Prompt & Waitlist Link */}
                 {immediateAction?.madhav_prompt && !isPdfMode && (
                   <div className="mt-4 border-t border-white/20 pt-4">
                     <p className="text-xs font-bold uppercase tracking-widest text-white/60 mb-2">
@@ -1039,6 +1038,16 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
                         >
                           Copy this prompt → open Madhav
                         </button>
+                        
+                        {/* 🚀 THE REVIEWER FIX: Waitlist Lead Capture */}
+                        <a 
+                          href="https://forms.zohopublic.in/adminsarat1/form/SARATHIWaitlistDashboard/formperma/Dv72Ts1XH9iyE8_Ph7LkwGUWbE8F-pMaSduHFVXv0J4" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block mt-2 text-xs text-white/50 hover:text-white/90 transition-colors underline"
+                        >
+                          Join the Madhav AI waitlist to use this prompt →
+                        </a>
                       </div>
                     </div>
                   </div>
