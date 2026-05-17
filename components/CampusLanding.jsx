@@ -94,7 +94,7 @@ export default function CampusLanding({
         </p>
 
         {/* Feature grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-10">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
           {[
             { icon: Zap,    label: '15 Minutes' },
             { icon: Shield, label: 'Free for You' },
@@ -115,6 +115,20 @@ export default function CampusLanding({
             ⚠ Only {seatsRemaining} assessment slots remaining for your batch
           </div>
         )}
+
+        {/* 🚀 THE REVIEWER FIX: Social Proof Inject */}
+        <div className="mb-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-center bg-[#0A2351]/50 py-4 rounded-2xl border border-white/5">
+          {[
+            { val: '100+', label: 'Reports Generated' },
+            { val: '0',    label: 'Identical Reports' },
+            { val: '15',   label: 'Minutes to Clarity' },
+          ].map(({ val, label }) => (
+            <div key={label} className="flex-1 min-w-[100px]">
+              <p className="text-2xl sm:text-3xl font-extrabold text-[#F57D14]">{val}</p>
+              <p className="text-[10px] sm:text-xs text-white/50 font-medium uppercase tracking-widest mt-1">{label}</p>
+            </div>
+          ))}
+        </div>
 
         {/* CTA */}
         <Link
