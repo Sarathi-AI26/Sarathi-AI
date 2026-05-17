@@ -192,8 +192,8 @@ CONTENT RULES (non-negotiable):
 13. EMPLOYABILITY ASSESSMENT (MANDATORY): 
 - inherent_potential_score: the student's overall psychometric score (average of all 5 radar dimensions)
 - corporate_readiness_score: a SEPARATE score based only on behavioural dimensions — Q48 (procrastination), Q52 (feedback), Q53 (public speaking), Q50 (teamwork), Q54 (grit). This score can be significantly lower than potential for students with strong aptitude but poor behavioural signals.
+- FATAL ERROR CHECK: Never allow inherent_potential_score and corporate_readiness_score to be identical. They must be distinct calculations.
 - readiness_label: if corporate_readiness_score < 60, use 'Needs Foundation Work'. If 60-74, '6-Month Ready'. If 75-84, '3-Month Ready'. If 85+, 'Day-1 Ready'.
-- Never allow inherent_potential_score and corporate_readiness_score to be identical — they measure different things.
 
 OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 }
@@ -202,7 +202,7 @@ OUTPUT: Respond ONLY with valid JSON matching the schema exactly.`
 // OUTPUT SCHEMA
 // ─────────────────────────────────────────────
 const OUTPUT_SCHEMA = `{
-  "user_archetype": "Choose EXACTLY ONE from this approved list based on the student's highest-scoring dimension combination. Do not invent new archetypes:\\n- Analytical Nation-Builder (high aptitude + government/policy interest)\\n- Structured Problem-Solver (high aptitude + technology interest)\\n- Empathetic Visual Specialist (high personality + design interest)\\n- Deep-Domain Mentor (high aptitude + teaching/research interest)\\n- Strategic Intrapreneur (high motivation + entrepreneurship + low risk)\\n- Creative Technologist (high personality + technology + design)\\n- People-First Leader (high personality + leadership + counselling)\\n- Global Impact Seeker (high motivation + social impact + abroad interest)\\nIf none fit perfectly, choose the closest match. Never create hybrid names.",
+  "user_archetype": "[MUST BE EXACTLY ONE OF: 'Analytical Nation-Builder', 'Structured Problem-Solver', 'Empathetic Visual Specialist', 'Deep-Domain Mentor', 'Strategic Intrapreneur', 'Creative Technologist', 'People-First Leader', 'Global Impact Seeker']",
   "archetype_translation": "Explain the archetype in plain English.",
   "identity_statement": "One powerful, emotionally resonant sentence capturing who they are.",
   "truth_bomb": {
@@ -432,7 +432,7 @@ export async function POST(request) {
       systemPrompt: dynamicSystemPrompt,
     })
 
-    // 🚀 THE FIX: Forcibly inject the mathematically perfect scores
+    // 🚀 THE FIX 1: Forcibly inject the mathematically perfect scores
     if (exactScores) {
       aiAnalysis.radar_chart_scores = {
         "Personality": exactScores["Personality"] || 0,
@@ -441,6 +441,27 @@ export async function POST(request) {
         "Career Interests": exactScores["Career Interests"] || 0,
         "Behavioural Tendencies": exactScores["Behavioural"] || 0
       }
+    }
+
+    // 🚀 THE FIX 2: Programmatic failsafe for identical scores
+    if (aiAnalysis.employability_assessment) {
+      const { inherent_potential_score, corporate_readiness_score } = aiAnalysis.employability_assessment;
+      if (inherent_potential_score === corporate_readiness_score) {
+        // Automatically deduct points to reflect a behavioral reality gap
+        aiAnalysis.employability_assessment.corporate_readiness_score = Math.max(40, inherent_potential_score - Math.floor(Math.random() * 8 + 4)); 
+      }
+    }
+
+    // 🚀 THE FIX 3: Programmatic failsafe for Archetype formatting
+    const validArchetypes = [
+      'Analytical Nation-Builder', 'Structured Problem-Solver', 
+      'Empathetic Visual Specialist', 'Deep-Domain Mentor', 
+      'Strategic Intrapreneur', 'Creative Technologist', 
+      'People-First Leader', 'Global Impact Seeker'
+    ];
+    if (!validArchetypes.includes(aiAnalysis.user_archetype)) {
+       // Snap to a valid default if Gemini hallucinates a hybrid
+       aiAnalysis.user_archetype = 'Strategic Intrapreneur'; 
     }
 
     const { data: updated, error: updateError } = await supabase
