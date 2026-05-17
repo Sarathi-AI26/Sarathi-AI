@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { Menu, X, ArrowRight, Zap } from 'lucide-react'
 import { createClient } from '@supabase/supabase-js'
 import SarathiLogo from './sarathi-logo' 
 
@@ -14,11 +14,13 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
   const [session, setSession] = useState(null)
+  const [isLoading, setIsLoading] = useState(true) // Prevent layout shift while checking session
 
   useEffect(() => {
     // Check if student is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
+      setIsLoading(false)
     })
     
     // Listen for logins/logouts
@@ -59,26 +61,35 @@ export default function Header() {
           <Link href="/about" className="hover:text-[#F57D14] transition-colors duration-300">About SARATHI</Link>
           <Link href="/#methodology" className="hover:text-[#F57D14] transition-colors duration-300">Methodology</Link>
           <Link href="/#institutions" className="hover:text-[#F57D14] transition-colors duration-300">For Institutions</Link>
-          <Link href="/#contact" className="hover:text-[#F57D14] transition-colors duration-300">Contact</Link>
           
-          {/* NEW: Desktop Login/Dashboard Button */}
-          <div className="pl-4 border-l-2 border-slate-100">
-            {session ? (
-              <Link
-                href="/dashboard/student"
-                className="flex items-center gap-2 rounded-full bg-[#0A2351] px-5 py-2 text-sm font-bold text-white hover:bg-[#F57D14] transition-all hover:scale-105 shadow-md shadow-[#0A2351]/20"
-              >
-                My Report <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 rounded-full border-2 border-[#0A2351] bg-white px-5 py-1.5 text-sm font-bold text-[#0A2351] hover:bg-[#0A2351] hover:text-white transition-all shadow-sm"
-              >
-                View My Report
-              </Link>
-            )}
-          </div>
+          {/* NEW: Desktop Login/CTA Buttons */}
+          {!isLoading && (
+            <div className="pl-4 flex items-center gap-4 border-l-2 border-slate-100">
+              {session ? (
+                <Link
+                  href="/dashboard/student"
+                  className="flex items-center gap-2 rounded-full bg-[#0A2351] px-5 py-2 text-sm font-bold text-white hover:bg-[#F57D14] transition-all hover:scale-105 shadow-md shadow-[#0A2351]/20"
+                >
+                  My Report <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-[#0A2351] hover:text-[#F57D14] transition-colors duration-300"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/assessment"
+                    className="flex items-center gap-2 rounded-full bg-[#F57D14] px-5 py-2 text-sm font-bold text-white hover:bg-[#dd6f11] transition-all hover:scale-105 shadow-md shadow-[#F57D14]/20"
+                  >
+                    <Zap className="h-3.5 w-3.5" /> Start Free Test
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* 📱 Mobile Hamburger Button */}
@@ -102,28 +113,38 @@ export default function Header() {
             <Link href="/about" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">About SARATHI</Link>
             <Link href="/#methodology" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">Methodology</Link>
             <Link href="/#institutions" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">For Institutions</Link>
-            <Link href="/#contact" onClick={() => setIsOpen(false)} className="py-2 hover:text-[#F57D14] transition-colors">Contact</Link>
             
-            {/* NEW: Mobile Login/Dashboard Button */}
-            <div className="pt-4 border-t border-slate-100 mt-2">
-              {session ? (
-                <Link
-                  href="/dashboard/student"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full rounded-full bg-[#0A2351] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#0A2351]/20"
-                >
-                  My Report <ArrowRight className="h-4 w-4" />
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center justify-center w-full rounded-full border-2 border-[#0A2351] bg-white px-5 py-3 text-sm font-bold text-[#0A2351]"
-                >
-                  View My Report
-                </Link>
-              )}
-            </div>
+            {/* NEW: Mobile Login/CTA Buttons */}
+            {!isLoading && (
+              <div className="pt-4 border-t border-slate-100 mt-2 flex flex-col gap-3">
+                {session ? (
+                  <Link
+                    href="/dashboard/student"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full rounded-full bg-[#0A2351] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#0A2351]/20"
+                  >
+                    My Report <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center w-full rounded-full border-2 border-[#0A2351] bg-white px-5 py-3 text-sm font-bold text-[#0A2351]"
+                    >
+                      Login to existing report
+                    </Link>
+                    <Link
+                      href="/assessment"
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center justify-center gap-2 w-full rounded-full bg-[#F57D14] px-5 py-3 text-sm font-bold text-white shadow-md shadow-[#F57D14]/20"
+                    >
+                      <Zap className="h-4 w-4" /> Start Free Test
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
