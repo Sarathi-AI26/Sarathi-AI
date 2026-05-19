@@ -259,10 +259,10 @@ export default function ClientDashboard() {
   const studentName = getDisplayName();
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
- return (
+return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
-      {/* 🚀 1. THE GLOBAL HEADER FIX: 'fixed top-0 w-full' locks it to the top of the browser as you scroll */}
-      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md fixed top-0 left-0 w-full z-50">
+      {/* 🚀 FIX 1: Restored 'sticky' to eliminate the white gap, glued to z-50 so it floats */}
+      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-50 w-full">
         <div className="flex items-center gap-3 sm:gap-4">
          <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-white">SARATHI Personalised Dashboard</h1>
           <div className="hidden sm:block h-8 w-px bg-white/20"></div>
@@ -283,8 +283,8 @@ export default function ClientDashboard() {
         </button>
       </header>
 
-      {/* 🚀 2. THE CONTENT SPACING FIX: Added 'pt-[76px]' so the top of your roadmap isn't hidden under the floating header */}
-      <main className="flex-1 w-full pt-[76px]">
+      {/* 🚀 FIX 2: Removed the 76px padding to pull your dashboard back up to the header */}
+      <main className="flex-1 w-full">
         {analysisData ? (
             <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
         ) : (
