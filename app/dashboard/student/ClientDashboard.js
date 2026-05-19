@@ -260,11 +260,12 @@ export default function ClientDashboard() {
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
 return (
-    // Re-added min-h-screen to ensure the background color flows perfectly
-    <div className="min-h-screen bg-slate-50 flex flex-col relative">
+    // Replaced min-h-screen with h-full so it doesn't fight your global layout
+    <div className="flex flex-col w-full h-full bg-slate-50">
       
-      {/* 🚀 1. THE BULLETPROOF HEADER: Fixed to the top glass, completely immune to scrolling bugs */}
-      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md fixed top-0 left-0 w-full z-50">
+      {/* 🚀 THE FIX: Removed 'fixed' and the phantom spacer. 
+          Using native 'sticky top-0' keeps it in the normal flow so it doesn't get covered by your global layout header. */}
+      <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-40 w-full">
         <div className="flex items-center gap-3 sm:gap-4">
          <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-white">SARATHI Personalised Dashboard</h1>
           <div className="hidden sm:block h-8 w-px bg-white/20"></div>
@@ -285,12 +286,8 @@ return (
         </button>
       </header>
 
-      {/* 🚀 2. THE PHANTOM SPACER: This invisible block is exactly 72px tall. 
-          It prevents the ugly white gap and stops the roadmap from hiding under the fixed header. */}
-      <div className="h-[72px] w-full shrink-0"></div>
-
-      {/* 🚀 3. THE CONTENT: Clean, no weird padding hacks. */}
-      <main className="flex-1 w-full">
+      {/* 🚀 THE CONTENT: Normal document flow, no spacing hacks required. */}
+      <main className="flex-1 w-full relative">
         {analysisData ? (
             <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
         ) : (
