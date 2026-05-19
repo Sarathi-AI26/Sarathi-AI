@@ -704,9 +704,9 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
   const roadmapSteps = [
     { label: 'Year 1', title: 'Foundation & Skill Launch',     key: 'year_1', icon: Target     },
     { label: 'Year 2', title: 'Skill Application & Execution', key: 'year_2', icon: BookOpen   },
-    { label: 'Year 3', title: 'Market Acceleration',           key: 'year_3', icon: Sparkles   },
-    { label: 'Year 4', title: 'Strategic Positioning',         key: 'year_4', icon: TrendingUp },
-    { label: 'Year 5', title: 'Leadership & Mastery',          key: 'year_5', icon: Network    },
+    { label: 'Year 3', title: 'Market Acceleration',            key: 'year_3', icon: Sparkles   },
+    { label: 'Year 4', title: 'Strategic Positioning',          key: 'year_4', icon: TrendingUp },
+    { label: 'Year 5', title: 'Leadership & Mastery',           key: 'year_5', icon: Network    },
   ].map(s => ({ ...s, data: safeText(roadmap?.[s.key]) })).filter(s => s.data)
 
   const renderList = (title, items, icon) => {
@@ -737,8 +737,14 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
         <style dangerouslySetInnerHTML={{ __html: `
           .pdf-page-break { page-break-before: always !important; display: block; height: 0; margin: 0; padding: 0; }
           * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-          section { margin-bottom: 14px !important; }
+          
+          /* Tighten spacing specifically for print layout outputs */
+          section { margin-bottom: 12px !important; }
           p, li, span { orphans: 3 !important; widows: 3 !important; }
+          
+          /* Clear structural layout collapse patterns near manual hard breaks */
+          .pdf-page-break + section, 
+          section + .pdf-page-break { margin-top: 0 !important; margin-bottom: 0 !important; }
         `}} />
       )}
 
