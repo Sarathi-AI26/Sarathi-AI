@@ -239,7 +239,8 @@ export default function ClientDashboard() {
     return 'Student';
   }
 
-  const studentName = getDisplayName();
+ // Look for the name directly inside the fully loaded assessment object as well as your state container
+  const studentName = fetchedName || assessment?.users?.name || assessment?.user_details?.name || 'Student';
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
   return (
