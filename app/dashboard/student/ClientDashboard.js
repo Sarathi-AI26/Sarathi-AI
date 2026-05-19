@@ -265,7 +265,7 @@ export default function ClientDashboard() {
         </button>
       </header>
 
-      <body className="flex-1 w-full">
+      <main className="flex-1 w-full">
         {analysisData ? (
             <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
         ) : (
@@ -283,7 +283,7 @@ export default function ClientDashboard() {
                </button>
             </div>
         )}
-      </body>
+      </main>
     </div>
   )
 }
