@@ -26,7 +26,7 @@ export default function ClientDashboard() {
       try {
         let targetId = id;
 
-        // --- NEW: SESSION FALLBACK LOGIC WITH ORPHAN CLAIMER ---
+        // --- SESSION FALLBACK LOGIC WITH ORPHAN CLAIMER ---
         if (!targetId) {
           const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           
@@ -45,7 +45,7 @@ export default function ClientDashboard() {
             .limit(1)
             .single();
 
-          // 2. THE ORPHAN CLAIMER: If not found, search by their email address from their guest session!
+          // 2. THE ORPHAN CLAIMER
           if (!latestAssessment && session?.user?.email) {
             const { data: guestUser } = await supabase
               .from('users')
@@ -63,15 +63,14 @@ export default function ClientDashboard() {
                 .single();
 
               if (guestAssessment) {
-                latestAssessment = guestAssessment; // We found the orphaned test!
+                latestAssessment = guestAssessment; 
                 
-                // --- REVIEWER FIX 1: PERMANENTLY LINK GUEST TO AUTH ID ---
+                // PERMANENTLY LINK GUEST TO AUTH ID
                 await supabase
                   .from('users')
                   .update({ id: session.user.id })
                   .eq('email', session.user.email.toLowerCase())
                   .is('id', null);
-                // ---------------------------------------------------------
               }
             }
           }
@@ -81,16 +80,13 @@ export default function ClientDashboard() {
           }
           
           targetId = latestAssessment.id;
-          
-          // Update the URL quietly so it looks clean
           window.history.replaceState(null, '', `/dashboard/student?id=${targetId}`);
         }
-        // ---------------------------------------------------------
 
-        // 🚀 CRITICAL FIX 1: Join 'users' table directly to fetch real-time data cleanly and safely
+        // 🚀 CRITICAL FIX 1: Added 'email' to the join for the ultimate name fallback
         const { data, error } = await supabase
           .from('assessments')
-          .select('*, users(name, college)') 
+          .select('*, users(name, email, college)') 
           .eq('id', targetId)
           .single()
 
@@ -99,7 +95,7 @@ export default function ClientDashboard() {
 
         console.log("Raw Assessment Data:", data) 
 
-        // 🚀 CRITICAL FIX 2: Bulletproof Name Resolver (Handles direct objects, array wrappers, and structural anomalies)
+        // 🚀 CRITICAL FIX 2: Bulletproof Name Resolver (Handles array wrappers)
         let clearName = null;
         
         if (data.users) {
@@ -111,7 +107,6 @@ export default function ClientDashboard() {
         }
         
         if (!clearName && data.user_id) {
-          // Fallback legacy handler if row structure varies slightly across sessions
           const { data: users } = await supabase
             .from('users') 
             .select('*')
@@ -123,7 +118,6 @@ export default function ClientDashboard() {
           }
         }
 
-        // Final safety line check to fallback into account identity metadata variables if rows are still building
         if (!clearName) {
           const { data: { session } } = await supabase.auth.getSession();
           clearName = session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.name;
@@ -133,16 +127,18 @@ export default function ClientDashboard() {
           setFetchedName(clearName);
         }
         
-        // 🚀 CRITICAL FIX 3: B2C Paywall Enforcer 
+        // 🚀 CRITICAL FIX 3: Paywall Boolean Trap Fix
+        // Extracts the string safely whether users is an array or object
         const userCollegeStr = Array.isArray(data.users) ? data.users[0]?.college : data.users?.college;
         const isB2BUser = userCollegeStr && !userCollegeStr.toLowerCase().includes('individual_guest');
-        const hasAccessPermitted = data.payment_status === true || isB2BUser;
+        
+        // !! forces truthy evaluation (bypasses the "true" string bug)
+        const hasAccessPermitted = !!data.payment_status || isB2BUser;
 
-        // Clone tracking object to preserve payload integrity safely and pass parsed name references cleanly
         const verifiedAssessmentState = {
           ...data,
           payment_status: hasAccessPermitted,
-          parsed_student_name: clearName // Inject a custom safe parameter string directly
+          parsed_student_name: clearName 
         };
 
         setAssessment(verifiedAssessmentState)
@@ -159,11 +155,9 @@ export default function ClientDashboard() {
            })
            const clientResult = await res.json()
            
-           // --- SAFETY NET INJECTION ---
            if (!res.ok || !clientResult.ai_analysis_result) {
              throw new Error(clientResult.error || "AI Engine timeout. Please refresh to try again.")
            }
-           // ----------------------------
            
            setAnalysisData(clientResult.ai_analysis_result)
            setStatus("SUCCESS")
@@ -204,7 +198,6 @@ export default function ClientDashboard() {
           <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
             <button 
               onClick={() => {
-                // --- REVIEWER FIX 2 (UPGRADED): PRESERVE INSTITUTION ID IN STORAGE & URL ---
                 const urlParams = new URLSearchParams(window.location.search);
                 const instId = urlParams.get('institution_id') || localStorage.getItem('institution_id');
                 
@@ -214,7 +207,6 @@ export default function ClientDashboard() {
                 } else {
                   router.push('/assessment');
                 }
-                // -------------------------------------------------------------------------
               }}
               className="w-full bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 rounded-full transition-all shadow-md"
             >
@@ -229,7 +221,6 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        {/* --- SAFETY NET INJECTION: Show refresh button on AI timeout --- */}
         {status.includes('AI Engine timeout') && (
             <button 
               onClick={() => window.location.reload()}
@@ -242,7 +233,7 @@ export default function ClientDashboard() {
     )
   }
 
-  // 2. ULTIMATE NAME RESOLVER
+  // 2. ULTIMATE NAME RESOLVER WITH EMAIL FALLBACK
   const getDisplayName = () => {
     if (fetchedName) return fetchedName;
     if (assessment?.parsed_student_name) return assessment.parsed_student_name;
@@ -253,6 +244,13 @@ export default function ClientDashboard() {
         const firstPara = summary[0];
         const match = firstPara.match(/^([^,]+),/);
         if (match && match[1] && match[1].length < 20) return match[1];
+    }
+    
+    // 🚀 NEW: Dynamic email slicing if name is totally absent from database
+    const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
+    if (userEmail) {
+      const emailPrefix = userEmail.split('@')[0];
+      return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
     }
     
     return 'Student';
