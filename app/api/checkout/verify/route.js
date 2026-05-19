@@ -1,6 +1,8 @@
+// app/api/checkout/verify/route.js
 import { NextResponse } from 'next/server'
 import crypto from 'crypto'
-import nodemailer from 'nodemailer' // Added Nodemailer import
+import nodemailer from 'nodemailer' 
+import { getSupabaseAdmin } from '@/lib/supabase' // 🚀 FIX: Imported your Supabase admin client
 
 export async function POST(request) {
   try {
@@ -21,10 +23,17 @@ export async function POST(request) {
     if (isAuthentic) {
       // PAYMENT IS VALID! 
       
-      // TODO: Connect to MongoDB here and update the assessment document.
-      // Example: 
-      // await connectToDatabase();
-      // await Assessment.findByIdAndUpdate(assessmentId, { payment_status: true });
+      // 🚀 THE FIX: Actually update the database so the paywall drops!
+      const supabaseAdmin = getSupabaseAdmin()
+      const { error: updateError } = await supabaseAdmin
+        .from('assessments')
+        .update({ payment_status: true })
+        .eq('id', assessmentId)
+
+      if (updateError) {
+        console.error("Supabase update error:", updateError)
+        return NextResponse.json({ success: false, error: "Database update failed" }, { status: 500 })
+      }
 
       // ==========================================
       // EMAIL NOTIFICATION BLOCK START
