@@ -99,11 +99,19 @@ export default function ClientDashboard() {
 
         console.log("Raw Assessment Data:", data) 
 
-        // 🚀 CRITICAL FIX 2: Check for name mapping from relational table join setup
-        if (data.users?.name) {
-          setFetchedName(data.users.name);
-        } else if (data.user_id) {
-          // Fallback legacy handler if row structure varies slightly
+        // 🚀 CRITICAL FIX 2: Bulletproof Name Resolver (Handles direct objects, array wrappers, and structural anomalies)
+        let clearName = null;
+        
+        if (data.users) {
+          if (Array.isArray(data.users) && data.users[0]?.name) {
+            clearName = data.users[0].name;
+          } else if (data.users.name) {
+            clearName = data.users.name;
+          }
+        }
+        
+        if (!clearName && data.user_id) {
+          // Fallback legacy handler if row structure varies slightly across sessions
           const { data: users } = await supabase
             .from('users') 
             .select('*')
@@ -111,20 +119,30 @@ export default function ClientDashboard() {
             
           if (users && users.length > 0) {
             const userData = users[0];
-            const name = userData.name || userData.full_name || userData.first_name;
-            if (name) setFetchedName(name);
+            clearName = userData.name || userData.full_name || userData.first_name;
           }
+        }
+
+        // Final safety line check to fallback into account identity metadata variables if rows are still building
+        if (!clearName) {
+          const { data: { session } } = await supabase.auth.getSession();
+          clearName = session?.user?.user_metadata?.full_name || session?.user?.user_metadata?.name;
+        }
+
+        if (clearName) {
+          setFetchedName(clearName);
         }
         
         // 🚀 CRITICAL FIX 3: B2C Paywall Enforcer 
-        // Checks if payment_status is true OR verified B2B cohort. If it's a regular unpaid B2C account on this route, forces payment check.
-        const isB2BUser = data.users?.college && !data.users.college.toLowerCase().includes('individual_guest');
+        const userCollegeStr = Array.isArray(data.users) ? data.users[0]?.college : data.users?.college;
+        const isB2BUser = userCollegeStr && !userCollegeStr.toLowerCase().includes('individual_guest');
         const hasAccessPermitted = data.payment_status === true || isB2BUser;
 
-        // Clone tracking object to preserve payload integrity safely 
+        // Clone tracking object to preserve payload integrity safely and pass parsed name references cleanly
         const verifiedAssessmentState = {
           ...data,
-          payment_status: hasAccessPermitted
+          payment_status: hasAccessPermitted,
+          parsed_student_name: clearName // Inject a custom safe parameter string directly
         };
 
         setAssessment(verifiedAssessmentState)
@@ -139,15 +157,15 @@ export default function ClientDashboard() {
              headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({ assessmentId: data.id })
            })
-           const result = await res.json()
+           const clientResult = await res.json()
            
            // --- SAFETY NET INJECTION ---
-           if (!res.ok || !result.ai_analysis_result) {
-             throw new Error(result.error || "AI Engine timeout. Please refresh to try again.")
+           if (!res.ok || !clientResult.ai_analysis_result) {
+             throw new Error(clientResult.error || "AI Engine timeout. Please refresh to try again.")
            }
            // ----------------------------
            
-           setAnalysisData(result.ai_analysis_result)
+           setAnalysisData(clientResult.ai_analysis_result)
            setStatus("SUCCESS")
         } else {
            setStatus("SUCCESS")
@@ -227,6 +245,7 @@ export default function ClientDashboard() {
   // 2. ULTIMATE NAME RESOLVER
   const getDisplayName = () => {
     if (fetchedName) return fetchedName;
+    if (assessment?.parsed_student_name) return assessment.parsed_student_name;
     if (assessment?.user_details?.name) return assessment.user_details.name;
     
     const summary = analysisData?.executive_summary;
@@ -239,8 +258,7 @@ export default function ClientDashboard() {
     return 'Student';
   }
 
- // Look for the name directly inside the fully loaded assessment object as well as your state container
-  const studentName = fetchedName || assessment?.users?.name || assessment?.user_details?.name || 'Student';
+  const studentName = getDisplayName();
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
   return (
