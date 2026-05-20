@@ -1,16 +1,91 @@
 // app/dashboard/student/ClientDashboard.js
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@supabase/supabase-js'
-import { Loader2, LogOut, AlertTriangle } from 'lucide-react'
+import { Loader2, LogOut, AlertTriangle, CheckCircle2, Sparkles, Brain, Zap } from 'lucide-react'
 import ResultDashboardReal from '@/components/result-dashboard-real'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+// ── 1. Animated Generating Screen ──────────────────────────────
+function GeneratingScreen({ elapsed }) {
+  const stages = [
+    { min: 0,  max: 8,  icon: Brain,    text: 'Reading your 60 answers...',       sub: 'Analysing your personality and aptitude signals' },
+    { min: 8,  max: 18, icon: Zap,      text: 'Building your psychometric profile...', sub: 'Mapping your risk tolerance, decisiveness, and motivation' },
+    { min: 18, max: 30, icon: Sparkles, text: 'Generating your career matches...',  sub: 'Finding careers that fit your exact psychological wiring' },
+    { min: 30, max: 50, icon: Sparkles, text: 'Writing your 5-year roadmap...',     sub: 'Personalising every milestone to your specific goals' },
+    { min: 50, max: 999,icon: Sparkles, text: 'Finalising your report...',          sub: 'Almost ready — this is our most detailed analysis yet' },
+  ]
+
+  const current = stages.find(s => elapsed >= s.min && elapsed < s.max) || stages[stages.length - 1]
+  const Icon = current.icon
+  const progress = Math.min(95, (elapsed / 60) * 100)
+
+  return (
+    <div className="flex min-h-[80vh] flex-col items-center justify-center p-8 text-center mt-8 animate-in fade-in zoom-in duration-500">
+      <div className="mb-8 relative">
+        <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-[#F57D14]/10 animate-pulse">
+          <Icon className="h-12 w-12 text-[#F57D14]" />
+        </div>
+        <div
+          className="absolute h-3 w-3 rounded-full bg-[#F57D14]"
+          style={{
+            top: '50%', left: '50%',
+            transform: `rotate(${elapsed * 6}deg) translate(44px) rotate(-${elapsed * 6}deg)`,
+            transition: 'transform 0.1s linear',
+          }}
+        />
+      </div>
+
+      <h1 className="text-2xl font-bold text-[#0A2351] mb-2 transition-all">
+        {current.text}
+      </h1>
+      <p className="text-slate-500 text-sm max-w-sm leading-relaxed mb-8">
+        {current.sub}
+      </p>
+
+      <div className="w-full max-w-sm mb-3">
+        <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-[#F57D14] transition-all duration-1000"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+      <p className="text-xs text-slate-400 font-medium mb-8">
+        {elapsed < 60
+          ? `Approximately ${Math.max(5, 60 - elapsed)} seconds remaining`
+          : 'Taking a little longer than usual — please keep this tab open'}
+      </p>
+
+      {elapsed >= 35 && (
+        <div className="max-w-sm rounded-2xl bg-[#0A2351]/5 border border-[#0A2351]/10 p-4 text-left animate-in fade-in slide-in-from-bottom-2">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-bold text-[#0A2351]">Your answers are safely saved</p>
+              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                Even if you close this tab, your report will be waiting when you return.
+                Log back in at any time to see it.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="mt-6 flex items-center gap-2 text-slate-400 text-xs">
+        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        AI is working · {elapsed}s
+      </div>
+    </div>
+  )
+}
+
+// ── 2. Main Dashboard Manager ─────────────────────────────────
 export default function ClientDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -20,6 +95,50 @@ export default function ClientDashboard() {
   const [assessment, setAssessment] = useState(null)
   const [analysisData, setAnalysisData] = useState(null)
   const [fetchedName, setFetchedName] = useState(null)
+  const [elapsed, setElapsed] = useState(0)
+
+  const pollRef = useRef(null)
+  const elapsedRef = useRef(null)
+
+  // Clean up polling if user leaves
+  const stopPolling = useCallback(() => {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+    if (elapsedRef.current) { clearInterval(elapsedRef.current); elapsedRef.current = null }
+  }, [])
+
+  // 🚀 The Polling Engine
+  const startPolling = useCallback((assessmentId) => {
+    elapsedRef.current = setInterval(() => setElapsed(p => p + 1), 1000)
+
+    pollRef.current = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/poll-status?assessmentId=${assessmentId}`)
+        const data = await res.json()
+
+        if (!res.ok) return // Keep polling silently on network blips
+
+        if (data.isReady && data.assessment) {
+          stopPolling()
+          setAnalysisData(data.assessment.ai_analysis_result)
+          setAssessment(prev => ({ ...prev, ...data.assessment }))
+          setStatus("SUCCESS")
+        }
+
+        // If backend explicitly failed, try kicking it again
+        if (data.generationStatus === 'failed') {
+          stopPolling()
+          await fetch('/api/generate-roadmap', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ assessmentId }),
+          })
+          startPolling(assessmentId) // restart polling
+        }
+      } catch (err) {
+        console.warn('Poll error (will retry):', err.message)
+      }
+    }, 3000) // Poll every 3 seconds
+  }, [stopPolling])
 
   useEffect(() => {
     const loadData = async () => {
@@ -36,23 +155,21 @@ export default function ClientDashboard() {
             return;
           }
 
-          // 1. Try to find the assessment using their secure Auth ID
-          let { data: latestAssessment, error: latestError } = await supabase
+          let { data: latestAssessment } = await supabase
             .from('assessments')
             .select('id')
             .eq('user_id', session.user.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .maybeSingle(); // 🚀 FIX: Prevent crash on missing assessment
+            .maybeSingle();
 
-          // 2. THE ORPHAN CLAIMER
           if (!latestAssessment && session?.user?.email) {
             const { data: guestUser } = await supabase
               .from('users')
               .select('id')
               .eq('email', session.user.email.toLowerCase())
-              .limit(1) // 🚀 FIX: Protect against duplicate guest emails
-              .maybeSingle(); // 🚀 FIX: Prevent crash
+              .limit(1)
+              .maybeSingle();
 
             if (guestUser) {
               const { data: guestAssessment } = await supabase
@@ -61,12 +178,11 @@ export default function ClientDashboard() {
                 .eq('user_id', guestUser.id)
                 .order('created_at', { ascending: false })
                 .limit(1)
-                .maybeSingle(); // 🚀 FIX: Prevent crash
+                .maybeSingle();
 
               if (guestAssessment) {
                 latestAssessment = guestAssessment; 
                 
-                // PERMANENTLY LINK GUEST TO AUTH ID
                 await supabase
                   .from('users')
                   .update({ id: session.user.id })
@@ -84,19 +200,16 @@ export default function ClientDashboard() {
           window.history.replaceState(null, '', `/dashboard/student?id=${targetId}`);
         }
 
-        // 🚀 CRITICAL FIX 1: Added 'email' to the join for the ultimate name fallback
         const { data, error } = await supabase
           .from('assessments')
           .select('*, users(name, email, college)') 
           .eq('id', targetId)
-          .maybeSingle() // 🚀 FIX: Handles dead/deleted links gracefully without crashing
+          .maybeSingle() 
 
         if (error) throw error
         if (!data) throw new Error("This assessment link is invalid, expired, or the data was deleted.")
 
-        console.log("Raw Assessment Data:", data) 
-
-        // 🚀 CRITICAL FIX 2: Bulletproof Name Resolver (Handles array wrappers)
+        // Bulletproof Name Resolver
         let clearName = null;
         
         if (data.users) {
@@ -128,12 +241,9 @@ export default function ClientDashboard() {
           setFetchedName(clearName);
         }
         
-        // 🚀 CRITICAL FIX 3: Paywall Boolean Trap Fix
-        // Extracts the string safely whether users is an array or object
+        // Paywall Logic
         const userCollegeStr = Array.isArray(data.users) ? data.users[0]?.college : data.users?.college;
         const isB2BUser = userCollegeStr && !userCollegeStr.toLowerCase().includes('individual_guest');
-        
-        // !! forces truthy evaluation (bypasses the "true" string bug)
         const hasAccessPermitted = !!data.payment_status || isB2BUser;
 
         const verifiedAssessmentState = {
@@ -144,25 +254,26 @@ export default function ClientDashboard() {
 
         setAssessment(verifiedAssessmentState)
 
+        // 🚀 THE NEW ASYNC ROUTING LOGIC
         if (data.ai_analysis_result && hasAccessPermitted) {
+           // Scenario 1: Already Paid, Already Generated
            setAnalysisData(data.ai_analysis_result)
            setStatus("SUCCESS")
-        } else if (data.payment_status) {
-           setStatus("Synthesizing your 5-Year Roadmap...")
-           const res = await fetch('/api/generate-roadmap', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ assessmentId: data.id })
-           })
-           const clientResult = await res.json()
+        } else if (hasAccessPermitted) {
+           // Scenario 2: Paid, but NOT Generated yet (Background job is running)
+           setStatus("GENERATING")
+           startPolling(data.id)
            
-           if (!res.ok || !clientResult.ai_analysis_result) {
-             throw new Error(clientResult.error || "AI Engine timeout. Please refresh to try again.")
+           // Failsafe: Kickstart generation if it never started or crashed previously
+           if (!data.generation_status || ['pending', 'failed'].includes(data.generation_status)) {
+             fetch('/api/generate-roadmap', {
+               method: 'POST',
+               headers: { 'Content-Type': 'application/json' },
+               body: JSON.stringify({ assessmentId: data.id })
+             }).catch(e => console.warn(e))
            }
-           
-           setAnalysisData(clientResult.ai_analysis_result)
-           setStatus("SUCCESS")
         } else {
+           // Scenario 3: Unpaid Free Preview
            setStatus("SUCCESS")
         }
       } catch (err) {
@@ -171,15 +282,44 @@ export default function ClientDashboard() {
     }
 
     loadData()
-  }, [id, router])
+    
+    // Cleanup polling when component unmounts
+    return () => stopPolling()
+  }, [id, router, startPolling, stopPolling])
 
   const handleLogout = async () => {
+    stopPolling()
     await supabase.auth.signOut()
     router.push('/')
   }
 
-  if (status !== "SUCCESS" || !assessment) {
-    // 🚀 Added check for the friendly "invalid link" string
+  // ULTIMATE NAME RESOLVER WITH EMAIL FALLBACK
+  const getDisplayName = () => {
+    if (fetchedName) return fetchedName;
+    if (assessment?.parsed_student_name) return assessment.parsed_student_name;
+    if (assessment?.user_details?.name) return assessment.user_details.name;
+    
+    const summary = analysisData?.executive_summary;
+    if (Array.isArray(summary) && summary[0]) {
+        const firstPara = summary[0];
+        const match = firstPara.match(/^([^,]+),/);
+        if (match && match[1] && match[1].length < 20) return match[1];
+    }
+    
+    const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
+    if (userEmail) {
+      const emailPrefix = userEmail.split('@')[0];
+      return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
+    }
+    
+    return 'Student';
+  }
+
+  const studentName = getDisplayName();
+  const archetypeTitle = analysisData?.user_archetype || 'Explorer';
+
+  // ── ERROR AND LOADING RENDER STATES ───────────────────────────
+  if (status !== "SUCCESS" && status !== "GENERATING") {
     const isNoAssessmentError = status.includes("couldn't find a completed assessment") || status.includes("invalid, expired");
 
     return (
@@ -202,7 +342,6 @@ export default function ClientDashboard() {
               onClick={() => {
                 const urlParams = new URLSearchParams(window.location.search);
                 const instId = urlParams.get('institution_id') || localStorage.getItem('institution_id');
-                
                 if (instId) {
                   localStorage.setItem('institution_id', instId);
                   router.push(`/assessment?institution_id=${instId}`);
@@ -223,7 +362,7 @@ export default function ClientDashboard() {
           </div>
         )}
 
-        {status.includes('AI Engine timeout') && (
+        {(status.includes('timeout') || status.includes('traffic') || status.includes('try again') || status.includes('failed')) && (
             <button 
               onClick={() => window.location.reload()}
               className="mt-4 bg-[#0A2351] hover:bg-[#F57D14] text-white font-bold h-12 px-8 rounded-full transition-all shadow-md"
@@ -235,47 +374,22 @@ export default function ClientDashboard() {
     )
   }
 
-  // 2. ULTIMATE NAME RESOLVER WITH EMAIL FALLBACK
-  const getDisplayName = () => {
-    if (fetchedName) return fetchedName;
-    if (assessment?.parsed_student_name) return assessment.parsed_student_name;
-    if (assessment?.user_details?.name) return assessment.user_details.name;
-    
-    const summary = analysisData?.executive_summary;
-    if (Array.isArray(summary) && summary[0]) {
-        const firstPara = summary[0];
-        const match = firstPara.match(/^([^,]+),/);
-        if (match && match[1] && match[1].length < 20) return match[1];
-    }
-    
-    // 🚀 NEW: Dynamic email slicing if name is totally absent from database
-    const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
-    if (userEmail) {
-      const emailPrefix = userEmail.split('@')[0];
-      return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-    }
-    
-    return 'Student';
-  }
-
-  const studentName = getDisplayName();
-  const archetypeTitle = analysisData?.user_archetype || 'Explorer';
-
+  // ── SUCCESS / GENERATING RENDER STATE ───────────────────────────
   return (
-    // Replaced min-h-screen with h-full so it doesn't fight your global layout
     <div className="flex flex-col w-full h-full bg-slate-50">
-      
-      {/* 🚀 THE FIX: Removed 'fixed' and the phantom spacer. 
-          Using native 'sticky top-0' keeps it in the normal flow so it doesn't get covered by your global layout header. */}
       <header className="bg-[#0A2351] text-white px-4 sm:px-8 py-4 flex justify-between items-center shadow-md sticky top-0 z-40 w-full">
         <div className="flex items-center gap-3 sm:gap-4">
          <h1 className="font-extrabold text-lg sm:text-xl tracking-tight text-white">SARATHI Personalised Dashboard</h1>
           <div className="hidden sm:block h-8 w-px bg-white/20"></div>
           <div className="hidden sm:flex flex-col">
-            <span className="text-sm font-bold truncate max-w-[150px]">{studentName}</span>
-            <span className="text-[10px] text-[#F57D14] uppercase tracking-widest font-bold">
-              {archetypeTitle}
+            <span className="text-sm font-bold truncate max-w-[150px]">
+              {status === "GENERATING" ? "Analysing Profile..." : studentName}
             </span>
+            {status !== "GENERATING" && (
+              <span className="text-[10px] text-[#F57D14] uppercase tracking-widest font-bold">
+                {archetypeTitle}
+              </span>
+            )}
           </div>
         </div>
 
@@ -288,24 +402,11 @@ export default function ClientDashboard() {
         </button>
       </header>
 
-      {/* 🚀 THE CONTENT: Normal document flow, no spacing hacks required. */}
       <main className="flex-1 w-full relative">
-        {analysisData ? (
-            <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
+        {status === "GENERATING" ? (
+           <GeneratingScreen elapsed={elapsed} />
         ) : (
-            <div className="flex flex-col items-center justify-center p-12 mt-12 text-center text-slate-500">
-               <AlertTriangle className="w-12 h-12 text-amber-500 mb-4 mx-auto" />
-               <h2 className="text-xl font-bold text-[#0A2351] mb-2">Roadmap Processing</h2>
-               <p className="text-sm mb-6 max-w-sm mx-auto">
-                 Gemini is experiencing heavy load and couldn't display your data immediately. Please refresh to view your report.
-               </p>
-               <button 
-                 onClick={() => window.location.reload()} 
-                 className="bg-[#F57D14] hover:bg-[#dd6f11] text-white font-bold h-12 px-8 rounded-full transition-all"
-               >
-                 Refresh Page
-               </button>
-            </div>
+           <ResultDashboardReal assessment={assessment} analysisData={analysisData} studentName={studentName} />
         )}
       </main>
     </div>
