@@ -21,6 +21,61 @@ import {
 } from '@/lib/psychometric-assessment'
 
 // ─────────────────────────────────────────────
+// 🚀 BUG 4 FIX: B2B SESSION LEAK KILL SWITCH & VALIDATOR
+// ─────────────────────────────────────────────
+const useInstitutionKillSwitch = () => {
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // Check if current URL is specifically a campus link
+    const isCampusSession =
+      window.location.pathname.startsWith('/c/') ||
+      new URLSearchParams(window.location.search).has('campus')
+
+    if (!isCampusSession) {
+      // Not a campus session — purge any stale institution data from a previous test
+      const hadInstitutionId = 
+        localStorage.getItem('sarathi_institution_id') || 
+        localStorage.getItem('institution_id')
+
+      if (hadInstitutionId) {
+        console.log('🛡️ Kill switch activated: Purging stale institution_id from previous B2B session')
+        localStorage.removeItem('sarathi_institution_id')
+        localStorage.removeItem('sarathi_institution_name')
+        localStorage.removeItem('sarathi_institution_expiry')
+        sessionStorage.removeItem('sarathi_institution_id')
+        sessionStorage.removeItem('sarathi_institution_name')
+        localStorage.removeItem('institution_id')
+      }
+    }
+  }, [])
+}
+
+const getValidInstitutionId = () => {
+  if (typeof window === 'undefined') return null;
+  
+  const expiry = localStorage.getItem('sarathi_institution_expiry')
+  
+  // If the 4-hour session expired, silently purge it
+  if (expiry && Date.now() > parseInt(expiry)) {
+    console.log('🛡️ Session expired: Purging old institution_id')
+    localStorage.removeItem('sarathi_institution_id')
+    localStorage.removeItem('sarathi_institution_name')
+    localStorage.removeItem('sarathi_institution_expiry')
+    sessionStorage.removeItem('sarathi_institution_id')
+    localStorage.removeItem('institution_id')
+    return null
+  }
+  
+  return (
+    localStorage.getItem('sarathi_institution_id') ||
+    sessionStorage.getItem('sarathi_institution_id') ||
+    localStorage.getItem('institution_id') ||
+    null
+  )
+}
+
+// ─────────────────────────────────────────────
 // PROCESSING VIEW
 // ─────────────────────────────────────────────
 const ProcessingView = () => {
@@ -88,15 +143,18 @@ const ProcessingView = () => {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────
 const AssessmentFlowPsychometric = () => {
+  // 🚀 Activate the kill switch immediately when the component mounts
+  useInstitutionKillSwitch()
+
   const router = useRouter()
 
   const [isFormCompleted, setIsFormCompleted] = useState(false)
   const [absoluteStep, setAbsoluteStep] = useState(1)
-  const [highestStep, setHighestStep] = useState(1) // Tracks the furthest question reached for the Map
+  const [highestStep, setHighestStep] = useState(1) 
   const [currentSectionIdx, setCurrentSectionIdx] = useState(0)
   const [textResponse, setTextResponse] = useState('')
   
-  const [isTransitioning, setIsTransitioning] = useState(false) // Prevents double-tap skipping
+  const [isTransitioning, setIsTransitioning] = useState(false) 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState(null)
 
@@ -112,7 +170,6 @@ const AssessmentFlowPsychometric = () => {
   const isLastStep = absoluteStep === totalSteps
   const currentSection = assessmentSections[currentSectionIdx]
 
-  // Track the furthest step reached so users can freely navigate backwards and forwards via the Map
   useEffect(() => {
     setHighestStep((prev) => Math.max(prev, absoluteStep))
   }, [absoluteStep])
@@ -174,16 +231,12 @@ const AssessmentFlowPsychometric = () => {
       }
 
       if (data.assessmentId) {
-        // --- NEW B2B CAMPUS LOGIC ---
-        // Read from both storage types for resilience, including the fallback we created in ClientDashboard
-        const institutionId = 
-          localStorage.getItem('sarathi_institution_id') || 
-          sessionStorage.getItem('sarathi_institution_id') ||
-          localStorage.getItem('institution_id')
+        // --- NEW B2B CAMPUS LOGIC (WITH EXPIRY SAFEGUARD) ---
+        // 🚀 We now use the smart validator instead of raw localStorage
+        const institutionId = getValidInstitutionId()
 
         if (institutionId) {
           try {
-            // Note: Ensuring this explicitly hits /api/campus/claim-seat
             const claimRes = await fetch('/api/campus/claim-seat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -194,11 +247,12 @@ const AssessmentFlowPsychometric = () => {
               // Seat claimed! Clear institutional attribution storage and send straight to dashboard
               localStorage.removeItem('sarathi_institution_id')
               localStorage.removeItem('sarathi_institution_name')
+              localStorage.removeItem('sarathi_institution_expiry')
               sessionStorage.removeItem('sarathi_institution_id')
               localStorage.removeItem('institution_id')
               
               router.push(`/dashboard/student?id=${data.assessmentId}`)
-              return; // Exit function early so we don't trigger the B2C routing below
+              return; 
             } else {
               const claimData = await claimRes.json()
               console.warn('Seat claim failed (e.g. out of seats). Proceeding to paywall.', claimData.error)
@@ -209,7 +263,6 @@ const AssessmentFlowPsychometric = () => {
         }
         
         // --- FALLBACK B2C LOGIC ---
-        // If not a campus student, or the seat claim failed/rejected, send to normal checkout
         router.push(`/checkout?assessmentId=${data.assessmentId}`) 
         
       } else {
@@ -224,7 +277,7 @@ const AssessmentFlowPsychometric = () => {
   }
 
   const handleNext = async (selectedOptionValue = null) => {
-    if (isTransitioning) return // Double-tap protection
+    if (isTransitioning) return 
 
     setIsTransitioning(true)
     const qId = currentQuestion.id
@@ -247,7 +300,7 @@ const AssessmentFlowPsychometric = () => {
       setTimeout(() => {
         setAbsoluteStep((prev) => prev + 1)
         setTextResponse('')
-        setIsTransitioning(false) // Unlock buttons for the next question
+        setIsTransitioning(false) 
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }, 300)
     }
@@ -267,9 +320,6 @@ const AssessmentFlowPsychometric = () => {
   const currentAnswer = answersMap[currentQuestion?.id]
   const canProceedOpenEnded = isOpenEnded && textResponse.trim().length > 0
 
-  // ─────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────
   return (
     <main className="min-h-screen bg-slate-50 py-12 lg:py-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -373,7 +423,6 @@ const AssessmentFlowPsychometric = () => {
                         {currentQuestion.question}
                       </p>
                     </div>
-                    {/* 🚀 THE FIX: Max length, character counter, and disabled resizing */}
                     <div className="relative">
                       <textarea
                         value={textResponse}
