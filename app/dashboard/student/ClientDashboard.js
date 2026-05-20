@@ -43,7 +43,7 @@ export default function ClientDashboard() {
             .eq('user_id', session.user.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle(); // 🚀 FIX: Prevent crash on missing assessment
 
           // 2. THE ORPHAN CLAIMER
           if (!latestAssessment && session?.user?.email) {
@@ -51,7 +51,8 @@ export default function ClientDashboard() {
               .from('users')
               .select('id')
               .eq('email', session.user.email.toLowerCase())
-              .single();
+              .limit(1) // 🚀 FIX: Protect against duplicate guest emails
+              .maybeSingle(); // 🚀 FIX: Prevent crash
 
             if (guestUser) {
               const { data: guestAssessment } = await supabase
@@ -60,7 +61,7 @@ export default function ClientDashboard() {
                 .eq('user_id', guestUser.id)
                 .order('created_at', { ascending: false })
                 .limit(1)
-                .single();
+                .maybeSingle(); // 🚀 FIX: Prevent crash
 
               if (guestAssessment) {
                 latestAssessment = guestAssessment; 
@@ -88,10 +89,10 @@ export default function ClientDashboard() {
           .from('assessments')
           .select('*, users(name, email, college)') 
           .eq('id', targetId)
-          .single()
+          .maybeSingle() // 🚀 FIX: Handles dead/deleted links gracefully without crashing
 
         if (error) throw error
-        if (!data) throw new Error("Assessment not found.")
+        if (!data) throw new Error("This assessment link is invalid, expired, or the data was deleted.")
 
         console.log("Raw Assessment Data:", data) 
 
@@ -178,7 +179,8 @@ export default function ClientDashboard() {
   }
 
   if (status !== "SUCCESS" || !assessment) {
-    const isNoAssessmentError = status.includes("couldn't find a completed assessment");
+    // 🚀 Added check for the friendly "invalid link" string
+    const isNoAssessmentError = status.includes("couldn't find a completed assessment") || status.includes("invalid, expired");
 
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
@@ -190,7 +192,7 @@ export default function ClientDashboard() {
         
         <p className={`text-lg font-bold mb-8 ${status.includes('Error') ? 'text-slate-600' : 'text-[#F57D14]'}`}>
           {isNoAssessmentError 
-            ? "It looks like you haven't completed your career assessment yet." 
+            ? "It looks like you haven't completed your career assessment yet, or this link is expired." 
             : status}
         </p>
 
@@ -259,7 +261,7 @@ export default function ClientDashboard() {
   const studentName = getDisplayName();
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
-return (
+  return (
     // Replaced min-h-screen with h-full so it doesn't fight your global layout
     <div className="flex flex-col w-full h-full bg-slate-50">
       
