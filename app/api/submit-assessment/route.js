@@ -1,5 +1,10 @@
+// app/api/submit-assessment/route.js
 import { NextResponse } from 'next/server'
 import { getSupabaseAdmin } from '../../../lib/supabase'
+
+export const runtime = 'nodejs'
+// 🚀 Tells Vercel this is a fast route (only saving data, not waiting for AI)
+export const maxDuration = 30  
 
 const EXPECTED_ANSWER_COUNT = 60
 
@@ -23,8 +28,6 @@ export async function POST(request) {
       )
     }
 
-    // Critical: ensure all 60 answers are present so Gemini gets
-    // correctly aligned question→answer mapping
     if (answers.length !== EXPECTED_ANSWER_COUNT) {
       return NextResponse.json(
         {
@@ -34,7 +37,6 @@ export async function POST(request) {
       )
     }
 
-    // Ensure no null/undefined slots in the array
     const hasEmptyAnswers = answers.some(
       (a) => a === null || a === undefined || a === ''
     )
@@ -84,8 +86,6 @@ export async function POST(request) {
     }
 
     // ── 3. Duplicate assessment guard ────────────────────────────────
-    // If the student already has a completed + paid assessment,
-    // return the existing one instead of creating a duplicate
     const { data: existingAssessment } = await supabase
       .from('assessments')
       .select('id, ai_analysis_result')
@@ -96,12 +96,13 @@ export async function POST(request) {
       .single()
 
     if (existingAssessment) {
-      // Student is re-submitting — update their answers but keep the same row
+      // 🚀 Re-submitting: update answers, clear old AI result, set to pending
       const { error: updateError } = await supabase
         .from('assessments')
         .update({
           raw_answers: answers,
-          ai_analysis_result: null, // Clear old AI result so it regenerates
+          ai_analysis_result: null, 
+          generation_status: 'pending', // Tell poller it needs to run again
           updated_at: new Date().toISOString(),
         })
         .eq('id', existingAssessment.id)
@@ -114,6 +115,9 @@ export async function POST(request) {
         )
       }
 
+      // 🚀 Fire and forget background generation
+      triggerBackgroundGeneration(existingAssessment.id)
+
       return NextResponse.json({ assessmentId: existingAssessment.id })
     }
 
@@ -124,7 +128,8 @@ export async function POST(request) {
         {
           user_id: userId,
           raw_answers: answers,
-          payment_status: true, // TODO: wire to real payment before go-live
+          payment_status: false, // 🚀 Fixed: Requires Razorpay or B2B Campus Seat to unlock
+          generation_status: 'pending' // Tell poller AI is about to start
         },
       ])
       .select('id')
@@ -137,6 +142,10 @@ export async function POST(request) {
       )
     }
 
+    // 🚀 Fire and forget background generation
+    triggerBackgroundGeneration(assessment.id)
+
+    // Return instantly so the frontend routes them to checkout/dashboard
     return NextResponse.json({ assessmentId: assessment.id })
 
   } catch (error) {
@@ -145,5 +154,23 @@ export async function POST(request) {
       { error: 'Server error', details: error.message },
       { status: 500 }
     )
+  }
+}
+
+// ── 5. Background Trigger (Fire & Forget) ─────────────────────────
+// This function calls the Gemini API without making the user wait for it.
+async function triggerBackgroundGeneration(assessmentId) {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://sarathiapp.in'
+    
+    // We intentionally DO NOT 'await' this fetch. It runs entirely in the background.
+    fetch(`${baseUrl}/api/generate-roadmap`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ assessmentId }),
+    }).catch(err => console.warn("Background fetch warning (normal if unawaited):", err.message))
+    
+  } catch (err) {
+    console.warn(`Background generation trigger failed for ${assessmentId}:`, err.message)
   }
 }
