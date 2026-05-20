@@ -331,7 +331,6 @@ ${OUTPUT_SCHEMA}
   const text = result.response.text()
 
   try {
-    // 🚀 BULLETPROOF COPY-PASTE FIX: Using native regex literals to prevent line-break errors
     const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim()
     return JSON.parse(cleanText)
   } catch (err) {
@@ -378,9 +377,12 @@ const normalizeAssessment = (assessment) => {
 // POST HANDLER
 // ─────────────────────────────────────────────
 export async function POST(request) {
+  // 🚀 FIXED: Elevate assessmentId so the catch block can see it and mark it as 'failed'
+  let assessmentId = null;
+
   try {
     const body = await request.json()
-    const { assessmentId } = body
+    assessmentId = body.assessmentId
 
     if (!assessmentId) return jsonResponse({ error: 'assessmentId is required' }, 400)
 
@@ -402,6 +404,12 @@ export async function POST(request) {
       return jsonResponse({ ok: true, assessment: normalizeAssessment(assessment) })
     }
 
+    // 🚀 UPDATE 1: Mark as 'generating' so the poller knows work has begun
+    await supabase
+      .from('assessments')
+      .update({ generation_status: 'generating' })
+      .eq('id', assessmentId)
+
     // 🚀 CALCULATE AVERAGE SCORE FOR UNCERTAINTY LAYER
     let averageScore = 80;
     let exactScores = null;
@@ -414,7 +422,6 @@ export async function POST(request) {
         averageScore = scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length;
       }
       
-      // Check Q56 (index 55) for dream career presence
       const q56Answer = assessment.raw_answers[55];
       if (q56Answer && typeof q56Answer === 'string' && q56Answer.trim().length > 3 && !['none', 'n/a', 'na'].includes(q56Answer.trim().toLowerCase())) {
          hasDreamCareer = true;
@@ -432,7 +439,6 @@ export async function POST(request) {
       systemPrompt: dynamicSystemPrompt,
     })
 
-    // 🚀 THE FIX 1: Forcibly inject the mathematically perfect scores
     if (exactScores) {
       aiAnalysis.radar_chart_scores = {
         "Personality": exactScores["Personality"] || 0,
@@ -443,16 +449,13 @@ export async function POST(request) {
       }
     }
 
-    // 🚀 THE FIX 2: Programmatic failsafe for identical scores
     if (aiAnalysis.employability_assessment) {
       const { inherent_potential_score, corporate_readiness_score } = aiAnalysis.employability_assessment;
       if (inherent_potential_score === corporate_readiness_score) {
-        // Automatically deduct points to reflect a behavioral reality gap
         aiAnalysis.employability_assessment.corporate_readiness_score = Math.max(40, inherent_potential_score - Math.floor(Math.random() * 8 + 4)); 
       }
     }
 
-    // 🚀 THE FIX 3: Programmatic failsafe for Archetype formatting
     const validArchetypes = [
       'Analytical Nation-Builder', 'Structured Problem-Solver', 
       'Empathetic Visual Specialist', 'Deep-Domain Mentor', 
@@ -460,13 +463,16 @@ export async function POST(request) {
       'People-First Leader', 'Global Impact Seeker'
     ];
     if (!validArchetypes.includes(aiAnalysis.user_archetype)) {
-       // Snap to a valid default if Gemini hallucinates a hybrid
        aiAnalysis.user_archetype = 'Structured Problem-Solver'; 
     }
 
+    // 🚀 UPDATE 2: Save the report AND mark generation_status as 'complete' in one database call
     const { data: updated, error: updateError } = await supabase
       .from('assessments')
-      .update({ ai_analysis_result: aiAnalysis })
+      .update({ 
+        ai_analysis_result: aiAnalysis,
+        generation_status: 'complete' // Tells the poller to stop and show the dashboard
+      })
       .eq('id', assessmentId)
       .select('*, users(*)')
       .single()
@@ -480,6 +486,15 @@ export async function POST(request) {
 
   } catch (error) {
     console.error('Roadmap generation failed:', error)
+    
+    // 🚀 UPDATE 3: Mark as 'failed' so the dashboard knows to show the Retry button
+    if (assessmentId) {
+      await getSupabaseAdmin()
+        .from('assessments')
+        .update({ generation_status: 'failed' })
+        .eq('id', assessmentId)
+    }
+
     return jsonResponse({ error: 'Our AI is experiencing heavy traffic. Please try again.' }, 500)
   }
 }
