@@ -813,8 +813,7 @@ const FullReportView = ({ analysis, studentName, assessmentId, isPdfMode }) => {
 
       <TruthBomb data={analysis.truth_bomb} isPdfMode={isPdfMode} />
 
-      {isPdfMode && <div className="pdf-page-break" />}
-
+      
       <section className={`${sp.section}`}>
         <SectionHeading icon={BrainCircuit} title="Career DNA Snapshot" subtitle="The core wiring dictating your path." isPdfMode={isPdfMode} />
         {summaryBullets.core_wiring?.length > 0 && typeof summaryBullets.core_wiring[0] === 'string' && !summaryBullets.risk_profile?.length ? (
