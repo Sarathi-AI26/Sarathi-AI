@@ -13,9 +13,13 @@ export default function CampusLanding({
 
   useEffect(() => {
     if (institution?.id) {
+      // 🚀 THE BUG 4 FIX: Create a 4-hour expiration timestamp
+      const expiry = Date.now() + (4 * 60 * 60 * 1000) // 4 hours from now
+
       // Store in both localStorage AND sessionStorage for resilience
       localStorage.setItem('sarathi_institution_id', institution.id)
       localStorage.setItem('sarathi_institution_name', institution.name)
+      localStorage.setItem('sarathi_institution_expiry', expiry.toString()) // <-- The new timestamp
       sessionStorage.setItem('sarathi_institution_id', institution.id)
     }
   }, [institution])
@@ -50,7 +54,7 @@ export default function CampusLanding({
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-[#F57D14] opacity-10 blur-[120px]" />
         
-        {/* 🚀 THE FIX: Reduced bottom glow opacity to let the CTA button pop */}
+        {/* Reduced bottom glow opacity to let the CTA button pop */}
         <div className="absolute -bottom-40 -right-40 h-[500px] w-[500px] rounded-full bg-[#F57D14] opacity-5 blur-[120px]" />
         
         {/* Grid dots */}
@@ -75,7 +79,7 @@ export default function CampusLanding({
           </span>
         </div>
 
-        {/* 🚀 THE FIX: High-contrast badge for better readability */}
+        {/* High-contrast badge for better readability */}
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#F57D14]/40 bg-[#F57D14]/20 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white shadow-sm">
           <Shield className="h-3 w-3 text-[#F57D14]" />
           Institutional Partnership — Free for Your Batch
@@ -116,7 +120,7 @@ export default function CampusLanding({
           </div>
         )}
 
-        {/* 🚀 THE REVIEWER FIX: Social Proof Inject */}
+        {/* Social Proof Inject */}
         <div className="mb-8 flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-center bg-[#0A2351]/50 py-4 rounded-2xl border border-white/5">
           {[
             { val: '100+', label: 'Reports Generated' },
