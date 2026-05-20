@@ -136,7 +136,7 @@ export default function CampusLanding({
 
         {/* CTA */}
         <Link
-          href="/assessment"
+          href="/assessment?campus=true"
           className="inline-flex items-center gap-3 rounded-full bg-[#F57D14] px-8 py-4 text-base font-extrabold text-white shadow-2xl shadow-[#F57D14]/30 transition-all hover:bg-[#dd6f11] hover:scale-105"
         >
           Start Your Free Assessment
