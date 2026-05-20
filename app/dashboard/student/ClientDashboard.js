@@ -241,11 +241,10 @@ export default function ClientDashboard() {
           setFetchedName(clearName);
         }
         
-        // Paywall Logic
-        const userCollegeStr = Array.isArray(data.users) ? data.users[0]?.college : data.users?.college;
-        const isB2BUser = userCollegeStr && !userCollegeStr.toLowerCase().includes('individual_guest');
-        const hasAccessPermitted = !!data.payment_status || isB2BUser;
-
+        // 🚀 THE ULTIMATE PAYWALL SECURITY FIX
+        // We only trust the database's payment_status or a cryptographically verified institution_id.
+        // We DO NOT trust the text the user typed into the "College Name" input field.
+        const hasAccessPermitted = !!data.payment_status || !!data.institution_id;
         const verifiedAssessmentState = {
           ...data,
           payment_status: hasAccessPermitted,
