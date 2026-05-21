@@ -292,37 +292,57 @@ export default function ClientDashboard() {
     router.push('/')
   }
 
-  // 🚀 ULTIMATE NAME RESOLVER WITH A BULLETPROOF AI EXTRACTOR
+// 🚀 ULTIMATE NAME RESOLVER (String & Array Bulletproof)
   const getDisplayName = () => {
-    // 1. Priority: Direct from State
+    // 1. Priority: Direct from State or Database
     if (fetchedName && fetchedName !== 'Student') return fetchedName;
     if (assessment?.parsed_student_name && assessment.parsed_student_name !== 'Student') return assessment.parsed_student_name;
     
-    // 2. Priority: Direct from Database (Handles both arrays and objects securely)
     if (assessment?.users) {
       const dbName = Array.isArray(assessment.users) ? assessment.users[0]?.name : assessment.users.name;
       if (dbName && dbName !== 'Student') return dbName;
     }
 
-    // 3. Fallback: Deep Regex on AI Summary (Ignores markdown, asterisks, and tone changes)
-    if (analysisData?.executive_summary && Array.isArray(analysisData.executive_summary)) {
-        const firstPara = analysisData.executive_summary[0] || '';
-        // Strips any **bold** formatting the AI might have accidentally added
-        const cleanPara = firstPara.replace(/[*#_]/g, '').trim(); 
+    // 2. Fallback: Deep Extract from AI Text
+    if (analysisData) {
+      // Gather text from multiple places, handling both strings and arrays effortlessly
+      let possibleStrings = [];
+      
+      if (analysisData.truth_bomb?.insight) {
+          possibleStrings.push(analysisData.truth_bomb.insight);
+      }
+      
+      if (typeof analysisData.executive_summary === 'string') {
+          possibleStrings.push(analysisData.executive_summary);
+      } else if (Array.isArray(analysisData.executive_summary)) {
+          possibleStrings.push(...analysisData.executive_summary);
+      }
+      
+      if (Array.isArray(analysisData.top_career_matches) && analysisData.top_career_matches[0]?.match_reason) {
+          possibleStrings.push(analysisData.top_career_matches[0].match_reason);
+      }
+
+      for (let text of possibleStrings) {
+        if (!text) continue;
         
-        // Looks specifically for the first word(s) before a comma
-        const match = cleanPara.match(/^([A-Za-z\s]+),/);
+        // Strip quotes, asterisks, and newlines so the text is pure
+        const cleanText = text.replace(/[*#"_\n]/g, '').trim();
+        
+        // Match the first word(s) before a comma (e.g., "Ravi, your...")
+        const match = cleanText.match(/^([a-zA-Z\s]+),/);
         
         if (match && match[1]) {
-            const extractedName = match[1].trim();
-            // Ensures it isn't an accidentally long sentence
-            if (extractedName.length < 20 && extractedName.toLowerCase() !== 'student') {
-                return extractedName;
-            }
+           let extractedName = match[1].trim();
+           // Ensure it isn't an accidental sentence and isn't the word 'student'
+           if (extractedName.length < 20 && extractedName.toLowerCase() !== 'student') {
+               // Capitalize the first letter just to be safe and return it
+               return extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
+           }
         }
+      }
     }
 
-    // 4. Final Fallback: Email Slice
+    // 3. Final Fallback: Email Slice
     const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
     if (userEmail) {
       const emailPrefix = userEmail.split('@')[0];
@@ -331,7 +351,6 @@ export default function ClientDashboard() {
 
     return 'Student';
   }
-
   const studentName = getDisplayName();
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
