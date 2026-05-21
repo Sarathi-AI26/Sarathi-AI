@@ -4,6 +4,7 @@ import { getSupabaseAdmin } from '../../../lib/supabase'
 
 export const runtime = 'nodejs'
 export const maxDuration = 10
+export const dynamic = 'force-dynamic'
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url)
