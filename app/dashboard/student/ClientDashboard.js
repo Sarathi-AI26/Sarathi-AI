@@ -292,19 +292,23 @@ export default function ClientDashboard() {
     router.push('/')
   }
 
-  // ULTIMATE NAME RESOLVER WITH EMAIL FALLBACK
   const getDisplayName = () => {
+    // 1. Priority: The Name saved in your database during signup
     if (fetchedName) return fetchedName;
     if (assessment?.parsed_student_name) return assessment.parsed_student_name;
-    if (assessment?.user_details?.name) return assessment.user_details.name;
+    if (assessment?.users?.name) return assessment.users.name; // Added fix
+    if (assessment?.users?.[0]?.name) return assessment.users[0].name; // Added fix
     
+    // 2. Fallback: Parse the AI's Executive Summary
     const summary = analysisData?.executive_summary;
     if (Array.isArray(summary) && summary[0]) {
         const firstPara = summary[0];
-        const match = firstPara.match(/^([^,]+),/);
-        if (match && match[1] && match[1].length < 20) return match[1];
+        // This looks for "Name, you are..."
+        const match = firstPara.match(/^([A-Za-z]+),\s+you/i);
+        if (match && match[1]) return match[1];
     }
     
+    // 3. Final Fallback: Email prefix
     const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
     if (userEmail) {
       const emailPrefix = userEmail.split('@')[0];
