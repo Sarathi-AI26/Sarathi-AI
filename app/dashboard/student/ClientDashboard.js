@@ -335,8 +335,8 @@ export default function ClientDashboard() {
         // Strip quotes, asterisks, and newlines so the text is pure
         const cleanText = text.replace(/[*#"_\n]/g, '').trim();
         
-        // Match the first word(s) before a comma (e.g., "Ravi, your...")
-        const match = cleanText.match(/^([a-zA-Z\s]+),/);
+       // 🚀 THE ULTIMATE REGEX: Hunts for any capitalized word followed by a comma and "you" or "your", ANYWHERE in the text!
+        const match = cleanText.match(/\b([A-Z][a-zA-Z]+),\s+(?:you|your)\b/i);
         
         if (match && match[1]) {
            let extractedName = match[1].trim();
