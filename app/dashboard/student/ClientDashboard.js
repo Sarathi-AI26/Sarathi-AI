@@ -292,29 +292,43 @@ export default function ClientDashboard() {
     router.push('/')
   }
 
+  // 🚀 ULTIMATE NAME RESOLVER WITH A BULLETPROOF AI EXTRACTOR
   const getDisplayName = () => {
-    // 1. Priority: The Name saved in your database during signup
-    if (fetchedName) return fetchedName;
-    if (assessment?.parsed_student_name) return assessment.parsed_student_name;
-    if (assessment?.users?.name) return assessment.users.name; // Added fix
-    if (assessment?.users?.[0]?.name) return assessment.users[0].name; // Added fix
+    // 1. Priority: Direct from State
+    if (fetchedName && fetchedName !== 'Student') return fetchedName;
+    if (assessment?.parsed_student_name && assessment.parsed_student_name !== 'Student') return assessment.parsed_student_name;
     
-    // 2. Fallback: Parse the AI's Executive Summary
-    const summary = analysisData?.executive_summary;
-    if (Array.isArray(summary) && summary[0]) {
-        const firstPara = summary[0];
-        // This looks for "Name, you are..."
-        const match = firstPara.match(/^([A-Za-z]+),\s+you/i);
-        if (match && match[1]) return match[1];
+    // 2. Priority: Direct from Database (Handles both arrays and objects securely)
+    if (assessment?.users) {
+      const dbName = Array.isArray(assessment.users) ? assessment.users[0]?.name : assessment.users.name;
+      if (dbName && dbName !== 'Student') return dbName;
     }
-    
-    // 3. Final Fallback: Email prefix
+
+    // 3. Fallback: Deep Regex on AI Summary (Ignores markdown, asterisks, and tone changes)
+    if (analysisData?.executive_summary && Array.isArray(analysisData.executive_summary)) {
+        const firstPara = analysisData.executive_summary[0] || '';
+        // Strips any **bold** formatting the AI might have accidentally added
+        const cleanPara = firstPara.replace(/[*#_]/g, '').trim(); 
+        
+        // Looks specifically for the first word(s) before a comma
+        const match = cleanPara.match(/^([A-Za-z\s]+),/);
+        
+        if (match && match[1]) {
+            const extractedName = match[1].trim();
+            // Ensures it isn't an accidentally long sentence
+            if (extractedName.length < 20 && extractedName.toLowerCase() !== 'student') {
+                return extractedName;
+            }
+        }
+    }
+
+    // 4. Final Fallback: Email Slice
     const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
     if (userEmail) {
       const emailPrefix = userEmail.split('@')[0];
       return emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
     }
-    
+
     return 'Student';
   }
 
