@@ -106,32 +106,39 @@ export default function ClientDashboard() {
     if (elapsedRef.current) { clearInterval(elapsedRef.current); elapsedRef.current = null }
   }, [])
 
-  // 🚀 The Polling Engine
+ // 🚀 The Direct-Database Polling Engine (Bypasses Vercel Cache Completely)
   const startPolling = useCallback((assessmentId) => {
     elapsedRef.current = setInterval(() => setElapsed(p => p + 1), 1000)
 
     pollRef.current = setInterval(async () => {
       try {
-      const res = await fetch(`/api/poll-status?assessmentId=${assessmentId}&t=${Date.now()}`, { cache: 'no-store' })
-        const data = await res.json()
+        // Query Supabase directly from the browser to get the freshest data
+        const { data, error } = await supabase
+          .from('assessments')
+          .select('*, users(name, email, college)')
+          .eq('id', assessmentId)
+          .single()
 
-        if (!res.ok) return // Keep polling silently on network blips
+        if (error || !data) return // Keep polling silently on network blips
 
-        if (data.isReady && data.assessment) {
+        // Check if the generation is complete or if the data has arrived
+        const isReady = data.generation_status === 'complete' || Boolean(data.ai_analysis_result?.user_archetype)
+
+        if (isReady && data.ai_analysis_result) {
           stopPolling()
-          setAnalysisData(data.assessment.ai_analysis_result)
-          setAssessment(prev => ({ ...prev, ...data.assessment }))
+          setAnalysisData(data.ai_analysis_result)
+          setAssessment(prev => ({ ...prev, ...data }))
           setStatus("SUCCESS")
         }
 
         // If backend explicitly failed, try kicking it again
-        if (data.generationStatus === 'failed') {
+        if (data.generation_status === 'failed') {
           stopPolling()
-          await fetch('/api/generate-roadmap', {
+          fetch('/api/generate-roadmap', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ assessmentId }),
-          })
+          }).catch(e => console.warn(e))
           startPolling(assessmentId) // restart polling
         }
       } catch (err) {
