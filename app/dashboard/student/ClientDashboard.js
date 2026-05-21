@@ -112,7 +112,7 @@ export default function ClientDashboard() {
 
     pollRef.current = setInterval(async () => {
       try {
-        const res = await fetch(`/api/poll-status?assessmentId=${assessmentId}`)
+      const res = await fetch(`/api/poll-status?assessmentId=${assessmentId}&t=${Date.now()}`, { cache: 'no-store' })
         const data = await res.json()
 
         if (!res.ok) return // Keep polling silently on network blips
