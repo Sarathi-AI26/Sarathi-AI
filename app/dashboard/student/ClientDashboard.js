@@ -299,53 +299,50 @@ export default function ClientDashboard() {
     router.push('/')
   }
 
-// 🚀 ULTIMATE NAME RESOLVER (String & Array Bulletproof)
+// 🚀 ULTIMATE NAME RESOLVER & TRACKER
   const getDisplayName = () => {
-    // 1. Priority: Direct from State or Database
+    // TRACKER: This will print exactly what Supabase is sending to your browser
+    console.log("🔍 Name Debugger:", { 
+      fetchedName, 
+      assessmentUsers: assessment?.users, 
+      userDetails: assessment?.user_details 
+    });
+
+    // 1. Priority: Direct from State
     if (fetchedName && fetchedName !== 'Student') return fetchedName;
     if (assessment?.parsed_student_name && assessment.parsed_student_name !== 'Student') return assessment.parsed_student_name;
     
+    // 2. Priority: Direct from Database (users table)
     if (assessment?.users) {
       const dbName = Array.isArray(assessment.users) ? assessment.users[0]?.name : assessment.users.name;
       if (dbName && dbName !== 'Student') return dbName;
     }
 
-    // 2. Fallback: Deep Extract from AI Text
+    // 3. Priority: Legacy User Details (from your original code)
+    if (assessment?.user_details?.name && assessment.user_details.name !== 'Student') {
+      return assessment.user_details.name;
+    }
+
+    // 4. Fallback: Deep Extract from AI Text
     if (analysisData) {
-      // Gather text from multiple places, handling both strings and arrays effortlessly
       let possibleStrings = [];
-      
-      if (analysisData.truth_bomb?.insight) {
-          possibleStrings.push(analysisData.truth_bomb.insight);
-      }
-      
-      if (typeof analysisData.executive_summary === 'string') {
-          possibleStrings.push(analysisData.executive_summary);
-      } else if (Array.isArray(analysisData.executive_summary)) {
-          possibleStrings.push(...analysisData.executive_summary);
-      }
-      
+      if (analysisData.truth_bomb?.insight) possibleStrings.push(analysisData.truth_bomb.insight);
+      if (typeof analysisData.executive_summary === 'string') possibleStrings.push(analysisData.executive_summary);
+      else if (Array.isArray(analysisData.executive_summary)) possibleStrings.push(...analysisData.executive_summary);
       if (Array.isArray(analysisData.top_career_matches) && analysisData.top_career_matches[0]?.match_reason) {
           possibleStrings.push(analysisData.top_career_matches[0].match_reason);
       }
 
       for (let text of possibleStrings) {
         if (!text) continue;
-        
-        // Strip quotes, asterisks, and newlines so the text is pure
         const cleanText = text.replace(/[*#"_\n]/g, '').trim();
-        
-       // 🚀 THE ULTIMATE REGEX: Hunts for any capitalized word followed by a comma and "you" or "your", ANYWHERE in the text!
         const match = cleanText.match(/\b([A-Z][a-zA-Z]+),\s+(?:you|your)\b/i);
         
-       if (match && match[1]) {
+        if (match && match[1]) {
            let extractedName = match[1].trim();
            const lowerName = extractedName.toLowerCase();
-           
-           // 🚀 THE FIX: A list of words the AI uses that are definitely NOT names
            const bannedWords = ['however', 'overall', 'therefore', 'additionally', 'also', 'student', 'moreover', 'furthermore', 'firstly', 'secondly', 'lastly', 'hello', 'welcome', 'hi'];
            
-           // Ensure it isn't an accidental sentence or a banned transition word
            if (extractedName.length < 20 && !bannedWords.includes(lowerName)) {
                return extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
            }
@@ -353,7 +350,7 @@ export default function ClientDashboard() {
       }
     }
 
-    // 3. Final Fallback: Email Slice
+    // 5. Final Fallback: Email Slice
     const userEmail = Array.isArray(assessment?.users) ? assessment?.users[0]?.email : assessment?.users?.email;
     if (userEmail) {
       const emailPrefix = userEmail.split('@')[0];
