@@ -106,7 +106,7 @@ export default function ClientDashboard() {
     if (elapsedRef.current) { clearInterval(elapsedRef.current); elapsedRef.current = null }
   }, [])
 
- // 🚀 The Direct-Database Polling Engine (Bypasses Vercel Cache Completely)
+  // 🚀 The Direct-Database Polling Engine (Bypasses Vercel Cache Completely)
   const startPolling = useCallback((assessmentId) => {
     elapsedRef.current = setInterval(() => setElapsed(p => p + 1), 1000)
 
@@ -250,8 +250,8 @@ export default function ClientDashboard() {
         
         // 🚀 THE ULTIMATE PAYWALL SECURITY FIX
         // We only trust the database's payment_status or a cryptographically verified institution_id.
-        // We DO NOT trust the text the user typed into the "College Name" input field.
         const hasAccessPermitted = !!data.payment_status || !!data.institution_id;
+        
         const verifiedAssessmentState = {
           ...data,
           payment_status: hasAccessPermitted,
@@ -299,7 +299,7 @@ export default function ClientDashboard() {
     router.push('/')
   }
 
-// 🚀 ULTIMATE NAME RESOLVER & TRACKER
+  // 🚀 ULTIMATE NAME RESOLVER & TRACKER
   const getDisplayName = () => {
     // TRACKER: This will print exactly what Supabase is sending to your browser
     console.log("🔍 Name Debugger:", { 
@@ -359,6 +359,7 @@ export default function ClientDashboard() {
 
     return 'Student';
   }
+
   const studentName = getDisplayName();
   const archetypeTitle = analysisData?.user_archetype || 'Explorer';
 
