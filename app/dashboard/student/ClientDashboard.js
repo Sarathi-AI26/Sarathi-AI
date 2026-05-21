@@ -301,12 +301,11 @@ export default function ClientDashboard() {
 
   // 🚀 ULTIMATE NAME RESOLVER & TRACKER
   const getDisplayName = () => {
-    // TRACKER: This will print exactly what Supabase is sending to your browser
-    console.log("🔍 Name Debugger:", { 
-      fetchedName, 
+    console.log("🔍 Name Debugger:", JSON.stringify({ 
+      fetchedName: fetchedName, 
       assessmentUsers: assessment?.users, 
       userDetails: assessment?.user_details 
-    });
+    }));
 
     // 1. Priority: Direct from State
     if (fetchedName && fetchedName !== 'Student') return fetchedName;
