@@ -338,11 +338,15 @@ export default function ClientDashboard() {
        // 🚀 THE ULTIMATE REGEX: Hunts for any capitalized word followed by a comma and "you" or "your", ANYWHERE in the text!
         const match = cleanText.match(/\b([A-Z][a-zA-Z]+),\s+(?:you|your)\b/i);
         
-        if (match && match[1]) {
+       if (match && match[1]) {
            let extractedName = match[1].trim();
-           // Ensure it isn't an accidental sentence and isn't the word 'student'
-           if (extractedName.length < 20 && extractedName.toLowerCase() !== 'student') {
-               // Capitalize the first letter just to be safe and return it
+           const lowerName = extractedName.toLowerCase();
+           
+           // 🚀 THE FIX: A list of words the AI uses that are definitely NOT names
+           const bannedWords = ['however', 'overall', 'therefore', 'additionally', 'also', 'student', 'moreover', 'furthermore', 'firstly', 'secondly', 'lastly', 'hello', 'welcome', 'hi'];
+           
+           // Ensure it isn't an accidental sentence or a banned transition word
+           if (extractedName.length < 20 && !bannedWords.includes(lowerName)) {
                return extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
            }
         }
